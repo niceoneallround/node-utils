@@ -6,7 +6,7 @@
 
 var assert = require('assert'),
     winston = require('winston'),
-    leToken = {token: '8934aedd-b766-45d1-8514-aa82f0310f0c' },
+    //leToken = {token: '8934aedd-b766-45d1-8514-aa82f0310f0c' },
     logentries2 = require('winston-logentries'), //jshint ignore:line
     logentries1 = require('node-logentries'), //jshint ignore:line
     util = require('util'),
@@ -25,13 +25,15 @@ function create(cfg) {
   var useLogEntries = false,
       consoleOptions = {},
       loggerInstance,
-      thisLogger;
+      thisLogger,
+      leToken;
 
   winston.level = 'debug';
   consoleOptions.timestamp = true;
 
   if (cfg) {
     useLogEntries = cfg[PROPERTIES.useLogEntries];
+    leToken = cfg.leToken;
   }
 
   if (!useLogEntries) {

@@ -13,6 +13,10 @@ var should = require('should'),
 describe('Logger Tests', function() {
   'use strict';
 
+  var cfgLe = {};
+  cfgLe[LOG_P.useLogEntries] = 'true';
+  cfgLe.leToken = {token: '8934aedd-b766-45d1-8514-aa82f0310f0c' };
+
   function logSomeStuff(logger, p1) {
     var md = {test: 'hello'};
     logger.log('info', 'no params', null, md);
@@ -35,73 +39,53 @@ describe('Logger Tests', function() {
   });
 
   it('log some stuff also using log entries', function(done) {
-    var cfg = {};
-    cfg[LOG_P.useLogEntries] = 'true';
-    logSomeStuff(loggerFactory.create(cfg), 'test2');
+    logSomeStuff(loggerFactory.create(cfgLe), 'test2');
     done();
   });
 
   it('log some JSON also using log entries', function() {
-    var json = {serviceType: 'UP', error:'ouch'},
-        cfg = {};
-    cfg[LOG_P.useLogEntries] = 'true';
-    logSomeJSON(loggerFactory.create(cfg), json);
+    var json = {serviceType: 'UP', error:'ouch'};
+    logSomeJSON(loggerFactory.create(cfgLe), json);
   });
 
   it('log some JSON with a svcMsg', function() {
-    var json = {serviceType: 'UP', action: 'messageOnly', svcMsg: {id: 'nice', type: ['a']}},
-        cfg = {};
-    cfg[LOG_P.useLogEntries] = 'true';
-    logSomeJSON(loggerFactory.create(cfg), json);
+    var json = {serviceType: 'UP', action: 'messageOnly', svcMsg: {id: 'nice', type: ['a']}};
+    logSomeJSON(loggerFactory.create(cfgLe), json);
   });
 
   it('log some JSON with a svcMsg and a policy', function() {
-    var json = {serviceType: 'UP', action: 'messageAndPolicy', svcMsg: {id: 'nice', type: ['a']}, policy: {id: 'policy'}},
-        cfg = {};
-    cfg[LOG_P.useLogEntries] = 'true';
-    logSomeJSON(loggerFactory.create(cfg), json);
+    var json = {serviceType: 'UP', action: 'messageAndPolicy', svcMsg: {id: 'nice', type: ['a']}, policy: {id: 'policy'}};
+    logSomeJSON(loggerFactory.create(cfgLe), json);
   });
 
   it('log some JSON with a svcMsg and an error', function() {
-    var json = {serviceType: 'UP', action: 'messageAndPolicy', svcMsg: {id: 'nice', type: ['a']}, error: {id: 'error'}},
-        cfg = {};
-    cfg[LOG_P.useLogEntries] = 'true';
-    logSomeJSON(loggerFactory.create(cfg), json);
+    var json = {serviceType: 'UP', action: 'messageAndPolicy', svcMsg: {id: 'nice', type: ['a']}, error: {id: 'error'}};
+    logSomeJSON(loggerFactory.create(cfgLe), json);
   });
 
   it('log some JSON with a svcRequest', function() {
-    var json = {serviceType: 'UP', action: 'messageOnly', svcRequest: {id: 'nice', type: ['a']}},
-        cfg = {};
-    cfg[LOG_P.useLogEntries] = 'true';
-    logSomeJSON(loggerFactory.create(cfg), json);
+    var json = {serviceType: 'UP', action: 'messageOnly', svcRequest: {id: 'nice', type: ['a']}};
+    logSomeJSON(loggerFactory.create(cfgLe), json);
   });
 
   it('log some JSON with a svcResponse', function() {
-    var json = {serviceType: 'UP', action: 'messageOnly', svcResponse: {id: 'nice', type: ['a']}},
-        cfg = {};
-    cfg[LOG_P.useLogEntries] = 'true';
-    logSomeJSON(loggerFactory.create(cfg), json);
+    var json = {serviceType: 'UP', action: 'messageOnly', svcResponse: {id: 'nice', type: ['a']}};
+    logSomeJSON(loggerFactory.create(cfgLe), json);
   });
 
   it('log some JSON with a policy', function() {
-    var json = {serviceType: 'UP', action: 'policyOnly', policy: {id: 'nice', type: ['a']}},
-        cfg = {};
-    cfg[LOG_P.useLogEntries] = 'true';
-    logSomeJSON(loggerFactory.create(cfg), json);
+    var json = {serviceType: 'UP', action: 'policyOnly', policy: {id: 'nice', type: ['a']}};
+    logSomeJSON(loggerFactory.create(cfgLe), json);
   });
 
   it('log some JSON with metadata', function() {
-    var json = {serviceType: 'UP', action: 'metadataOnly', metadata: {id: 'nice', type: ['a']}},
-        cfg = {};
-    cfg[LOG_P.useLogEntries] = 'true';
-    logSomeJSON(loggerFactory.create(cfg), json);
+    var json = {serviceType: 'UP', action: 'metadataOnly', metadata: {id: 'nice', type: ['a']}};
+    logSomeJSON(loggerFactory.create(cfgLe), json);
   });
 
   it('log some JSON with data', function() {
-    var json = {serviceType: 'UP', action: 'metadataOnly', data: {id: 'nice', type: ['a']}},
-        cfg = {};
-    cfg[LOG_P.useLogEntries] = 'true';
-    logSomeJSON(loggerFactory.create(cfg), json);
+    var json = {serviceType: 'UP', action: 'metadataOnly', data: {id: 'nice', type: ['a']}};
+    logSomeJSON(loggerFactory.create(cfgLe), json);
   });
 
 });
