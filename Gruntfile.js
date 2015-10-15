@@ -10,9 +10,9 @@ module.exports = function(grunt) {
 
     jshint: {
       all: [
-        'logger/**/*.js'],
+        '*/lib/*.js', '*/test/*.js'],
       options: {
-        predef: ['describe', 'it'],
+        predef: ['describe', 'it', 'before'],
         exported: ['should'],
         curly: true,
         indent: 2,
@@ -29,12 +29,12 @@ module.exports = function(grunt) {
         options: {
           reporter: 'spec'
         },
-        src: ['logger/test/*.js']
+        src: ['*/test/*.js']
       }
     },
 
     jscs: {
-      src: ['logger/**/*.js'],
+      src: ['*/lib/*.js', '*/test/*.js'],
       options: {
         preset: 'airbnb'
       }
@@ -48,7 +48,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-jscs');
 
   grunt.registerTask('log', 'log name', function(arg) {
-    grunt.log.writeln('In Logger');
+    grunt.log.writeln('In node-utils');
   });
 
   grunt.registerTask('pp', 'preprocess files', ['log', 'jshint', 'jscs']);
