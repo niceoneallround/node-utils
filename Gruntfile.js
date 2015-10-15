@@ -56,6 +56,7 @@ module.exports = function(grunt) {
   grunt.registerTask('utest', ['log', 'pp', 'mochaTest:unitTest']);
   grunt.registerTask('test', ['utest']);
 
+  grunt.registerTask('buildTestCode', ['test']);
   grunt.registerTask('default', ['pp', 'mochaTest:unitTest']);
 
 };
