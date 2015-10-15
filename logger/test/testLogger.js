@@ -12,7 +12,7 @@ describe('Logger Tests', function() {
   'use strict';
 
   var cfgLe = {};
-  cfgLe[LOG_P.useLogEntries] = 'false';
+  cfgLe[LOG_P.useLogEntries] = false;
 
   function logSomeStuff(logger, p1) {
     var md = {test: 'hello'};

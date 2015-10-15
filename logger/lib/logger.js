@@ -73,7 +73,7 @@ function create(cfg) {
   function log(level, message, params, md) {
 
     //buddy ignore:start
-    if ((params === null) || (params.length === 0)) {
+    if ((!params) || (params.length === 0)) {
       getLogger().log(level, message, md);
     } else if (params.length === 1) {
       getLogger().log(level, message, params[0], md);
