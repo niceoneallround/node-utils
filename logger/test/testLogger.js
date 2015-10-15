@@ -7,7 +7,7 @@
 var should = require('should'),
 
     //util = require('util'),
-    loggerFactory = require('../lib/logger/logger'),
+    loggerFactory = require('../lib/logger'),
     LOG_P = loggerFactory.PROPERTIES;
 
 describe('Logger Tests', function() {

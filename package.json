@@ -1,7 +1,7 @@
 {
   "name": "node-utils",
   "version": "1.0.0",
-  "description": "Not a NPM package - contains npm packages of utils",
+  "description": "Contains a set of utils",
   "main": "Gruntfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,6 +16,11 @@
     "url": "https://github.com/niceoneallround/node-utils/issues"
   },
   "homepage": "https://github.com/niceoneallround/node-utils#readme",
+  "dependencies": {
+    "node-logentries": "^0.1.4",
+    "winston": "^1.1.0",
+    "winston-logentries": "^1.0.1"
+  },
   "devDependencies": {
     "grunt": "~0.4.x",
     "grunt-buddyjs": "~0.1.0",
@@ -23,7 +28,10 @@
     "grunt-jscs": "~0.8.0",
     "grunt-mocha-test": "~0.x.x",
     "grunt-shell": "~1.1.1",
-    "mocha": "~1.x.x"
+    "mocha": "~1.x.x",
+    "should": "^7.1.0"
   },
-  "engines": {"node": ">=0.12.x"}
+  "engines": {
+    "node": ">=0.12.x"
+  }
 }

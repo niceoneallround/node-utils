@@ -1,32 +1,61 @@
 //
 // Assume that grunt-cli has been installed at the npm -g level, so can run grunt
 //
-// Builds and tests all utils
-//
 
 module.exports = function(grunt) {
   'use strict';
 
   grunt.initConfig({
-    shell: {
-      //
-      // npm update, build and run regression tests for all code
-      //
-      buildTestCode: {
-        command: [
-          'echo run utils:buildTestCode',
-          'cd logger', 'npm update', 'grunt', 'cd ..'
-                  ].join('&&'),
+    pkg: grunt.file.readJSON('package.json'),
+
+    jshint: {
+      all: [
+        'logger/**/*.js'],
+      options: {
+        predef: ['describe', 'it'],
+        exported: ['should'],
+        curly: true,
+        indent: 2,
+        node: true,
+        undef: true,
+        unused: true,
+        eqeqeq: true,
+        strict: true
+      }
+    },
+
+    mochaTest: {
+      unitTest: {
         options: {
-          execOptions: {
-            maxBuffer: Infinity
-          }
-        }
+          reporter: 'spec'
+        },
+        src: ['logger/test/*.js']
+      }
+    },
+
+    jscs: {
+      src: ['logger/**/*.js'],
+      options: {
+        preset: 'airbnb'
       }
     }
   });
 
+  grunt.loadNpmTasks('grunt-buddyjs');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-shell');
-  grunt.registerTask('buildTestCode', ['shell:buildTestCode']);
-  grunt.registerTask('default', ['buildTestCode']);
+  grunt.loadNpmTasks('grunt-jscs');
+
+  grunt.registerTask('log', 'log name', function(arg) {
+    grunt.log.writeln('In Logger');
+  });
+
+  grunt.registerTask('pp', 'preprocess files', ['log', 'jshint', 'jscs']);
+
+  grunt.registerTask('utest', ['log', 'pp', 'mochaTest:unitTest']);
+  grunt.registerTask('test', ['utest']);
+
+  grunt.registerTask('default', ['pp', 'mochaTest:unitTest']);
+
 };
