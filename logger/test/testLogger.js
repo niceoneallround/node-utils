@@ -5,8 +5,6 @@
 //
 
 var should = require('should'),
-
-    //util = require('util'),
     loggerFactory = require('../lib/logger'),
     LOG_P = loggerFactory.PROPERTIES;
 
@@ -14,8 +12,7 @@ describe('Logger Tests', function() {
   'use strict';
 
   var cfgLe = {};
-  cfgLe[LOG_P.useLogEntries] = 'true';
-  cfgLe.leToken = {token: '8934aedd-b766-45d1-8514-aa82f0310f0c' };
+  cfgLe[LOG_P.useLogEntries] = 'false';
 
   function logSomeStuff(logger, p1) {
     var md = {test: 'hello'};

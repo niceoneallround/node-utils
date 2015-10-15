@@ -6,7 +6,6 @@
 
 var assert = require('assert'),
     winston = require('winston'),
-    //leToken = {token: '8934aedd-b766-45d1-8514-aa82f0310f0c' },
     logentries2 = require('winston-logentries'), //jshint ignore:line
     logentries1 = require('node-logentries'), //jshint ignore:line
     util = require('util'),
