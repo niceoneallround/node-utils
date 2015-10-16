@@ -31,19 +31,21 @@ function createRestService(props) {
   serviceName = props.name;
   loggingMD.ServiceType = props.name;
 
-  // logger can handle a null config so just pass in
-  logger = loggerFactory.create(props.logConfig);
-
-  //
   // start the service
   // *config
   //  **port - the port to start on
   //  **version - the version to prefix all paths with, i.e v1
   function start(cfg, callback) {
-    //
-    // set logging parameters
-    //
     config = cfg;
+
+    // if passed in a logger then use that over the one we have
+    //
+    if (cfg.logger) {
+      logger = cfg.logger;
+    } else {
+      // logger can handle a null logConfig
+      logger = loggerFactory.create(props.logConfig);
+    }
 
     logger.logJSON('info', { serviceType: serviceName, action: 'Service-Start', metadata:config}, loggingMD);
 
