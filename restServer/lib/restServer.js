@@ -31,21 +31,27 @@ function createRestService(props) {
   serviceName = props.name;
   loggingMD.ServiceType = props.name;
 
+  // if passed in a logger then use that over the one we have
+  //
+  if (props.logger) {
+    logger = props.logger;
+  } else {
+    // logger can handle a null logConfig
+    logger = loggerFactory.create(props.logConfig);
+  }
+
+  //
+  // Return logger associated with the service
+  function getLogger() {
+    return logger;
+  }
+
   // start the service
   // *config
   //  **port - the port to start on
   //  **version - the version to prefix all paths with, i.e v1
   function start(cfg, callback) {
     config = cfg;
-
-    // if passed in a logger then use that over the one we have
-    //
-    if (cfg.logger) {
-      logger = cfg.logger;
-    } else {
-      // logger can handle a null logConfig
-      logger = loggerFactory.create(props.logConfig);
-    }
 
     logger.logJSON('info', { serviceType: serviceName, action: 'Service-Start', metadata:config}, loggingMD);
 
@@ -176,7 +182,7 @@ function createRestService(props) {
   }
 
   thisService = {
-    //registerHomeDocument: registerHomeDocument,
+    logger: getLogger,
     registerGETHandler: registerGETHandler,
     registerPOSTHandler: registerPOSTHandler,
     start: start,

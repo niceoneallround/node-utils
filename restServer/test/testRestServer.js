@@ -1,5 +1,6 @@
 /*jslint node: true, vars: true */
 var assert = require('assert'),
+  loggerFactory = require('../../logger/lib/logger'),
   HttpStatus = require('http-status'),
   restServiceFactory = require('../lib/restServer'),
   restify = require('restify'),
@@ -33,6 +34,19 @@ describe('restServer Tests', function() {
         done();
       });
     }); //it 1.1
+
+    it('1.2 should be able to create with passed in logger', function(done) {
+      var restService2, props = {};
+
+      props.name = 'test 1.2';
+      props.logger = loggerFactory.create(null);
+      restService2 = restServiceFactory.create(props);
+
+      restService2.logger().should.be.equal(props.logger);
+      done();
+
+    }); //it 1.2
+
   }); // describe 1
 
   describe('2 GET tests', function() {
