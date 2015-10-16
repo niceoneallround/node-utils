@@ -13,7 +13,9 @@ var assert = require('assert'),
 
 //
 // create a service - non blocking
-// props.name
+// props.name - the service name
+// props.logger - if want to use a specific logger then pass it in
+// props.logConfig - if want to service to create own one
 //
 function createRestService(props) {
   'use strict';

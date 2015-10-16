@@ -12,13 +12,15 @@ var assert = require('assert'),
     PROPERTIES = null;
 
 PROPERTIES = {
-  useLogEntries: 'http://log.internal.schema.webshield.io/prop#useLogEntries'
+  useLogEntries: 'useLogEntries'
 };
 
 //
 // create an instance of a logger based on configuration options
+// props.useLogEntries
+// props.leToken - the log entries token
 //
-function create(cfg) {
+function create(props) {
   'use strict';
 
   var useLogEntries = false,
@@ -30,9 +32,9 @@ function create(cfg) {
   winston.level = 'debug';
   consoleOptions.timestamp = true;
 
-  if (cfg) {
-    useLogEntries = cfg[PROPERTIES.useLogEntries];
-    leToken = cfg.leToken;
+  if (props) {
+    useLogEntries = props[PROPERTIES.useLogEntries];
+    leToken = props.leToken;
   }
 
   if (!useLogEntries) {
