@@ -17,8 +17,13 @@ var assert = require('assert'),
 
 //
 // Create a new config
+// overrides - can be used to overide the process ones
+//  .HOSTNAME
+//  .PORT
+//  .MODE
+//  .PORT_INSIDE_DOCKER
 //
-function create() {
+function create(overrides) {
   'use strict';
   var c = {};
 
@@ -45,6 +50,35 @@ function create() {
     c.DEV_PROTOCOL = process.env.DEV_PROTOCOL;
     c.DEV_PORT_INSIDE_DOCKER = process.env.DEV_PORT_INSIDE_DOCKER;
     c.HOST_TYPE = process.env.DEV_HOST_TYPE;
+  }
+
+  //
+  // If overrides has been passed in the set
+  //
+  if (overrides) {
+    if (overrides.MODE) {
+      c.MODE = overrides.MODE;
+    }
+
+    if (overrides.HOSTNAME) {
+      c.HOSTNAME = overrides.HOSTNAME;
+    }
+
+    if (overrides.PORT) {
+      if (isProduction(c)) {
+        c.PROD_PORT = overrides.PORT;
+      } else {
+        c.DEV_PORT = overrides.PORT;
+      }
+    }
+
+    if (overrides.PORT_INSIDE_DOCKER) {
+      if (isProduction(c)) {
+        c.PROD_PORT_INSIDE_DOCKER = overrides.PORT_INSIDE_DOCKER;
+      } else {
+        c.DEV_PORT_INSIDE_DOCKER = overrides.PORT_INSIDE_DOCKER;
+      }
+    }
   }
 
   // by default do not use unless an environmental to override.

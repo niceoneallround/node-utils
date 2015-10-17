@@ -228,4 +228,19 @@ describe('Server Config Utils Tests', function() {
     });
   });
 
+  describe('10 test overrides', function() {
+
+    it('9.1 it should work with PROD', function() {
+
+      var c, overrides;
+
+      overrides = {};
+      overrides.MODE = 'DEV';
+      overrides.HOSTNAME = 'override_yea';
+      overrides.PORT = '23';
+      c = configUtils.create(overrides);
+      c.getHost().should.be.equal('http://override_yea:23');
+    });
+  });
+
 });
