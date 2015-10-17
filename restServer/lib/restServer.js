@@ -25,8 +25,8 @@ function createRestService(props) {
       restifyServer = null,
       serviceName,
       baseURL,
-      config,
-      version;
+      URLversion,
+      port;
 
   assert(props, 'createRestService requires props');
   assert(props.name, util.format('createRestService props must have a name param:%j', props));
@@ -50,20 +50,21 @@ function createRestService(props) {
 
   // start the service
   // *config
+  //  **baseURL
   //  **port - the port to start on
-  //  **version - the version to prefix all paths with, i.e v1
-  function start(cfg, callback) {
-    config = cfg;
+  //  **URLversion - the version to prefix all paths with, i.e v1
+  function start(props, callback) {
 
-    logger.logJSON('info', { serviceType: serviceName, action: 'Service-Start', metadata:config}, loggingMD);
+    logger.logJSON('info', { serviceType: serviceName, action: 'Service-Start', props:props}, loggingMD);
 
-    assert(config.baseURL, util.format('RestServer.start No baseURL in config:%j', cfg));
-    baseURL = config.baseURL;
+    assert(props.baseURL, util.format('RestServer.start No baseURL in props:%j', props));
+    baseURL = props.baseURL;
 
-    assert(config.version, util.format('RestServer.start No version in config:%j', cfg));
-    version = '/' + config.version;
+    assert(props.URLversion, util.format('RestServer.start No URLversion in props:%j', props));
+    URLversion = '/' + props.URLversion;
 
-    assert(config.port, util.format('RestServer.start No port in config:%j', cfg));
+    assert(props.port, util.format('RestServer.start No port in config:%j', props));
+    port = props.port;
     restifyServer = restify.createServer();
 
     //
@@ -85,10 +86,10 @@ function createRestService(props) {
     // add the built in plugins - if do not add this then no body
     restifyServer.use(restify.bodyParser());
 
-    restifyServer.listen(config.port, function() {
+    restifyServer.listen(port, function() {
       logger.logJSON('info', { serviceType: serviceName, action: 'Service-Started',
                                serverName: restifyServer.name, serverUrl:restifyServer.url,
-                                metadata:config}, loggingMD);
+                               baseURL: baseURL, URLversion: URLversion, port: port}, loggingMD);
 
       return callback(null);
 
@@ -114,7 +115,7 @@ function createRestService(props) {
   //
   function registerGETHandler(path, handler) {
 
-    var versionedPath = baseURL + version;
+    var versionedPath = baseURL + URLversion;
 
     // if a path passed in the append
     if (path) {
@@ -155,7 +156,7 @@ function createRestService(props) {
   //
   function registerPOSTHandler(path, handler) {
 
-    var versionedPath = baseURL + version + path;
+    var versionedPath = baseURL + URLversion + path;
 
     assert(handler, 'No handler passed to registerPOSTHandler');
     assert(handler.post, util.format('No post method on handler:%j', handler));

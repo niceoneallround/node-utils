@@ -20,7 +20,7 @@ describe('restServer Tests', function() {
 
       // start the service
       config.baseURL = '/baseURL';
-      config.version = 'v1';
+      config.URLversion = 'v1';
       config.port = 3100;
       restService1.start(config, function(err) {
         assert(!err, util.format('Unexpected error starting service: %j', err));
@@ -60,7 +60,7 @@ describe('restServer Tests', function() {
 
       // start the service
       config.baseURL = '/baseURL';
-      config.version = 'v1';
+      config.URLversion = 'v1';
       config.port = 3101;
       restService2.start(config, function(err) {
         assert(!err, util.format('Unexpected error starting service2: %j', err));
@@ -112,7 +112,7 @@ describe('restServer Tests', function() {
 
       // start the service
       config.baseURL = '/baseURL';
-      config.version = 'v1';
+      config.URLversion = 'v1';
       config.port = 3102;
       restService3.start(config, function(err) {
         assert(!err, util.format('Unexpected error starting service2: %j', err));
