@@ -16,9 +16,7 @@ var assert = require('assert'),
     util = require('util');
 
 //
-// Get the configuration for this service
-// *id the service id
-// *type the service type
+// Create a new config
 //
 function create() {
   'use strict';

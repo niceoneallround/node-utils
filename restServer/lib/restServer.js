@@ -29,7 +29,7 @@ function createRestService(props) {
       version;
 
   assert(props, 'createRestService requires props');
-  assert(props.name, util.format('props must have a name param:%j', props));
+  assert(props.name, util.format('createRestService props must have a name param:%j', props));
   serviceName = props.name;
   loggingMD.ServiceType = props.name;
 
@@ -57,13 +57,13 @@ function createRestService(props) {
 
     logger.logJSON('info', { serviceType: serviceName, action: 'Service-Start', metadata:config}, loggingMD);
 
-    assert(config.baseURL, util.format('No baseURL in config:%j', cfg));
+    assert(config.baseURL, util.format('RestServer.start No baseURL in config:%j', cfg));
     baseURL = config.baseURL;
 
-    assert(config.version, util.format('No version in config:%j', cfg));
+    assert(config.version, util.format('RestServer.start No version in config:%j', cfg));
     version = '/' + config.version;
 
-    assert(config.port, util.format('No port in config:%j', cfg));
+    assert(config.port, util.format('RestServer.start No port in config:%j', cfg));
     restifyServer = restify.createServer();
 
     //
