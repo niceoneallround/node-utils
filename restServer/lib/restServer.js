@@ -24,7 +24,7 @@ function createRestService(props) {
       logger,
       restifyServer = null,
       serviceName,
-      baseURL,
+      baseURL = null,
       URLversion,
       port;
 
@@ -44,7 +44,13 @@ function createRestService(props) {
 
   // check properties needed for paths
   assert(props.baseURL, util.format('RestServer.start No baseURL in props:%j', props));
-  baseURL = props.baseURL;
+
+  // if just slash then do set to null as resify adds a slash
+  if (props.baseURL !== '/') {
+    baseURL = props.baseURL;
+  } else {
+    baseURL = null;
+  }
 
   assert(props.URLversion, util.format('RestServer.start No URLversion in props:%j', props));
   URLversion = '/' + props.URLversion;
@@ -61,7 +67,7 @@ function createRestService(props) {
   // start the service
   function start(startedCallback) {
 
-    assert(startedCallback, 'start - no callbacl passed in');
+    assert(startedCallback, 'start - no callback passed in');
 
     logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Start', baseURL: baseURL, URLversion: URLversion, port:port}, loggingMD);
 
@@ -115,7 +121,13 @@ function createRestService(props) {
   //
   function registerGETHandler(path, handler) {
 
-    var versionedPath = baseURL + URLversion;
+    var versionedPath;
+
+    if (baseURL) {
+      versionedPath = baseURL + URLversion;
+    } else {
+      versionedPath = URLversion;
+    }
 
     // if a path passed in the append
     if (path) {
@@ -156,10 +168,16 @@ function createRestService(props) {
   //
   function registerPOSTHandler(path, handler) {
 
-    var versionedPath = baseURL + URLversion + path;
+    var versionedPath;
 
     assert(handler, 'No handler passed to registerPOSTHandler');
     assert(handler.post, util.format('No post method on handler:%j', handler));
+
+    if (baseURL) {
+      versionedPath = baseURL + URLversion + path;
+    } else {
+      versionedPath = URLversion + path;
+    }
 
     logger.logJSON('info', { serviceType: serviceName, action: 'Registered-POST-Handler', path: versionedPath}, loggingMD);
 
