@@ -100,7 +100,7 @@ function createRestService(props) {
     // add the built in plugins - if do not add this then no body
     restifyServer.use(restify.bodyParser());
 
-    restifyServer.listen({port: port, host: host}, function(err) {
+    restifyServer.listen(port, host, function(err) {
       assert(!err, util.format('Error restifyServer.listen;%j', err));
 
       //
