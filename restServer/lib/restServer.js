@@ -8,6 +8,7 @@
 var assert = require('assert'),
     loggerFactory = require('../../logger/lib/logger'),
     loggingMD = { fileName: 'restService.js' },
+    HttpStatus = require('http-status'),
     restify = require('restify'),
     util = require('util');
 
@@ -93,7 +94,19 @@ function createRestService(props) {
     restifyServer.use(restify.bodyParser());
 
     restifyServer.listen(port, function() {
+
+      //
+      // add a log request at '/'
+      //
+      restifyServer.get('/', function(req, res, next) { // jshint ignore:line
+        loggingHandler(req, res, next, 'GET-on-path', '/');
+        res.statusCode = HttpStatus.OK;
+        res.setHeader('content-type', 'application/json');
+        res.send({statusCode: HttpStatus.OK});
+      });
+
       logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Started',
+                               address: restifyServer.address(),
                                serverName: restifyServer.name, serverUrl:restifyServer.url,
                                baseURL: baseURL, URLversion: URLversion, port: port}, loggingMD);
 
