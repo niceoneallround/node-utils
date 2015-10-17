@@ -59,9 +59,9 @@ function createRestService(props) {
   }
 
   // start the service
-  function start(callback) {
+  function start(startedCallback) {
 
-    logger.logJSON('info', { serviceType: serviceName, action: 'Service-Start', baseURL: baseURL, URLversion: URLversion, port:port}, loggingMD);
+    logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Start', baseURL: baseURL, URLversion: URLversion, port:port}, loggingMD);
 
     restifyServer = restify.createServer();
 
@@ -71,13 +71,13 @@ function createRestService(props) {
     restifyServer.on('uncaughtException', function(p1, p2, p3, p4) {
       if (p4 instanceof assert.AssertionError) {
         logger.logJSON('error', { serviceType: serviceName,
-                action: 'Service-Crashing-assert-AssertionError', errString:p4}, loggingMD);
+                action: 'RestServer-Crashing-assert-AssertionError', errString:p4}, loggingMD);
       } else {
         logger.logJSON('error', { serviceType: serviceName,
-                action: 'Service-Crashing-Unknown-Error', errType: (typeof p4) }, loggingMD);
+                action: 'RestServer-Crashing-Unknown-Error', errType: (typeof p4) }, loggingMD);
       }
 
-      console.log('%s - Service-Crashing-Unknown-Error: \np1:%s, \np2:%s, \np3:%s, \np4:%s', serviceName, p1, p2, p3, p4);
+      console.log('%s - RestServer-Crashing-Unknown-Error: \np1:%s, \np2:%s, \np3:%s, \np4:%s', serviceName, p1, p2, p3, p4);
       process.abort();
     });
 
@@ -85,11 +85,11 @@ function createRestService(props) {
     restifyServer.use(restify.bodyParser());
 
     restifyServer.listen(port, function() {
-      logger.logJSON('info', { serviceType: serviceName, action: 'Service-Started',
+      logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Started',
                                serverName: restifyServer.name, serverUrl:restifyServer.url,
                                baseURL: baseURL, URLversion: URLversion, port: port}, loggingMD);
 
-      return callback(null);
+      return startedCallback(null);
 
     });
   }
