@@ -17,6 +17,7 @@ var assert = require('assert'),
 // props.name - the service name
 // props.logger - if want to use a specific logger then pass it in
 // props.logConfig - if want to service to create own one
+// props.host - override default host of 0.0.0.0 passed to .listen()
 //
 function createRestService(props) {
   'use strict';
@@ -27,7 +28,8 @@ function createRestService(props) {
       serviceName,
       baseURL = null,
       URLversion,
-      port;
+      port,
+      host = '0.0.0.0'; // for docker bind to this can overide with props.host
 
   assert(props, 'createRestService requires props');
   assert(props.name, util.format('createRestService props must have a name param:%j', props));
@@ -58,6 +60,10 @@ function createRestService(props) {
 
   assert(props.port, util.format('RestServer.start No port in config:%j', props));
   port = props.port;
+
+  if (props.host) {
+    host = props.host;
+  }
 
   //
   // Return logger associated with the service
@@ -93,7 +99,8 @@ function createRestService(props) {
     // add the built in plugins - if do not add this then no body
     restifyServer.use(restify.bodyParser());
 
-    restifyServer.listen(port, function() {
+    restifyServer.listen({port: port, host: '0.0.0.0'}, function(err) {
+      assert(!err, util.format('Error restifyServer.listen;%j', err));
 
       //
       // add a log request at '/'
@@ -107,7 +114,7 @@ function createRestService(props) {
 
       logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Started',
                                address: restifyServer.address(),
-                               serverName: restifyServer.name, serverUrl:restifyServer.url,
+                               serverName: restifyServer.name, restifyServerUrl:restifyServer.url,
                                baseURL: baseURL, URLversion: URLversion, port: port}, loggingMD);
 
       return startedCallback(null);
