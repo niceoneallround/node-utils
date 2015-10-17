@@ -76,7 +76,8 @@ function createRestService(props) {
 
     assert(startedCallback, 'start - no callback passed in');
 
-    logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Start', baseURL: baseURL, URLversion: URLversion, port:port}, loggingMD);
+    logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Start',
+      baseURL: baseURL, URLversion: URLversion, port: port, host: host}, loggingMD);
 
     restifyServer = restify.createServer();
 
@@ -99,7 +100,7 @@ function createRestService(props) {
     // add the built in plugins - if do not add this then no body
     restifyServer.use(restify.bodyParser());
 
-    restifyServer.listen({port: port, host: '0.0.0.0'}, function(err) {
+    restifyServer.listen({port: port, host: host}, function(err) {
       assert(!err, util.format('Error restifyServer.listen;%j', err));
 
       //
