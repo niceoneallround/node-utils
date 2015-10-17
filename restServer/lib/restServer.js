@@ -42,6 +42,16 @@ function createRestService(props) {
     logger = loggerFactory.create(props.logConfig);
   }
 
+  // check properties needed for paths
+  assert(props.baseURL, util.format('RestServer.start No baseURL in props:%j', props));
+  baseURL = props.baseURL;
+
+  assert(props.URLversion, util.format('RestServer.start No URLversion in props:%j', props));
+  URLversion = '/' + props.URLversion;
+
+  assert(props.port, util.format('RestServer.start No port in config:%j', props));
+  port = props.port;
+
   //
   // Return logger associated with the service
   function getLogger() {
@@ -49,22 +59,10 @@ function createRestService(props) {
   }
 
   // start the service
-  // *config
-  //  **baseURL
-  //  **port - the port to start on
-  //  **URLversion - the version to prefix all paths with, i.e v1
-  function start(props, callback) {
+  function start(callback) {
 
-    logger.logJSON('info', { serviceType: serviceName, action: 'Service-Start', props:props}, loggingMD);
+    logger.logJSON('info', { serviceType: serviceName, action: 'Service-Start', baseURL: baseURL, URLversion: URLversion, port:port}, loggingMD);
 
-    assert(props.baseURL, util.format('RestServer.start No baseURL in props:%j', props));
-    baseURL = props.baseURL;
-
-    assert(props.URLversion, util.format('RestServer.start No URLversion in props:%j', props));
-    URLversion = '/' + props.URLversion;
-
-    assert(props.port, util.format('RestServer.start No port in config:%j', props));
-    port = props.port;
     restifyServer = restify.createServer();
 
     //

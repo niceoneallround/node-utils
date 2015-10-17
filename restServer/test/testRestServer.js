@@ -14,15 +14,14 @@ describe('restServer Tests', function() {
     var restService1;
 
     before(function(done) {
-      var props = {}, config = {};
+      var props = {};
       props.name = 'Test 1';
+      props.baseURL = '/baseURL';
+      props.URLversion = 'v1';
+      props.port = 3100;
       restService1 = restServiceFactory.create(props);
 
-      // start the service
-      config.baseURL = '/baseURL';
-      config.URLversion = 'v1';
-      config.port = 3100;
-      restService1.start(config, function(err) {
+      restService1.start(function(err) {
         assert(!err, util.format('Unexpected error starting service: %j', err));
         done();
       });
@@ -40,6 +39,9 @@ describe('restServer Tests', function() {
 
       props.name = 'test 1.2';
       props.logger = loggerFactory.create(null);
+      props.baseURL = '/baseURL';
+      props.URLversion = 'v1';
+      props.port = 3200;
       restService2 = restServiceFactory.create(props);
 
       restService2.logger().should.be.equal(props.logger);
@@ -54,18 +56,17 @@ describe('restServer Tests', function() {
     var restService2, client;
 
     before(function(done) {
-      var props = {}, config = {};
+      var props = {};
       props.name = 'Test 2';
+      props.baseURL = '/baseURL';
+      props.URLversion = 'v1';
+      props.port = 3101;
       restService2 = restServiceFactory.create(props);
 
-      // start the service
-      config.baseURL = '/baseURL';
-      config.URLversion = 'v1';
-      config.port = 3101;
-      restService2.start(config, function(err) {
+      restService2.start(function(err) {
         assert(!err, util.format('Unexpected error starting service2: %j', err));
 
-        client = restify.createJsonClient({url: 'http://localhost:' + config.port});
+        client = restify.createJsonClient({url: 'http://localhost:' + props.port});
         done();
       });
     });
@@ -106,18 +107,18 @@ describe('restServer Tests', function() {
     var restService3, client;
 
     before(function(done) {
-      var props = {}, config = {};
+      var props = {};
       props.name = 'Test 3';
+      props.baseURL = '/baseURL';
+      props.URLversion = 'v1';
+      props.port = 3102;
       restService3 = restServiceFactory.create(props);
 
       // start the service
-      config.baseURL = '/baseURL';
-      config.URLversion = 'v1';
-      config.port = 3102;
-      restService3.start(config, function(err) {
+      restService3.start(function(err) {
         assert(!err, util.format('Unexpected error starting service2: %j', err));
 
-        client = restify.createJsonClient({url: 'http://localhost:' + config.port});
+        client = restify.createJsonClient({url: 'http://localhost:' + props.port});
         done();
       });
     });
