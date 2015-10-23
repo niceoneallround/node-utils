@@ -12,6 +12,7 @@ var assert = require('assert'),
     PROPERTIES = null;
 
 PROPERTIES = {
+  leToken: 'leToken',
   useLogEntries: 'useLogEntries'
 };
 
@@ -26,18 +27,18 @@ function create(props) {
   var useLogEntries = false,
       consoleOptions = {},
       loggerInstance,
-      thisLogger,
-      leToken;
+      thisLogger;
 
   winston.level = 'debug';
   consoleOptions.timestamp = true;
 
-  if (props) {
-    useLogEntries = props[PROPERTIES.useLogEntries];
-    leToken = props.leToken;
+  if ((props) && (props[PROPERTIES.useLogEntries])) {
+    useLogEntries = true;
+    assert(props[PROPERTIES.leToken], 'Using log entries but no log entry token:%j', props);
   }
 
   if (!useLogEntries) {
+    console.log('Creating log NOT using log entries...%s', useLogEntries);
     loggerInstance = new (winston.Logger)({
       transports: [
         new (winston.transports.Console)(consoleOptions),
@@ -48,12 +49,13 @@ function create(props) {
 
     log('info', 'Logger NOT using logEntries', [], {filename: 'logger/utils.js'});
   } else {
+    console.log('Creating log using log entries...%s', useLogEntries);
     loggerInstance = new (winston.Logger)({
       transports: [
         new (winston.transports.Console)(consoleOptions),
         new (winston.transports.File)({filename: 'workpnservice.log',
                                         maxSize: 20000, maxFiles: 5}),
-        new (winston.transports.Logentries)(leToken)
+        new (winston.transports.Logentries)(props[PROPERTIES.leToken])
       ]
     });
 
