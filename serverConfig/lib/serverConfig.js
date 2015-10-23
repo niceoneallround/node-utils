@@ -25,7 +25,7 @@ var assert = require('assert'),
 //
 function create(overrides) {
   'use strict';
-  var c = {};
+  var c = {}, tmp;
 
   c.MODE = process.env.MODE;
 
@@ -84,7 +84,10 @@ function create(overrides) {
   // by default do not use unless an environmental to override.
   c[LOG_P.useLogEntries] = false;
   if (process.env.LOG_ENTRIES) {
-    c[LOG_P.useLogEntries] = process.env.LOG_ENTRIES;
+    tmp = process.env.LOG_ENTRIES;
+    if (tmp.toLowerCase() === 'true') {
+      c[LOG_P.useLogEntries] = true;
+    }
   }
 
   c.VERSION_NUMBER = 'not-set';
