@@ -34,7 +34,7 @@ function create(props) {
 
   if ((props) && (props[PROPERTIES.useLogEntries])) {
     useLogEntries = true;
-    assert(props[PROPERTIES.leToken], 'Using log entries but no log entry token:%j', props);
+    assert(props[PROPERTIES.leToken], util.format('Using log entries but no log entry token:%j', props));
   }
 
   if (!useLogEntries) {
