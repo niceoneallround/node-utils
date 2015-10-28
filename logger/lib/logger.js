@@ -35,6 +35,9 @@ function create(props) {
   if ((props) && (props[PROPERTIES.useLogEntries])) {
     useLogEntries = true;
     assert(props[PROPERTIES.leToken], util.format('Using log entries but no log entry token:%j', props));
+
+    // fixme i turned of log entries but still see it mentioned so adding this code
+    assert(false, util.format('NOT MEANT TO BE USING LOG_ENTRIES HOW COME ENABLED:%j', props));
   }
 
   if (!useLogEntries) {
