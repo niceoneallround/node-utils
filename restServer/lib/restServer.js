@@ -90,10 +90,11 @@ function createRestService(props) {
                 action: 'RestServer-Crashing-assert-AssertionError', errString:p4}, loggingMD);
       } else {
         logger.logJSON('error', { serviceType: serviceName,
-                action: 'RestServer-Crashing-Unknown-Error', errType: (typeof p4) }, loggingMD);
+                action: 'RestServer-Crashing-Unknown-Error',
+                errorMsg: util.format('\np1:%s, \np2:%s, \np3:%s, \np4:%s', serviceName, p1, p2, p3, p4)}, loggingMD);
       }
 
-      console.log('%s - RestServer-Crashing-Unknown-Error: \np1:%s, \np2:%s, \np3:%s, \np4:%s', serviceName, p1, p2, p3, p4);
+      console.log('%s - console-log-RestServer-Crashing-Unknown-Error: \np1:%s, \np2:%s, \np3:%s, \np4:%s', serviceName, p1, p2, p3, p4);
       process.abort();
     });
 
