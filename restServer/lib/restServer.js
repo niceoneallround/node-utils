@@ -91,7 +91,7 @@ function createRestService(props) {
       } else {
         logger.logJSON('error', { serviceType: serviceName,
                 action: 'RestServer-Crashing-Unknown-Error',
-                errorMsg: util.format('\np1:%s, \np2:%s, \np3:%s, \np4:%s', serviceName, p1, p2, p3, p4)}, loggingMD);
+                errorMsg: util.format('p1:%s, p2:%s, p3:%s, p4:%s', serviceName, p1, p2, p3, p4)}, loggingMD);
       }
 
       console.log('%s - console-log-RestServer-Crashing-Unknown-Error: \np1:%s, \np2:%s, \np3:%s, \np4:%s', serviceName, p1, p2, p3, p4);
