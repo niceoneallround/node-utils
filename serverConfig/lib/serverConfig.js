@@ -95,6 +95,12 @@ function create(overrides) {
     c.VERSION_NUMBER = process.env.VERSION_NUMBER;
   }
 
+  // audit info - should be in the dataset metadata or other but for now use and env as easier
+  c.AUDIT_URL = 'not-set';
+  if (process.env.AUDIT_URL) {
+    c.AUDIT_URL = process.env.AUDIT_URL;
+  }
+
   c.getHost = function() {
     return getHost(c);
   };
@@ -234,14 +240,15 @@ function getHost(c) {
 }
 
 module.exports = {
-  create: create
-  /*getHost: getHost,
+  create: create,
+
+  // accessors that work if pass in a config
+  getHost: getHost,
   getHostname: getHostname,
   getHostnameWithPort: getHostnameWithPort,
   getPort: getPort,
   getPortInsideDocker: getPortInsideDocker,
   getProtocol: getProtocol,
-  getServiceConfig: getServiceConfig,
   isDevelopment: isDevelopment,
-  isProduction: isProduction*/
+  isProduction: isProduction
 };
