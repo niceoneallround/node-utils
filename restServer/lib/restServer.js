@@ -82,10 +82,10 @@ function createRestService(props) {
     restifyServer = restify.createServer();
 
     //
-    // if an unexpected errors the shut down process
+    // if an unexpected errors the shut down process - REMOVE AS HIDING ERROR STACK AND DO NOT HAVE TIME TO DEBUg
     //
-    restifyServer.on('uncaughtException', function(p1, p2, p3, p4) {
-      if (p4 instanceof assert.AssertionError) {
+    /*restifyServer.on('uncaughtException', function(p1, p2, p3, p4) {
+      if (p4 instanceof AssertionError) {
         logger.logJSON('error', { serviceType: serviceName,
                 action: 'RestServer-Crashing-assert-AssertionError', errString:p4}, loggingMD);
       } else {
@@ -96,7 +96,7 @@ function createRestService(props) {
 
       console.log('%s - console-log-RestServer-Crashing-Unknown-Error: \np1:%s, \np2:%s, \np3:%s, \np4:%s', serviceName, p1, p2, p3, p4);
       process.abort();
-    });
+    });*/
 
     // add the built in plugins - if do not add this then no body
     restifyServer.use(restify.bodyParser());
