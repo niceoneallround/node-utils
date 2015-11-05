@@ -12,7 +12,6 @@
 // VERSION
 //
 var assert = require('assert'),
-    LOG_P = require('../../logger/lib/logger').PROPERTIES,
     util = require('util');
 
 //
@@ -82,11 +81,10 @@ function create(overrides) {
   }
 
   // by default do not use unless an environmental to override.
-  c[LOG_P.useLogEntries] = false;
+  c.LOG_ENTRIES = false;
   if (process.env.LOG_ENTRIES) {
     tmp = process.env.LOG_ENTRIES;
     if (tmp.toLowerCase() === 'true') {
-      c[LOG_P.useLogEntries] = true;
       c.LOG_ENTRIES = true;
       c.LOG_ENTRIES_TOKEN = process.env.LOG_ENTRIES_TOKEN;
     }

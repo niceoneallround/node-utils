@@ -2,7 +2,6 @@
 
 var assert = require('assert'),
     configUtils = require('../lib/serverConfig'),
-    LOG_P = require('../../logger/lib/logger').PROPERTIES,
     util = require('util');
 
 describe('Server Config Utils Tests', function() {
@@ -187,15 +186,17 @@ describe('Server Config Utils Tests', function() {
 
     it('7.1 it should be false by default', function() {
       var c = configUtils.create();
-      assert(!c[LOG_P.useLogEntries], util.format('Log entries by default should be false:%j', c));
+      assert(!c.LOG_ENTRIES, util.format('Log entries by default should be false:%j', c));
     });
 
     it('7.2 it should pick up from env ', function() {
       var c;
 
       process.env.LOG_ENTRIES = true;
+      process.env.LOG_ENTRIES_TOKEN = '23';
       c = configUtils.create();
-      assert(c[LOG_P.useLogEntries], util.format('Log entries should be true:%j', c));
+      assert(c.LOG_ENTRIES, util.format('Log entries should be true:%j', c));
+      c.should.have.property('LOG_ENTRIES_TOKEN', '23');
     });
   });
 

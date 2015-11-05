@@ -8,13 +8,7 @@ var assert = require('assert'),
     winston = require('winston'),
     logentries2 = require('winston-logentries'), //jshint ignore:line
     logentries1 = require('node-logentries'), //jshint ignore:line
-    util = require('util'),
-    PROPERTIES = null;
-
-PROPERTIES = {
-  leToken: 'leToken',
-  useLogEntries: 'useLogEntries'
-};
+    util = require('util');
 
 //
 // create an instance of a logger based on configuration options
@@ -24,24 +18,17 @@ PROPERTIES = {
 function create(props) {
   'use strict';
 
-  var useLogEntries = false,
-      consoleOptions = {},
+  var consoleOptions = {},
       loggerInstance,
       thisLogger;
 
   winston.level = 'debug';
   consoleOptions.timestamp = true;
 
-  if ((props) && (props[PROPERTIES.useLogEntries])) {
-    useLogEntries = true;
-    assert(props[PROPERTIES.leToken], util.format('Using log entries but no log entry token:%j', props));
+  console.log('Configuring log file with props:%j');
 
-    // fixme i turned of log entries but still see it mentioned so adding this code
-    assert(false, util.format('NOT MEANT TO BE USING LOG_ENTRIES HOW COME ENABLED:%j', props));
-  }
-
-  if (!useLogEntries) {
-    console.log('Creating log NOT using log entries...%s', useLogEntries);
+  if (!props || !props.LOG_ENTRIES) {
+    console.log('Creating log NOT using log entries...%j', props);
     loggerInstance = new (winston.Logger)({
       transports: [
         new (winston.transports.Console)(consoleOptions),
@@ -52,13 +39,14 @@ function create(props) {
 
     log('info', 'Logger NOT using logEntries', [], {filename: 'logger/utils.js'});
   } else {
-    console.log('Creating log using log entries...%s', useLogEntries);
+    console.log('Creating log using log entries...%j', props);
+    assert(props.LOG_ENTRIES_TOKEN, util.format('Cannot use log entries unless a token is passed in:%j', props));
     loggerInstance = new (winston.Logger)({
       transports: [
         new (winston.transports.Console)(consoleOptions),
         new (winston.transports.File)({filename: 'workpnservice.log',
                                         maxSize: 20000, maxFiles: 5}),
-        new (winston.transports.Logentries)(props[PROPERTIES.leToken])
+        new (winston.transports.Logentries)(props.LOG_ENTRIES_TOKEN)
       ]
     });
 
@@ -199,6 +187,5 @@ function create(props) {
 }
 
 module.exports = {
-  create: create,
-  PROPERTIES: PROPERTIES
+  create: create
 };

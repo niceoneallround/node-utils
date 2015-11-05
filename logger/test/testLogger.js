@@ -5,14 +5,13 @@
 //
 
 var should = require('should'),
-    loggerFactory = require('../lib/logger'),
-    LOG_P = loggerFactory.PROPERTIES;
+    loggerFactory = require('../lib/logger');
 
 describe('Logger Tests', function() {
   'use strict';
 
-  var cfgLe = {};
-  cfgLe[LOG_P.useLogEntries] = false;
+  var props = {};
+  props.LOG_ENTRIES = false;
 
   function logSomeStuff(logger, p1) {
     var md = {test: 'hello'};
@@ -36,53 +35,53 @@ describe('Logger Tests', function() {
   });
 
   it('log some stuff also using log entries', function(done) {
-    logSomeStuff(loggerFactory.create(cfgLe), 'test2');
+    logSomeStuff(loggerFactory.create(props), 'test2');
     done();
   });
 
   it('log some JSON also using log entries', function() {
     var json = {serviceType: 'UP', error:'ouch'};
-    logSomeJSON(loggerFactory.create(cfgLe), json);
+    logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a svcMsg', function() {
     var json = {serviceType: 'UP', action: 'messageOnly', svcMsg: {id: 'nice', type: ['a']}};
-    logSomeJSON(loggerFactory.create(cfgLe), json);
+    logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a svcMsg and a policy', function() {
     var json = {serviceType: 'UP', action: 'messageAndPolicy', svcMsg: {id: 'nice', type: ['a']}, policy: {id: 'policy'}};
-    logSomeJSON(loggerFactory.create(cfgLe), json);
+    logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a svcMsg and an error', function() {
     var json = {serviceType: 'UP', action: 'messageAndPolicy', svcMsg: {id: 'nice', type: ['a']}, error: {id: 'error'}};
-    logSomeJSON(loggerFactory.create(cfgLe), json);
+    logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a svcRequest', function() {
     var json = {serviceType: 'UP', action: 'messageOnly', svcRequest: {id: 'nice', type: ['a']}};
-    logSomeJSON(loggerFactory.create(cfgLe), json);
+    logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a svcResponse', function() {
     var json = {serviceType: 'UP', action: 'messageOnly', svcResponse: {id: 'nice', type: ['a']}};
-    logSomeJSON(loggerFactory.create(cfgLe), json);
+    logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a policy', function() {
     var json = {serviceType: 'UP', action: 'policyOnly', policy: {id: 'nice', type: ['a']}};
-    logSomeJSON(loggerFactory.create(cfgLe), json);
+    logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with metadata', function() {
     var json = {serviceType: 'UP', action: 'metadataOnly', metadata: {id: 'nice', type: ['a']}};
-    logSomeJSON(loggerFactory.create(cfgLe), json);
+    logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with data', function() {
     var json = {serviceType: 'UP', action: 'metadataOnly', data: {id: 'nice', type: ['a']}};
-    logSomeJSON(loggerFactory.create(cfgLe), json);
+    logSomeJSON(loggerFactory.create(props), json);
   });
 
 });
