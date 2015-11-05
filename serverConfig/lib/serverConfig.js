@@ -87,6 +87,7 @@ function create(overrides) {
     tmp = process.env.LOG_ENTRIES;
     if (tmp.toLowerCase() === 'true') {
       c[LOG_P.useLogEntries] = true;
+      c.LOG_ENTRIES_TOKEN = process.env.LOG_ENTRIES_TOKEN;
     }
   }
 
