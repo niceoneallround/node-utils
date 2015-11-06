@@ -25,7 +25,7 @@ function create(props) {
   winston.level = 'debug';
   consoleOptions.timestamp = true;
 
-  console.log('Configuring log file with props:%j');
+  console.log('Configuring log file with props:%j', props);
 
   if (!props || !props.LOG_ENTRIES) {
     console.log('Creating log NOT using log entries...%j', props);
@@ -119,7 +119,7 @@ function create(props) {
     } else if (json.svcRequest) {
       msg = json.svcRequest;
     } else if (json.svcResponse) {
-      msg = json.SvcResponse;
+      msg = json.svcResponse;
     }
 
     if (msg) {
