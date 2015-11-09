@@ -18,6 +18,7 @@ var assert = require('assert'),
 // props.logger - if want to use a specific logger then pass it in
 // props.logConfig - if want to service to create own one
 // props.host - override default host of 0.0.0.0 passed to .listen()
+// props.serviceVersionNumber - optional if exists added to status message on '/' - not used for url versioning
 //
 function createRestService(props) {
   'use strict';
@@ -109,16 +110,21 @@ function createRestService(props) {
       // add a log request at '/'
       //
       restifyServer.get('/', function(req, res, next) { // jshint ignore:line
+        var statusMsg = {};
         loggingHandler(req, res, next, 'GET-on-path', '/');
         res.statusCode = HttpStatus.OK;
         res.setHeader('content-type', 'application/json');
-        res.send({statusCode: HttpStatus.OK});
+        statusMsg.statusCode = HttpStatus.OK;
+        statusMsg.serviceName = serviceName;
+        statusMsg.version = props.serviceVersionNumber;
+        res.send(statusMsg);
       });
 
       logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Started',
                                address: restifyServer.address(),
                                serverName: restifyServer.name, restifyServerUrl:restifyServer.url,
-                               baseURL: baseURL, URLversion: URLversion, port: port}, loggingMD);
+                               baseURL: baseURL, URLversion: URLversion, port: port,
+                               serviceName: serviceName, serviceVersion: props.serviceVersionNumber}, loggingMD);
 
       return startedCallback(null);
 
