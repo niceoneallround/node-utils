@@ -111,6 +111,9 @@ function create(props) {
   function logJSON(level, json, md) {
     var id, msg;
 
+    // log message if any pretty stuff then print that afterwards
+    log(level, 'jsonMsg:%j', [json], md);
+
     //
     // If the json contains a service message then pretty it up and print it
     //
