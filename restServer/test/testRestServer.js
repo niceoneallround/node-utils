@@ -7,13 +7,13 @@ var assert = require('assert'),
   should = require('should'),
   util = require('util');
 
-describe('restServer Tests', function() {
+describe('restServer Tests', function () {
   'use strict';
 
-  describe('1 management tests', function() {
+  describe('1 management tests', function () {
     var restService1;
 
-    before(function(done) {
+    before(function (done) {
       var props = {};
       props.name = 'Test 1';
       props.baseURL = '/baseURL';
@@ -21,20 +21,20 @@ describe('restServer Tests', function() {
       props.port = 3100;
       restService1 = restServiceFactory.create(props);
 
-      restService1.start(function(err) {
+      restService1.start(function (err) {
         assert(!err, util.format('Unexpected error starting service: %j', err));
         done();
       });
     });
 
-    it('1.1 should be able to stop the service', function(done) {
-      restService1.stop(function(err) {
+    it('1.1 should be able to stop the service', function (done) {
+      restService1.stop(function (err) {
         assert(!err, util.format('Unexpected error stopping service: %j', err));
         done();
       });
     }); //it 1.1
 
-    it('1.2 should be able to create with passed in logger', function(done) {
+    it('1.2 should be able to create with passed in logger', function (done) {
       var restService2, props = {};
 
       props.name = 'test 1.2';
@@ -51,11 +51,11 @@ describe('restServer Tests', function() {
 
   }); // describe 1
 
-  describe('2 GET tests', function() {
+  describe('2 GET tests', function () {
 
     var restService2, client;
 
-    before(function(done) {
+    before(function (done) {
       var props = {};
       props.name = 'Test 2';
       props.baseURL = '/baseURL';
@@ -63,7 +63,7 @@ describe('restServer Tests', function() {
       props.port = 3101;
       restService2 = restServiceFactory.create(props);
 
-      restService2.start(function(err) {
+      restService2.start(function (err) {
         assert(!err, util.format('Unexpected error starting service2: %j', err));
 
         client = restify.createJsonClient({url: 'http://localhost:' + props.port});
@@ -71,11 +71,11 @@ describe('restServer Tests', function() {
       });
     });
 
-    it('2.1 register a handler on a path that returns 200 response, and GET it', function(done) {
+    it('2.1 register a handler on a path that returns 200 response, and GET it', function (done) {
 
       var handler11 = {}, sendData = {get: 'hello'};
 
-      handler11.get = function(req, res, cb) {
+      handler11.get = function (req, res, cb) {
         assert(req, 'No req passed to handler');
         assert(res, 'No res passed to handler');
         return cb(null, sendData);
@@ -83,7 +83,7 @@ describe('restServer Tests', function() {
 
       restService2.registerGETHandler('/path_ok', handler11);
 
-      client.get('/baseURL/v1/path_ok', function(err, req, res, data) {
+      client.get('/baseURL/v1/path_ok', function (err, req, res, data) {
         assert(!err, util.format('Unexpected error starting on GET: %j', err));
         assert(req, 'No req passed from client');
         assert(res, 'No res passed from client');
@@ -102,11 +102,11 @@ describe('restServer Tests', function() {
     }); //it 2.1
   }); // describe 2
 
-  describe('3 POST tests', function() {
+  describe('3 POST tests', function () {
 
     var restService3, client;
 
-    before(function(done) {
+    before(function (done) {
       var props = {};
       props.name = 'Test 3';
       props.baseURL = '/baseURL';
@@ -115,7 +115,7 @@ describe('restServer Tests', function() {
       restService3 = restServiceFactory.create(props);
 
       // start the service
-      restService3.start(function(err) {
+      restService3.start(function (err) {
         assert(!err, util.format('Unexpected error starting service2: %j', err));
 
         client = restify.createJsonClient({url: 'http://localhost:' + props.port});
@@ -123,11 +123,11 @@ describe('restServer Tests', function() {
       });
     });
 
-    it('3.1 register a POST handler on a path that returns 200 and some data in the response', function(done) {
+    it('3.1 register a POST handler on a path that returns 200 and some data in the response', function (done) {
 
       var handler21 = {}, postData = {hello: 'world2'}, responseData = {post: 'response'};
 
-      handler21.post = function(req, res, cb) {
+      handler21.post = function (req, res, cb) {
         req.body.should.have.property('hello');
         res.setHeader('content-type', 'application/json');
         res.send(responseData);
@@ -136,7 +136,7 @@ describe('restServer Tests', function() {
 
       restService3.registerPOSTHandler('/path_ok', handler21);
 
-      client.post('/baseURL/v1/path_ok', postData, function(err, req, res, data) {
+      client.post('/baseURL/v1/path_ok', postData, function (err, req, res, data) {
         assert(!err, util.format('Unexpected error starting on POST: %j', err));
         assert(data, 'No data passed from server');
 

@@ -40,6 +40,15 @@ module.exports = function(grunt) {
         requireSpacesInsideObjectBrackets: false,
         disallowMultipleVarDecl: false,
         requireTrailingComma: false,
+      },
+      fix: {
+        options:{
+          preset: 'airbnb',
+          requireSpacesInsideObjectBrackets: false,
+          disallowMultipleVarDecl: false,
+          requireTrailingComma: false,
+          fix: true
+        }
       }
     }
   });

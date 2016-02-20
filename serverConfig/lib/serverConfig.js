@@ -101,35 +101,35 @@ function create(overrides) {
     c.AUDIT_URL = process.env.AUDIT_URL;
   }
 
-  c.getHost = function() {
+  c.getHost = function () {
     return getHost(c);
   };
 
-  c.getHostname = function() {
+  c.getHostname = function () {
     return getHostname(c);
   };
 
-  c.getHostnameWithPort = function() {
+  c.getHostnameWithPort = function () {
     return getHostnameWithPort(c);
   };
 
-  c.getPort = function() {
+  c.getPort = function () {
     return getPort(c);
   };
 
-  c.getPortInsideDocker = function() {
+  c.getPortInsideDocker = function () {
     return getPortInsideDocker(c);
   };
 
-  c.getProtocol = function() {
+  c.getProtocol = function () {
     return getProtocol(c);
   };
 
-  c.isDevelopment = function() {
+  c.isDevelopment = function () {
     return isDevelopment(c);
   };
 
-  c.isProduction = function() {
+  c.isProduction = function () {
     return isProduction(c);
   };
 

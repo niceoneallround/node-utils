@@ -85,7 +85,7 @@ function createRestService(props) {
     //
     // if an unexpected errors the shut down process
     //
-    restifyServer.on('uncaughtException', function(p1, p2, p3, p4) {
+    restifyServer.on('uncaughtException', function (p1, p2, p3, p4) {
       if (p4 instanceof assert.AssertionError) {
         logger.logJSON('error', { serviceType: serviceName,
                 action: 'RestServer-Crashing-assert-AssertionError', errString:p4}, loggingMD);
@@ -103,13 +103,13 @@ function createRestService(props) {
     // add the built in plugins - if do not add this then no body
     restifyServer.use(restify.bodyParser());
 
-    restifyServer.listen(port, host, function(err) {
+    restifyServer.listen(port, host, function (err) {
       assert(!err, util.format('Error restifyServer.listen;%j', err));
 
       //
       // add a log request at '/'
       //
-      restifyServer.get('/', function(req, res, next) { // jshint ignore:line
+      restifyServer.get('/', function (req, res, next) { // jshint ignore:line
         var statusMsg = {};
         loggingHandler(req, res, next, 'GET-on-path', '/');
         res.statusCode = HttpStatus.OK;
@@ -170,12 +170,12 @@ function createRestService(props) {
 
     restifyServer.get(
       versionedPath,
-      function(req, res, next) { // jshint ignore:line
+      function (req, res, next) { // jshint ignore:line
         loggingHandler(req, res, next, 'GET-on-path', versionedPath);
       },
 
-      function(req, res, next) {
-        handler.get(req, res, function(err, data) {
+      function (req, res, next) {
+        handler.get(req, res, function (err, data) {
           if (err) {
             logger.logJSON('error', { serviceType: serviceName, action: 'pnServiceService-GET-Handler-ERROR',
                             path: versionedPath, error: err}, loggingMD);
@@ -212,12 +212,12 @@ function createRestService(props) {
 
     restifyServer.post(
       versionedPath,
-      function(req, res, next) { // jshint ignore:line
+      function (req, res, next) { // jshint ignore:line
         loggingHandler(req, res, next, 'Recieved-POST-on', versionedPath);
       },
 
-      function(req, res, next) {
-        handler.post(req, res, function(err) {
+      function (req, res, next) {
+        handler.post(req, res, function (err) {
           if (err) {
             logger.logJSON('error', { serviceType: serviceName, action: 'pnServiceService-POST-Handler-ERROR',
                             path: versionedPath, error: err, svcRequest: req}, loggingMD);

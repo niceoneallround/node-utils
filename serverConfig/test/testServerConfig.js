@@ -4,17 +4,17 @@ var assert = require('assert'),
     configUtils = require('../lib/serverConfig'),
     util = require('util');
 
-describe('Server Config Utils Tests', function() {
+describe('Server Config Utils Tests', function () {
   'use strict';
 
-  it('0.1 it should return a configuration', function() {
+  it('0.1 it should return a configuration', function () {
 
     var c = configUtils.create();
     assert(c, 'No config returned from create');
   });
 
-  describe('1 test production versus dev flags', function() {
-    it('1.1 it should support isProduction', function() {
+  describe('1 test production versus dev flags', function () {
+    it('1.1 it should support isProduction', function () {
 
       var c = configUtils.create();
 
@@ -25,7 +25,7 @@ describe('Server Config Utils Tests', function() {
       c.isProduction().should.be.equal(false);
     });
 
-    it('1.2 it should support isDevelopment', function() {
+    it('1.2 it should support isDevelopment', function () {
 
       var c = configUtils.create();
 
@@ -37,8 +37,8 @@ describe('Server Config Utils Tests', function() {
     });
   });
 
-  describe('2 test getHostnameWithPort', function() {
-    it('2.1 it should work with PROD and hostname', function() {
+  describe('2 test getHostnameWithPort', function () {
+    it('2.1 it should work with PROD and hostname', function () {
 
       var c = configUtils.create();
 
@@ -51,7 +51,7 @@ describe('Server Config Utils Tests', function() {
 
     });
 
-    it('2.2 it should work with DEV and hostname', function() {
+    it('2.2 it should work with DEV and hostname', function () {
 
       var c = configUtils.create();
 
@@ -64,7 +64,7 @@ describe('Server Config Utils Tests', function() {
 
     });
 
-    it('2.2 it should work with no hostname', function() {
+    it('2.2 it should work with no hostname', function () {
 
       var c = configUtils.create();
 
@@ -77,8 +77,8 @@ describe('Server Config Utils Tests', function() {
     });
   });
 
-  describe('3 test getHostname', function() {
-    it('it should work with PROD', function() {
+  describe('3 test getHostname', function () {
+    it('it should work with PROD', function () {
 
       var c = configUtils.create();
 
@@ -87,7 +87,7 @@ describe('Server Config Utils Tests', function() {
       c.getHostname().should.be.equal('hell_yea');
     });
 
-    it('3.1 it should work with DEV', function() {
+    it('3.1 it should work with DEV', function () {
 
       var c = configUtils.create();
 
@@ -97,7 +97,7 @@ describe('Server Config Utils Tests', function() {
 
     });
 
-    it('3.2 it should work with no hostname', function() {
+    it('3.2 it should work with no hostname', function () {
 
       var c = configUtils.create();
 
@@ -106,8 +106,8 @@ describe('Server Config Utils Tests', function() {
     });
   });
 
-  describe('4 test getPort', function() {
-    it('it should work with PROD and port', function() {
+  describe('4 test getPort', function () {
+    it('it should work with PROD and port', function () {
 
       var c = configUtils.create();
 
@@ -116,7 +116,7 @@ describe('Server Config Utils Tests', function() {
       c.getPort().should.be.equal('666');
     });
 
-    it('4.1 it should work with DEV and hostname', function() {
+    it('4.1 it should work with DEV and hostname', function () {
 
       var c = configUtils.create();
 
@@ -126,8 +126,8 @@ describe('Server Config Utils Tests', function() {
     });
   });
 
-  describe('5 test getPortInsideDocker', function() {
-    it('5.1 it should work with PROD and port', function() {
+  describe('5 test getPortInsideDocker', function () {
+    it('5.1 it should work with PROD and port', function () {
 
       var c = configUtils.create();
 
@@ -136,7 +136,7 @@ describe('Server Config Utils Tests', function() {
       c.getPortInsideDocker().should.be.equal('666');
     });
 
-    it('5.2 it should work with DEV and hostname', function() {
+    it('5.2 it should work with DEV and hostname', function () {
 
       var c = configUtils.create();
 
@@ -146,8 +146,8 @@ describe('Server Config Utils Tests', function() {
     });
   });
 
-  describe('6 test getProtocol', function() {
-    it('6.1 it should work with PROD and protocol', function() {
+  describe('6 test getProtocol', function () {
+    it('6.1 it should work with PROD and protocol', function () {
 
       var c = configUtils.create();
 
@@ -156,7 +156,7 @@ describe('Server Config Utils Tests', function() {
       c.getProtocol().should.be.equal('http_1');
     });
 
-    it('6.2 it should work with DEV and protocol', function() {
+    it('6.2 it should work with DEV and protocol', function () {
 
       var c = configUtils.create();
 
@@ -165,7 +165,7 @@ describe('Server Config Utils Tests', function() {
       c.getProtocol().should.be.equal('http_2');
     });
 
-    it('6.3 it should default to http if dev mode', function() {
+    it('6.3 it should default to http if dev mode', function () {
 
       var c = configUtils.create();
 
@@ -173,7 +173,7 @@ describe('Server Config Utils Tests', function() {
       c.getProtocol().should.be.equal('http');
     });
 
-    it('6.4 it should default to http if prod mode', function() {
+    it('6.4 it should default to http if prod mode', function () {
 
       var c = configUtils.create();
 
@@ -182,14 +182,14 @@ describe('Server Config Utils Tests', function() {
     });
   });
 
-  describe('7 test log entries', function() {
+  describe('7 test log entries', function () {
 
-    it('7.1 it should be false by default', function() {
+    it('7.1 it should be false by default', function () {
       var c = configUtils.create();
       assert(!c.LOG_ENTRIES, util.format('Log entries by default should be false:%j', c));
     });
 
-    it('7.2 it should pick up from env ', function() {
+    it('7.2 it should pick up from env ', function () {
       var c;
 
       process.env.LOG_ENTRIES = true;
@@ -200,14 +200,14 @@ describe('Server Config Utils Tests', function() {
     });
   });
 
-  describe('8 test VERSION_NUMBER', function() {
+  describe('8 test VERSION_NUMBER', function () {
 
-    it('8.1 it should be false by default', function() {
+    it('8.1 it should be false by default', function () {
       var c = configUtils.create();
       assert((c.VERSION_NUMBER === 'not-set'), util.format('Version number not set to not set :):%j', c));
     });
 
-    it('8.2 it should pick up from env ', function() {
+    it('8.2 it should pick up from env ', function () {
       var c;
 
       process.env.VERSION_NUMBER = '1.0.23';
@@ -216,9 +216,9 @@ describe('Server Config Utils Tests', function() {
     });
   });
 
-  describe('9 test getHost', function() {
+  describe('9 test getHost', function () {
 
-    it('9.1 it should work with PROD', function() {
+    it('9.1 it should work with PROD', function () {
 
       var c = configUtils.create();
       c.MODE = 'PROD';
@@ -229,9 +229,9 @@ describe('Server Config Utils Tests', function() {
     });
   });
 
-  describe('10 test overrides', function() {
+  describe('10 test overrides', function () {
 
-    it('9.1 it should work with PROD', function() {
+    it('9.1 it should work with PROD', function () {
 
       var c, overrides;
 
