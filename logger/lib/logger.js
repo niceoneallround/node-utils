@@ -32,25 +32,25 @@ function create(props) {
     loggerInstance = new (winston.Logger)({
       transports: [
         new (winston.transports.Console)(consoleOptions),
-        new (winston.transports.File)({filename: 'workpnservice.log',
-                                        maxSize: 20000, maxFiles: 5})
+        new (winston.transports.File)({ filename: 'workpnservice.log',
+                                        maxSize: 20000, maxFiles: 5 })
       ]
     });
 
-    log('info', 'Logger NOT using logEntries', [], {filename: 'logger/utils.js'});
+    log('info', 'Logger NOT using logEntries', [], { filename: 'logger/utils.js' });
   } else {
     console.log('Creating log using log entries...%j', props);
     assert(props.LOG_ENTRIES_TOKEN, util.format('Cannot use log entries unless a token is passed in:%j', props));
     loggerInstance = new (winston.Logger)({
       transports: [
         new (winston.transports.Console)(consoleOptions),
-        new (winston.transports.File)({filename: 'workpnservice.log',
-                                        maxSize: 20000, maxFiles: 5}),
+        new (winston.transports.File)({ filename: 'workpnservice.log',
+                                        maxSize: 20000, maxFiles: 5 }),
         new (winston.transports.Logentries)(props.LOG_ENTRIES_TOKEN)
       ]
     });
 
-    log('info', 'Logger using logEntries', null, {filename: 'logger/utils.js'});
+    log('info', 'Logger using logEntries', null, { filename: 'logger/utils.js' });
   }
 
   function getLogger() {

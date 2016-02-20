@@ -37,14 +37,13 @@ module.exports = function(grunt) {
       src: ['*/lib/*.js', '*/test/*.js'],
       options: {
         preset: 'airbnb',
-        requireSpacesInsideObjectBrackets: false,
         disallowMultipleVarDecl: false,
         requireTrailingComma: false,
       },
       fix: {
+        src: ['*/lib/*.js', '*/test/*.js'],
         options:{
           preset: 'airbnb',
-          requireSpacesInsideObjectBrackets: false,
           disallowMultipleVarDecl: false,
           requireTrailingComma: false,
           fix: true
@@ -59,7 +58,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-jscs');
 
-  grunt.registerTask('log', 'log name', function(arg) {
+  grunt.registerTask('log', 'log name', function (arg) {
     grunt.log.writeln('In node-utils');
   });
 

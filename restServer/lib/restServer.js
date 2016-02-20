@@ -78,7 +78,7 @@ function createRestService(props) {
     assert(startedCallback, 'start - no callback passed in');
 
     logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Start',
-      baseURL: baseURL, URLversion: URLversion, port: port, host: host}, loggingMD);
+      baseURL: baseURL, URLversion: URLversion, port: port, host: host }, loggingMD);
 
     restifyServer = restify.createServer();
 
@@ -88,11 +88,11 @@ function createRestService(props) {
     restifyServer.on('uncaughtException', function (p1, p2, p3, p4) {
       if (p4 instanceof assert.AssertionError) {
         logger.logJSON('error', { serviceType: serviceName,
-                action: 'RestServer-Crashing-assert-AssertionError', errString:p4}, loggingMD);
+                action: 'RestServer-Crashing-assert-AssertionError', errString:p4 }, loggingMD);
       } else {
         logger.logJSON('error', { serviceType: serviceName,
                 action: 'RestServer-Crashing-Unknown-Error',
-                errorMsg: util.format('p1:%s, p2:%s, p3:%s, p4:%s', serviceName, p1, p2, p3, p4)}, loggingMD);
+                errorMsg: util.format('p1:%s, p2:%s, p3:%s, p4:%s', serviceName, p1, p2, p3, p4) }, loggingMD);
       }
 
       console.log('%s - console-log-RestServer-Crashing-Unknown-Error: \np1:%s, \np2:%s, \np3:%s, \np4:%s', serviceName, p1, p2, p3, p4);
@@ -124,7 +124,7 @@ function createRestService(props) {
                                address: restifyServer.address(),
                                serverName: restifyServer.name, restifyServerUrl:restifyServer.url,
                                baseURL: baseURL, URLversion: URLversion, port: port,
-                               serviceName: serviceName, serviceVersion: props.serviceVersionNumber}, loggingMD);
+                               serviceName: serviceName, serviceVersion: props.serviceVersionNumber }, loggingMD);
 
       return startedCallback(null);
 
@@ -135,13 +135,13 @@ function createRestService(props) {
   // stop the service
   //
   function stop(callback) {
-    logger.logJSON('info', { serviceType: serviceName, action: 'Service-Stop'}, loggingMD);
+    logger.logJSON('info', { serviceType: serviceName, action: 'Service-Stop' }, loggingMD);
     return callback(null);
   }
 
   // logs a message - can be placed on handler chain for a path
   function loggingHandler(req, res, next, actionMsg, path) {
-    logger.logJSON('info', { serviceType: serviceName, action: actionMsg, path: path, headers: req.headers}, loggingMD);
+    logger.logJSON('info', { serviceType: serviceName, action: actionMsg, path: path, headers: req.headers }, loggingMD);
     return next();
   }
 
@@ -166,7 +166,7 @@ function createRestService(props) {
     assert(handler, 'No handler passed to registerGETHandler');
     assert(handler.get, util.format('No get method on handler:%j', handler));
 
-    logger.logJSON('info', { serviceType: serviceName, action: 'Registered-GET-Handler', path: versionedPath}, loggingMD);
+    logger.logJSON('info', { serviceType: serviceName, action: 'Registered-GET-Handler', path: versionedPath }, loggingMD);
 
     restifyServer.get(
       versionedPath,
@@ -178,7 +178,7 @@ function createRestService(props) {
         handler.get(req, res, function (err, data) {
           if (err) {
             logger.logJSON('error', { serviceType: serviceName, action: 'pnServiceService-GET-Handler-ERROR',
-                            path: versionedPath, error: err}, loggingMD);
+                            path: versionedPath, error: err }, loggingMD);
             assert(!err, util.format('pnServiceSerice - Unexpected ERROR: %j - processing GET on: %s', err, versionedPath));
             return next((new restify.BadRequestError(err)));
           } else {
@@ -208,7 +208,7 @@ function createRestService(props) {
       versionedPath = URLversion + path;
     }
 
-    logger.logJSON('info', { serviceType: serviceName, action: 'Registered-POST-Handler', path: versionedPath}, loggingMD);
+    logger.logJSON('info', { serviceType: serviceName, action: 'Registered-POST-Handler', path: versionedPath }, loggingMD);
 
     restifyServer.post(
       versionedPath,
@@ -220,7 +220,7 @@ function createRestService(props) {
         handler.post(req, res, function (err) {
           if (err) {
             logger.logJSON('error', { serviceType: serviceName, action: 'pnServiceService-POST-Handler-ERROR',
-                            path: versionedPath, error: err, svcRequest: req}, loggingMD);
+                            path: versionedPath, error: err, svcRequest: req }, loggingMD);
             assert(!err, util.format('pnServiceSerice - Unexpected ERROR: %j - processing POST on: %s', err, versionedPath));
             return next((new restify.BadRequestError(err)));
           } else {

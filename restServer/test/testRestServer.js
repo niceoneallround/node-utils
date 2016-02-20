@@ -66,14 +66,14 @@ describe('restServer Tests', function () {
       restService2.start(function (err) {
         assert(!err, util.format('Unexpected error starting service2: %j', err));
 
-        client = restify.createJsonClient({url: 'http://localhost:' + props.port});
+        client = restify.createJsonClient({ url: 'http://localhost:' + props.port });
         done();
       });
     });
 
     it('2.1 register a handler on a path that returns 200 response, and GET it', function (done) {
 
-      var handler11 = {}, sendData = {get: 'hello'};
+      var handler11 = {}, sendData = { get: 'hello' };
 
       handler11.get = function (req, res, cb) {
         assert(req, 'No req passed to handler');
@@ -118,14 +118,14 @@ describe('restServer Tests', function () {
       restService3.start(function (err) {
         assert(!err, util.format('Unexpected error starting service2: %j', err));
 
-        client = restify.createJsonClient({url: 'http://localhost:' + props.port});
+        client = restify.createJsonClient({ url: 'http://localhost:' + props.port });
         done();
       });
     });
 
     it('3.1 register a POST handler on a path that returns 200 and some data in the response', function (done) {
 
-      var handler21 = {}, postData = {hello: 'world2'}, responseData = {post: 'response'};
+      var handler21 = {}, postData = { hello: 'world2' }, responseData = { post: 'response' };
 
       handler21.post = function (req, res, cb) {
         req.body.should.have.property('hello');
