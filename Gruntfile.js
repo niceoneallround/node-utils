@@ -62,12 +62,12 @@ module.exports = function(grunt) {
     grunt.log.writeln('In node-utils');
   });
 
-  grunt.registerTask('pp', 'preprocess files', ['log', 'jshint', 'jscs']);
+  grunt.registerTask('pp', 'preprocess files', ['log', 'jshint', 'jscs:src']);
 
-  grunt.registerTask('utest', ['log', 'pp', 'mochaTest:unitTest']);
+  grunt.registerTask('utest', ['pp', 'mochaTest:unitTest']);
   grunt.registerTask('test', ['utest']);
 
-  grunt.registerTask('buildTestCode', ['test']);
-  grunt.registerTask('default', ['pp', 'mochaTest:unitTest']);
+  grunt.registerTask('buildTestCode', ['log', 'test']);
+  grunt.registerTask('default', ['buildTestCode']);
 
 };
