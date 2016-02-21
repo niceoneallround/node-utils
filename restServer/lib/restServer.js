@@ -18,7 +18,8 @@ var assert = require('assert'),
 // props.logger - if want to use a specific logger then pass it in
 // props.logConfig - if want to service to create own one
 // props.host - override default host of 0.0.0.0 passed to .listen()
-// props.serviceVersionNumber - optional if exists added to status message on '/' - not used for url versioning
+// props.serviceVersionNumber - optional if exists added to status message
+//      on '/' - not used for url versioning
 //
 function createRestService(props) {
   'use strict';
