@@ -79,7 +79,7 @@ function createRestService(props) {
 
     assert(startedCallback, 'start - no callback passed in');
 
-    logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Start',
+    logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Start-Invoked',
       baseURL: baseURL, URLversion: URLversion, port: port, host: host }, loggingMD);
 
     restifyServer = restify.createServer();

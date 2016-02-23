@@ -112,7 +112,7 @@ function create(props) {
     var id, msg;
 
     // log message if any pretty stuff then print that afterwards
-    log(level, '%j', [json], md);
+    //log(level, '%j', [json], md);
 
     //
     // If the json contains a service message then pretty it up and print it
@@ -130,7 +130,7 @@ function create(props) {
       log(level, json.serviceType + '-' + json.action + '\nSVC_MESSAGE: %s', [JSON.stringify(msg, null, 2)], md);
     } else {
       // just log what was passed in
-      getLogger().log(level, 'message: %j', json, md);
+      getLogger().log(level, '%j', [json], md);
     }
 
     //
