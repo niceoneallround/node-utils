@@ -2,7 +2,7 @@
 // Assume that grunt-cli has been installed at the npm -g level, so can run grunt
 //
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
   'use strict';
 
   grunt.initConfig({
@@ -34,11 +34,13 @@ module.exports = function(grunt) {
     },
 
     jscs: {
-      src: ['*/lib/*.js', '*/test/*.js'],
-      options: {
-        preset: 'airbnb',
-        disallowMultipleVarDecl: false,
-        requireTrailingComma: false,
+      check: {
+        src: ['*/lib/*.js', '*/test/*.js'],
+        options: {
+          preset: 'airbnb',
+          disallowMultipleVarDecl: false,
+          requireTrailingComma: false,
+        },
       },
       fix: {
         src: ['*/lib/*.js', '*/test/*.js'],
@@ -62,7 +64,7 @@ module.exports = function(grunt) {
     grunt.log.writeln('In node-utils');
   });
 
-  grunt.registerTask('pp', 'preprocess files', ['log', 'jshint', 'jscs:src']);
+  grunt.registerTask('pp', 'preprocess files', ['log', 'jshint', 'jscs:check']);
 
   grunt.registerTask('utest', ['pp', 'mochaTest:unitTest']);
   grunt.registerTask('test', ['utest']);

@@ -35,6 +35,7 @@ function createRestService(props) {
 
   assert(props, 'createRestService requires props');
   assert(props.name, util.format('createRestService props must have a name param:%j', props));
+  console.log('createRestService invoked with props:%j', props);
   serviceName = props.name;
   loggingMD.ServiceType = props.name;
 
