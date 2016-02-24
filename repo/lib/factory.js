@@ -9,7 +9,7 @@ var assert = require('assert'),
     memoryRepoFactory = require('./memoryRepo');
 
 CONFIG_OPTIONS = {
-  DB_TYPE_MEMORY: 'memoryReop'
+  DB_TYPE_MEMORY: 'memory'
 };
 
 //
