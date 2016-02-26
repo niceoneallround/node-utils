@@ -40,7 +40,7 @@ describe('Memory Repo tests', function () {
     });
   });
 
-  describe('2 create collection tests', function () {
+  describe('2 create collection tests with callbacks', function () {
 
     var repo;
 
@@ -117,7 +117,32 @@ describe('Memory Repo tests', function () {
           });
         });
       });
-
     }); // 2.1
+  }); // describe 2
+
+  describe('3 create collection tests with Promises', function () {
+
+    var repo;
+
+    before(function (done) {
+      createNewRepo(function (r) {
+        repo = r;
+        done();
+      });
+    });
+
+    it('3.1 should support create collection, insert into it and fetch from it', function () {
+
+      var props = {
+        name: 'test.com/http://id.webshield.io/com/test/datamodel_1'
+      };
+
+      return repo.promises.createCollection(serviceCtx, props)
+        .then(
+          function (created) {
+            assert(created, 'repo was not created');
+          }
+        );
+    }); // 3.1
   }); // describe 2
 });

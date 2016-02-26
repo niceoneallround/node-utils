@@ -16,13 +16,13 @@ var assert = require('assert'),
 function MemoryRepo() {
   'use strict';
 
-  var collections = {};
+  var collections = {}, repo = {};
 
   // assign the collection of collections a unique id so can debug easier
   collections.id = '_:' + '_collection_id_' + collectionId;
   collectionId = collectionId + 1;
 
-  return {
+  repo = {
 
     // nothing to do for a memory repo
     // callback
@@ -219,7 +219,25 @@ function MemoryRepo() {
 
       return callback(null, results);
     }
+  }; // repo
+
+  //
+  // Add promise versions of the repo operations
+  repo.promises = {
+    createCollection: function (serviceCtx, props) {
+      return new Promise(function (resolve, reject) {
+        repo.createCollection(serviceCtx, props, function (err, created) {
+          if (!err) {
+            return resolve(created);
+          } else {
+            return reject(err);
+          }
+        });
+      });
+    }
   };
+
+  return repo;
 }
 
 module.exports = {
