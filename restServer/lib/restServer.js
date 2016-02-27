@@ -227,7 +227,13 @@ function createRestService(props) {
             return next((new restify.BadRequestError(err)));
           } else {
             console.log('---------restServer.js - calling next');
-            return next();
+            try {
+              next();
+            } catch (ex) {
+              console.log('---------restServer.js caught error by next:%s', ex);
+            }
+
+            //return next();
           }
         });
       }
