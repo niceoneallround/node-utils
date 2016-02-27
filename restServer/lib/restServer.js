@@ -49,6 +49,8 @@ function createRestService(props) {
   // add the built in plugins - if do not add this then no body
   restifyServer.use(restify.bodyParser());
 
+  console.log('createRestService - created server and added the bodyParser');
+
   // if passed in a logger then use that over the one we have
   //
   if (props.logger) {
