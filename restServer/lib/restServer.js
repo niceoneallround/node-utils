@@ -226,6 +226,7 @@ function createRestService(props) {
             assert(!err, util.format('pnServiceSerice - Unexpected ERROR: %j - processing POST on: %s', err, versionedPath));
             return next((new restify.BadRequestError(err)));
           } else {
+            console.log('---------restServer.js - calling next');
             return next();
           }
         });
