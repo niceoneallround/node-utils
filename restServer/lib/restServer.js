@@ -39,6 +39,16 @@ function createRestService(props) {
   serviceName = props.name;
   loggingMD.ServiceType = props.name;
 
+  //
+  // create the underlying RestServer and install any middleware it needs before
+  // installing others - was running into issues with Promises and next being
+  // ignored if installed afterwards
+  //
+  restifyServer = restify.createServer();
+
+  // add the built in plugins - if do not add this then no body
+  restifyServer.use(restify.bodyParser());
+
   // if passed in a logger then use that over the one we have
   //
   if (props.logger) {
@@ -82,8 +92,6 @@ function createRestService(props) {
     logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Start-Invoked',
       baseURL: baseURL, URLversion: URLversion, port: port, host: host }, loggingMD);
 
-    restifyServer = restify.createServer();
-
     //
     // if an unexpected errors the shut down process
     //
@@ -101,9 +109,6 @@ function createRestService(props) {
       console.log('STACK:%s', p4.stack);
       process.abort();
     });
-
-    // add the built in plugins - if do not add this then no body
-    restifyServer.use(restify.bodyParser());
 
     restifyServer.listen(port, host, function (err) {
       assert(!err, util.format('Error restifyServer.listen;%j', err));
