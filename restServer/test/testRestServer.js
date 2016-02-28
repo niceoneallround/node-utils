@@ -123,28 +123,51 @@ describe('restServer Tests', function () {
       });
     });
 
-    it('3.1 register a POST handler on a path that returns 200 and some data in the response', function (done) {
+    it('3.1 register a POST handler on a path that returns data and uses default status', function (done) {
 
-      var handler21 = {}, postData = { hello: 'world2' }, responseData = { post: 'response' };
+      var handler31 = {}, postData = { hello: 'world2' }, responseData = { post: 'response' };
 
-      handler21.post = function (req, res, cb) {
+      handler31.post = function (req, res, cb) {
         req.body.should.have.property('hello');
-        res.setHeader('content-type', 'application/json');
-        res.send(responseData);
-        return cb(null);
+        return cb(null, responseData);
       };
 
-      restService3.registerPOSTHandler('/path_ok', handler21);
+      restService3.registerPOSTHandler('/path_ok31', handler31);
 
-      client.post('/baseURL/v1/path_ok', postData, function (err, req, res, data) {
+      client.post('/baseURL/v1/path_ok31', postData, function (err, req, res, data) {
         assert(!err, util.format('Unexpected error starting on POST: %j', err));
         assert(data, 'No data passed from server');
 
         //console.log('StatusCode:%d -- headers:%j', res.statusCode, res.headers);
-        //console.log('response data string:%s, json:%j', data, JSON.parse(data));
+        //console.log('response data string:%j', data);
 
         res.header('content-type').should.be.equal('application/json');
         res.statusCode.should.be.equal(HttpStatus.OK);
+        data.should.have.property('post', 'response');
+        done();
+      });
+    }); //it 3.1
+
+    it('3.2 register a POST handler on a path that returns 200 and some data in the response', function (done) {
+
+      var handler32 = {}, postData = { hello: 'world2' }, responseData = { post: 'response' };
+
+      handler32.post = function (req, res, cb) {
+        req.body.should.have.property('hello');
+        return cb(null, responseData, HttpStatus.ACCEPTED);
+      };
+
+      restService3.registerPOSTHandler('/path_ok32', handler32);
+
+      client.post('/baseURL/v1/path_ok32', postData, function (err, req, res, data) {
+        assert(!err, util.format('Unexpected error starting on POST: %j', err));
+        assert(data, 'No data passed from server');
+
+        //console.log('StatusCode:%d -- headers:%j', res.statusCode, res.headers);
+        //console.log('response data string:%j', data);
+
+        res.header('content-type').should.be.equal('application/json');
+        res.statusCode.should.be.equal(HttpStatus.ACCEPTED);
         data.should.have.property('post', 'response');
         done();
       });
