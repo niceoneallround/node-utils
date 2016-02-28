@@ -235,13 +235,20 @@ function createRestService(props) {
           } else {
             // send the data - expected to be json
             res.setHeader('content-type', 'application/json');
+
             if (!statusCode) {
               res.status(HttpStatus.OK);
             } else {
               res.status(statusCode);
             }
 
-            res.send(data);
+            if (!data) {
+              res.send();
+            } else {
+              res.send(data);
+            }
+
+            console.log('-----------restServer.js - sent data calling next');
             return next();
           }
         });
