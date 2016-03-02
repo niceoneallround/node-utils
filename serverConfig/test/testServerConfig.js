@@ -2,6 +2,7 @@
 
 var assert = require('assert'),
     configUtils = require('../lib/serverConfig'),
+    should = require('should'),
     util = require('util');
 
 describe('Server Config Utils Tests', function () {
@@ -17,6 +18,8 @@ describe('Server Config Utils Tests', function () {
     it('1.1 it should support isProduction', function () {
 
       var c = configUtils.create();
+
+      assert(c, 'No config returned!');
 
       c.MODE = 'PROD';
       c.isProduction().should.be.equal(true);
@@ -231,7 +234,7 @@ describe('Server Config Utils Tests', function () {
 
   describe('10 test overrides', function () {
 
-    it('9.1 it should work with PROD', function () {
+    it('10.1 it should work with PROD', function () {
 
       var c, overrides;
 
@@ -241,6 +244,24 @@ describe('Server Config Utils Tests', function () {
       overrides.PORT = '23';
       c = configUtils.create(overrides);
       c.getHost().should.be.equal('http://override_yea:23');
+    });
+  });
+
+  describe('11 test crypto params', function () {
+
+    it('11.1 check defaults are good', function () {
+
+      var c, overrides;
+
+      overrides = {};
+      overrides.HOSTNAME = 'override_yea';
+      overrides.jwt = {};
+      overrides.jwt.JWT_SECRET = 'a_secret';
+      c = configUtils.create(overrides);
+      c.should.have.property('crypto');
+      c.crypto.should.have.property('jwt');
+      c.crypto.jwt.should.have.property('issuer', overrides.HOSTNAME);
+      c.crypto.jwt.should.have.property('JWT_SECRET', 'a_secret');
     });
   });
 
