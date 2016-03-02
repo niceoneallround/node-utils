@@ -255,8 +255,9 @@ describe('Server Config Utils Tests', function () {
 
       overrides = {};
       overrides.HOSTNAME = 'override_yea';
-      overrides.jwt = {};
-      overrides.jwt.JWT_SECRET = 'a_secret';
+      overrides.crypto = {};
+      overrides.crypto.jwt = {};
+      overrides.crypto.jwt.JWT_SECRET = 'a_secret';
       c = configUtils.create(overrides);
       c.should.have.property('crypto');
       c.crypto.should.have.property('jwt');

@@ -138,8 +138,8 @@ function create(overrides) {
   c.crypto.jwt = {};
   c.crypto.jwt.type = 'HS256';
   c.crypto.jwt.issuer = c.HOSTNAME;
-  if ((overrides) && (overrides.jwt) && (overrides.jwt.JWT_SECRET)) {
-    c.crypto.jwt.JWT_SECRET = overrides.jwt.JWT_SECRET;
+  if ((overrides) && (overrides.crypto) && (overrides.crypto.jwt) && (overrides.crypto.jwt.JWT_SECRET)) {
+    c.crypto.jwt.JWT_SECRET = overrides.crypto.jwt.JWT_SECRET;
   } else if (process.env.JWT_SECRET) {
     c.crypto.jwt.JWT_SECRET = process.env.JWT_SECRET;
   }
