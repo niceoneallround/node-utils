@@ -118,6 +118,31 @@ describe('Memory Repo tests', function () {
         });
       });
     }); // 2.1
+
+    it('2.2 test that size function works', function (done) {
+
+      var props = {
+        name: 'test.com/http://id.webshield.io/com/test/datamodel22_size'
+      };
+
+      repo.createCollection(serviceCtx, props, function (err, created) {
+        assert(!err, util.format('unexpected err'));
+        assert(created, 'expected created to be true');
+
+        // add an item to the collection
+        repo.insertIntoCollection(serviceCtx, props, [data], function (err, rowsInserted) {
+          assert(!err, util.format('unexpected err'));
+          rowsInserted.length.should.be.equal(1);
+
+          // check size
+          repo.sizeOfCollection(serviceCtx, props, function (err, size) {
+            assert(!err, util.format('unexpected err'));
+            assert((size === 1), util.format('expected colleciton size of 1 got :%s', size));
+            done();
+          });
+        });
+      });
+    }); // 2.2
   }); // describe 2
 
   describe('3 create collection tests with Promises', function () {

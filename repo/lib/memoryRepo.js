@@ -218,6 +218,24 @@ function MemoryRepo() {
       }
 
       return callback(null, results);
+    },
+
+    //
+    // Return the size of the specified collection
+    // *serviceCtx
+    // *props.name - collection name
+    // *callback
+    //  *err
+    //  *results collection
+    sizeOfCollection: function sizeOfCollection(serviceCtx, props, callback) {
+      assert(serviceCtx, util.format('sizeOfCollection needs a serviceCtx'));
+      assert(props.name, util.format('sizeOfCollection with props.name undefined, props is: %j', props));
+
+      var col = this.getCollection(serviceCtx, props.name);
+      assert(col, util.format('sizeOfCollection could not find collection? props:%j', props));
+
+      return callback(null, col.length);
+
     }
   }; // repo
 
