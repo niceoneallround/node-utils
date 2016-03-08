@@ -156,16 +156,24 @@ describe('Memory Repo tests', function () {
       });
     });
 
-    it('3.1 should support create collection, insert into it and fetch from it', function () {
+    it('3.1 should support create collection and check size', function () {
 
       var props = {
-        name: 'test.com/http://id.webshield.io/com/test/datamodel_1'
+        name: 'test.com/http://id.webshield.io/com/test/datamodel31'
       };
 
       return repo.promises.createCollection(serviceCtx, props)
         .then(
           function (created) {
             assert(created, 'repo was not created');
+
+            // check collection size
+            return repo.promises.sizeOfCollection(serviceCtx, props)
+              .then(
+                function (size) {
+                  assert((size === 0), util.format('expected size to be zero got:%s', size));
+                }
+              );
           }
         );
     }); // 3.1

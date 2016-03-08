@@ -252,6 +252,18 @@ function MemoryRepo() {
           }
         });
       });
+    },
+
+    sizeOfCollection: function (serviceCtx, props) {
+      return new Promise(function (resolve, reject) {
+        repo.sizeOfCollection(serviceCtx, props, function (err, size) {
+          if (!err) {
+            return resolve(size);
+          } else {
+            return reject(err);
+          }
+        });
+      });
     }
   };
 
