@@ -64,16 +64,10 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-jscs');
 
-  grunt.registerTask('log', 'log name', function (arg) {
-    grunt.log.writeln('In node-utils');
-  });
+  grunt.registerTask('pp', 'preprocess files', ['jshint', 'jscs:check']);
 
-  grunt.registerTask('pp', 'preprocess files', ['log', 'jshint', 'jscs:check']);
+  grunt.registerTask('test', ['pp', 'mochaTest:unitTest']);
 
-  grunt.registerTask('utest', ['pp', 'mochaTest:unitTest']);
-  grunt.registerTask('test', ['utest']);
-
-  grunt.registerTask('buildTestCode', ['log', 'test']);
-  grunt.registerTask('default', ['buildTestCode']);
+  grunt.registerTask('default', ['test']);
 
 };

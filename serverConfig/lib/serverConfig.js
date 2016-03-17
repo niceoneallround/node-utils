@@ -133,15 +133,15 @@ function create(overrides) {
     return isProduction(c);
   };
 
-  // setup the crypto aspects
+  // setup the crypto configuration
   c.crypto = {};
   c.crypto.jwt = {};
-  c.crypto.jwt.type = 'HS256';
   c.crypto.jwt.issuer = c.HOSTNAME;
+  c.crypto.jwt.type = 'HS256';
   if ((overrides) && (overrides.crypto) && (overrides.crypto.jwt) && (overrides.crypto.jwt.JWT_SECRET)) {
-    c.crypto.jwt.JWT_SECRET = overrides.crypto.jwt.JWT_SECRET;
+    c.crypto.jwt.secret = overrides.crypto.jwt.JWT_SECRET;
   } else if (process.env.JWT_SECRET) {
-    c.crypto.jwt.JWT_SECRET = process.env.JWT_SECRET;
+    c.crypto.jwt.secret = process.env.JWT_SECRET;
   }
 
   return c;

@@ -262,7 +262,7 @@ describe('Server Config Utils Tests', function () {
       c.should.have.property('crypto');
       c.crypto.should.have.property('jwt');
       c.crypto.jwt.should.have.property('issuer', overrides.HOSTNAME);
-      c.crypto.jwt.should.have.property('JWT_SECRET', 'a_secret');
+      c.crypto.jwt.should.have.property('secret', 'a_secret');
     });
   });
 
