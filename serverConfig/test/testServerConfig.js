@@ -248,9 +248,7 @@ describe('Server Config Utils Tests', function () {
   });
 
   describe('11 test crypto params', function () {
-
     it('11.1 check defaults are good', function () {
-
       var c, overrides;
 
       overrides = {};
@@ -263,6 +261,24 @@ describe('Server Config Utils Tests', function () {
       c.crypto.should.have.property('jwt');
       c.crypto.jwt.should.have.property('issuer', overrides.HOSTNAME);
       c.crypto.jwt.should.have.property('secret', 'a_secret');
+    });
+  });
+
+  describe('12 test TLS params', function () {
+
+    it('11.1 check overrides work', function () {
+      var c, overrides;
+
+      overrides = {};
+      overrides.SERVER_TLS_CERT_FILE = 'override1';
+      overrides.SERVER_TLS_ENCODED_KEY_FILE = 'override2';
+      overrides.AWS_KMS_REGION = 'override3';
+      c = configUtils.create(overrides);
+      c.should.have.property('SERVER_TLS_CERT_FILE', 'override1');
+      c.should.have.property('SERVER_TLS_ENCODED_KEY_FILE', 'override2');
+      c.should.have.property('AWS_KMS_REGION', 'override3');
+      c.should.have.property('INBOUND_TLS_ON');
+      c.should.have.property('OUTBOUND_TLS_ON');
     });
   });
 

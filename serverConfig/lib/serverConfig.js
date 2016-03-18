@@ -133,6 +133,28 @@ function create(overrides) {
     return isProduction(c);
   };
 
+  // setup the TLS related configuration options
+  if ((overrides) && (overrides.SERVER_TLS_CERT_FILE)) {
+    c.SERVER_TLS_CERT_FILE = overrides.SERVER_TLS_CERT_FILE;
+  } else {
+    c.SERVER_TLS_CERT_FILE = process.env.SERVER_TLS_CERT_FILE;
+  }
+
+  if ((overrides) && (overrides.SERVER_TLS_ENCODED_KEY_FILE)) {
+    c.SERVER_TLS_ENCODED_KEY_FILE = overrides.SERVER_TLS_ENCODED_KEY_FILE;
+  } else {
+    c.SERVER_TLS_ENCODED_KEY_FILE = process.env.SERVER_TLS_ENCODED_KEY_FILE;
+  }
+
+  if ((overrides) && (overrides.AWS_KMS_REGION)) {
+    c.AWS_KMS_REGION = overrides.AWS_KMS_REGION;
+  } else {
+    c.AWS_KMS_REGION = process.env.AWS_KMS_REGION;
+  }
+
+  c.INBOUND_TLS_ON = 'fixme-set-in-config';
+  c.OUTBOUND_TLS_ON = 'fixme-set-in-config';
+
   // setup the crypto configuration
   c.crypto = {};
   c.crypto.jwt = {};
