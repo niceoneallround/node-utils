@@ -262,15 +262,13 @@ function createRestService(props) {
   // *data - the jsonld to send
   // *callback(err, response, body)
   //
-  function POSTJson(props, callback) {
+  function POSTJwt(props, callback) {
 
     // create request options
     function createRequestOptions(props, next) {
       assert(props.url, util.format('props.url missing:%j', props));
-      assert(props.json, util.format('props.json missing:%j', props));
+      assert(props.jwt, util.format('props.jwt missing:%j', props));
 
-      // convert json to string
-      var mess = JSON.stringify(props.json);
       if (props.tls) {
         assert(false, 'restserver - Add code for tls path');
         return next(null,
@@ -279,7 +277,7 @@ function createRestService(props) {
             cert:   'foobar', //protectedStore.serverTlsCertBuffer(),
             url: props.url,
             method: 'POST',
-            body: mess,
+            body: props.jwt,
             requestCert:        true,
             rejectUnauthorized: false, // added this as no ability to check the cert returned by Aetna as no chain
             agent: false
@@ -288,11 +286,11 @@ function createRestService(props) {
         return next(null,
           {
             method: 'POST',
-            body: mess,
+            body: props.jwt,
             url: props.url,
             headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': Buffer.byteLength(props.message)
+              'Content-Type': 'text/plain', // was not sure so put this
+              'Content-Length': Buffer.byteLength(props.jwt)
             }
           }); // next
       }
@@ -302,18 +300,13 @@ function createRestService(props) {
       // turn on request debug
       //require('request').debug = true;
 
-      logger.logJSON('info', { serviceType: serviceName, action: 'POSTJson-Start', URL: props.url }, loggingMD);
+      logger.logJSON('info', { serviceType: serviceName, action: 'POSTJwt-Start', URL: props.url }, loggingMD);
 
       request(requestOpts, function (err, response, body) {
-        // convert body to json from string
-        var jsonBody = null;
-        if (body) {
-          jsonBody = JSON.parse(body); // just let any errors flow up for now - FIXME rich 23-march
-        }
+        logger.logJSON('info', { serviceType: serviceName, action: 'POSTJwt-End', URL: props.url }, loggingMD);
 
-        logger.logJSON('info', { serviceType: serviceName, action: 'POSTJson-End', URL: props.url }, loggingMD);
-
-        return callback(err, response, jsonBody);
+        // just return the body which may be a JWT and let caller deal with
+        return callback(err, response, body);
       }); // request
     });
   } // post
@@ -322,7 +315,7 @@ function createRestService(props) {
     logger: getLogger,
     registerGETHandler: registerGETHandler,
     registerPOSTHandler: registerPOSTHandler,
-    POSTJson: POSTJson,
+    POSTJwt: POSTJwt,
     start: start,
     stop: stop };
 

@@ -175,7 +175,7 @@ describe('restServer Tests', function () {
     }); //it 3.2
   }); // describe 3
 
-  describe('4 POST to another server tests', function () {
+  describe('4 POST JWT to another server tests', function () {
     var restService1;
 
     before(function (done) {
@@ -192,9 +192,9 @@ describe('restServer Tests', function () {
       });
     });
 
-    it('4.1 should be able to post to another URL', function (done) {
+    it('4.1 should be able to post JWT to another URL', function (done) {
       var props, url = 'https://bogus.webshield.io/test41',
-          message = { '@id': '_:a_message_body' },
+          jwtM = '7282822882-bogus',
           nockScope;
 
       // nock out the POST call
@@ -206,19 +206,19 @@ describe('restServer Tests', function () {
             .post('/test41')
             .reply(HttpStatus.OK, function (uri, requestBody) {
               uri.should.equal('/test41');
-              requestBody.should.have.property('@id', message['@id']);
-              this.req.headers.should.have.property('content-type', 'application/json');
+              requestBody.should.be.equal(jwtM);
+              this.req.headers.should.have.property('content-type', 'text/plain');
               console.log('---headers:%j', this.req.headers);
-              return { prop1: 'dummy.com:8080' };
+              return 'what-is-this';
             });
 
       props = {};
       props.url = url;
-      props.json = message;
-      restService1.POSTJson(props, function (err, response, body) {
+      props.jwt = jwtM;
+      restService1.POSTJwt(props, function (err, response, body) {
         assert(!err, util.format('Unexpected error starting on POST: %j', err));
         response.should.have.property('statusCode', HttpStatus.OK);
-        console.log('body:%j', body);
+        body.should.be.equal('what-is-this');
         console.log('response:%j', response);
         done();
       });
