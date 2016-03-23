@@ -2,6 +2,7 @@
 var assert = require('assert'),
   loggerFactory = require('../../logger/lib/logger'),
   HttpStatus = require('http-status'),
+  nock = require('nock'),
   restServiceFactory = require('../lib/restServer'),
   restify = require('restify'),
   should = require('should'),
@@ -51,7 +52,7 @@ describe('restServer Tests', function () {
 
   }); // describe 1
 
-  describe('2 GET tests', function () {
+  describe('2 GET handler tests', function () {
 
     var restService2, client;
 
@@ -102,7 +103,7 @@ describe('restServer Tests', function () {
     }); //it 2.1
   }); // describe 2
 
-  describe('3 POST tests', function () {
+  describe('3 POST handler tests', function () {
 
     var restService3, client;
 
@@ -171,7 +172,58 @@ describe('restServer Tests', function () {
         data.should.have.property('post', 'response');
         done();
       });
-    }); //it 3.1
+    }); //it 3.2
   }); // describe 3
+
+  describe('4 POST to another server tests', function () {
+    var restService1;
+
+    before(function (done) {
+      var props = {};
+      props.name = 'Test 1';
+      props.baseURL = '/baseURL';
+      props.URLversion = 'v1';
+      props.port = 3104;
+      restService1 = restServiceFactory.create(props);
+
+      restService1.start(function (err) {
+        assert(!err, util.format('Unexpected error starting service: %j', err));
+        done();
+      });
+    });
+
+    it('4.1 should be able to post to another URL', function (done) {
+      var props, url = 'https://bogus.webshield.io/test41',
+          message = { '@id': '_:a_message_body' },
+          nockScope;
+
+      // nock out the POST call
+      nock.cleanAll(); // remove any left over nocks
+
+      // nock out the GET for the home document
+      nockScope = nock('https://bogus.webshield.io')
+            .log(console.log)
+            .post('/test41')
+            .reply(HttpStatus.OK, function (uri, requestBody) {
+              uri.should.equal('/test41');
+              requestBody.should.have.property('@id', message['@id']);
+              this.req.headers.should.have.property('content-type', 'application/json');
+              console.log('---headers:%j', this.req.headers);
+              return { prop1: 'dummy.com:8080' };
+            });
+
+      props = {};
+      props.url = url;
+      props.json = message;
+      restService1.POSTJson(props, function (err, response, body) {
+        assert(!err, util.format('Unexpected error starting on POST: %j', err));
+        response.should.have.property('statusCode', HttpStatus.OK);
+        console.log('body:%j', body);
+        console.log('response:%j', response);
+        done();
+      });
+    }); //it 4.1
+
+  }); // describe 1
 
 }); // describe

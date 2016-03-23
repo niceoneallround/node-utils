@@ -9,6 +9,7 @@ var assert = require('assert'),
     loggerFactory = require('../../logger/lib/logger'),
     loggingMD = { fileName: 'restService.js' },
     HttpStatus = require('http-status'),
+    request = require('request'),
     restify = require('restify'),
     util = require('util');
 
@@ -248,7 +249,6 @@ function createRestService(props) {
               res.send(data);
             }
 
-            console.log('-----------restServer.js - sent data calling next');
             return next();
           }
         });
@@ -256,10 +256,69 @@ function createRestService(props) {
     );
   }
 
+  //
+  // Utitility routine to POST to a URL
+  // *props - will base on request options
+  // *data - the jsonld to send
+  // *callback(err, response, body)
+  //
+  function POSTJson(props, callback) {
+
+    // create request options
+    function createRequestOptions(props, next) {
+      assert(props.url, util.format('props.url missing:%j', props));
+      assert(props.json, util.format('props.json missing:%j', props));
+
+      // convert json to string
+      var mess = JSON.stringify(props.json);
+      if (props.tls) {
+        assert(false, 'restserver - Add code for tls path');
+        return next(null,
+          {
+            key:    'foobar', // key from the protected store
+            cert:   'foobar', //protectedStore.serverTlsCertBuffer(),
+            url: props.url,
+            method: 'POST',
+            body: mess,
+            requestCert:        true,
+            rejectUnauthorized: false, // added this as no ability to check the cert returned by Aetna as no chain
+            agent: false
+          }); // next
+      } else {
+        return next(null,
+          {
+            method: 'POST',
+            body: mess,
+            url: props.url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(props.message)
+            }
+          }); // next
+      }
+    } // createRequestOptions
+
+    createRequestOptions(props, function (err, requestOpts) {
+      // turn on request debug
+      //require('request').debug = true;
+
+      request(requestOpts, function (err, response, body) {
+        // convert body to json from string
+        var jsonBody = null;
+        if (body) {
+          jsonBody = JSON.parse(body); // just let any errors flow up for now - FIXME rich 23-march
+        }
+
+        return callback(err, response, jsonBody);
+      }); // request
+    });
+  } // post
+
   thisService = {
     logger: getLogger,
     registerGETHandler: registerGETHandler,
     registerPOSTHandler: registerPOSTHandler,
+    POSTJson: POSTJson,
     start: start,
     stop: stop };
 
