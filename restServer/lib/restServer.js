@@ -302,12 +302,16 @@ function createRestService(props) {
       // turn on request debug
       //require('request').debug = true;
 
+      logger.logJSON('info', { serviceType: serviceName, action: 'POSTJson-Start', URL: props.url }, loggingMD);
+
       request(requestOpts, function (err, response, body) {
         // convert body to json from string
         var jsonBody = null;
         if (body) {
           jsonBody = JSON.parse(body); // just let any errors flow up for now - FIXME rich 23-march
         }
+
+        logger.logJSON('info', { serviceType: serviceName, action: 'POSTJson-End', URL: props.url }, loggingMD);
 
         return callback(err, response, jsonBody);
       }); // request
