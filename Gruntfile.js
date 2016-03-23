@@ -41,10 +41,7 @@ module.exports = function (grunt) {
           preset: 'airbnb',
           disallowMultipleVarDecl: false,
           requireTrailingComma: false,
-          maximumLineLength: 255,
-          requireSpacesInAnonymousFunctionExpression: {
-            beforeOpeningRoundBrace: true
-          },
+          maximumLineLength: 255
         },
       },
       fix: {
