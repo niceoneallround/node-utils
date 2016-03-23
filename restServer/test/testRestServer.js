@@ -2,7 +2,6 @@
 var assert = require('assert'),
   loggerFactory = require('../../logger/lib/logger'),
   HttpStatus = require('http-status'),
-  nock = require('nock'),
   restServiceFactory = require('../lib/restServer'),
   restify = require('restify'),
   should = require('should'),
@@ -174,56 +173,5 @@ describe('restServer Tests', function () {
       });
     }); //it 3.2
   }); // describe 3
-
-  describe('4 POST JWT to another server tests', function () {
-    var restService1;
-
-    before(function (done) {
-      var props = {};
-      props.name = 'Test 1';
-      props.baseURL = '/baseURL';
-      props.URLversion = 'v1';
-      props.port = 3104;
-      restService1 = restServiceFactory.create(props);
-
-      restService1.start(function (err) {
-        assert(!err, util.format('Unexpected error starting service: %j', err));
-        done();
-      });
-    });
-
-    it('4.1 should be able to post JWT to another URL', function (done) {
-      var props, url = 'https://bogus.webshield.io/test41',
-          jwtM = '7282822882-bogus',
-          nockScope;
-
-      // nock out the POST call
-      nock.cleanAll(); // remove any left over nocks
-
-      // nock out the GET for the home document
-      nockScope = nock('https://bogus.webshield.io')
-            .log(console.log)
-            .post('/test41')
-            .reply(HttpStatus.OK, function (uri, requestBody) {
-              uri.should.equal('/test41');
-              requestBody.should.be.equal(jwtM);
-              this.req.headers.should.have.property('content-type', 'text/plain');
-              console.log('---headers:%j', this.req.headers);
-              return 'what-is-this';
-            });
-
-      props = {};
-      props.url = url;
-      props.jwt = jwtM;
-      restService1.POSTJwt(props, function (err, response, body) {
-        assert(!err, util.format('Unexpected error starting on POST: %j', err));
-        response.should.have.property('statusCode', HttpStatus.OK);
-        body.should.be.equal('what-is-this');
-        console.log('response:%j', response);
-        done();
-      });
-    }); //it 4.1
-
-  }); // describe 1
 
 }); // describe
