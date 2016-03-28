@@ -188,11 +188,14 @@ function createRestService(props) {
           if (err) {
             logger.logJSON('error', { serviceType: serviceName, action: 'pnServiceService-GET-Handler-ERROR',
                             path: versionedPath, error: err }, loggingMD);
-            assert(!err, util.format('pnServiceSerice - Unexpected ERROR: %j - processing GET on: %s', err, versionedPath));
+            assert.fail(util.format('pnServiceSerice - Unexpected ERROR: %j - processing GET on: %s', err, versionedPath));
             return next((new restify.BadRequestError(err)));
           } else {
-            // send the data - expected to be json
-            res.setHeader('content-type', 'application/json');
+            // if not set then default to json
+            if (!res.getHeader('content-type')) {
+              res.setHeader('content-type', 'application/json');
+            }
+
             res.send(data);
             return next();
           }

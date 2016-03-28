@@ -65,7 +65,6 @@ describe('restServer Tests', function () {
 
       restService2.start(function (err) {
         assert(!err, util.format('Unexpected error starting service2: %j', err));
-
         client = restify.createJsonClient({ url: 'http://localhost:' + props.port });
         done();
       });
@@ -73,17 +72,17 @@ describe('restServer Tests', function () {
 
     it('2.1 register a handler on a path that returns 200 response, and GET it', function (done) {
 
-      var handler11 = {}, sendData = { get: 'hello' };
+      var handler21 = {}, sendData = { get: 'hello' };
 
-      handler11.get = function (req, res, cb) {
+      handler21.get = function (req, res, cb) {
         assert(req, 'No req passed to handler');
         assert(res, 'No res passed to handler');
         return cb(null, sendData);
       };
 
-      restService2.registerGETHandler('/path_ok', handler11);
+      restService2.registerGETHandler('/path_21', handler21);
 
-      client.get('/baseURL/v1/path_ok', function (err, req, res, data) {
+      client.get('/baseURL/v1/path_21', function (err, req, res, data) {
         assert(!err, util.format('Unexpected error starting on GET: %j', err));
         assert(req, 'No req passed from client');
         assert(res, 'No res passed from client');
@@ -95,6 +94,33 @@ describe('restServer Tests', function () {
         //console.log('StatusCode:%d -- headers:%j', res.statusCode, res.headers);
         //console.log('response data json:%j', data);
 
+        data.should.have.property('get');
+        data.should.have.property('get', 'hello');
+        done();
+      });
+    }); //it 2.1
+
+    it('2.2 register a handler on a path that returns text/plain and GET it', function (done) {
+
+      var handler22 = {}, sendData = { get: 'hello' };
+
+      handler22.get = function (req, res, cb) {
+        assert(req, 'No req passed to handler');
+        assert(res, 'No res passed to handler');
+        res.setHeader('content-type', 'text/plain');
+        return cb(null, sendData);
+      };
+
+      restService2.registerGETHandler('/path_22', handler22);
+
+      client.get('/baseURL/v1/path_22', function (err, req, res, data) {
+        assert(!err, util.format('Unexpected error starting on GET: %j', err));
+        assert(req, 'No req passed from client');
+        assert(res, 'No res passed from client');
+        assert(data, 'No data passed from server');
+
+        res.statusCode.should.be.equal(HttpStatus.OK);
+        res.header('content-type').should.be.equal('text/plain');
         data.should.have.property('get');
         data.should.have.property('get', 'hello');
         done();
