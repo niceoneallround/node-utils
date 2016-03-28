@@ -85,7 +85,7 @@ function MemoryRepo() {
       var col, i;
       assert(serviceCtx, util.format('insertIntoCollection needs a serviceCtx'));
       assert(props.name, util.format('insertIntoCollection needs a prop.name, props is: %j', props));
-      assert(util.isArray(data), util.format('data must be an array: %j', data));
+      assert(util.isArray(data), util.format('insertIntoCollection data must be an array: %j', data));
 
       col = this.getCollection(serviceCtx, props.name);
       assert(col, util.format('insertIntoCollection could not find collection? props:%j', props));
@@ -112,9 +112,9 @@ function MemoryRepo() {
     updateItemInCollection: function updateItemInCollection(serviceCtx, props, query, updateItem, callback) {
       var updatedCount = 0, col, i;
 
-      assert(serviceCtx, util.format('update needs a serviceCtx'));
-      assert(props.name, util.format('update needs a prop.name, props is: %j', props));
-      assert(query['@id'], util.format('update query needs an @id to search for %j', props));
+      assert(serviceCtx, util.format('updateItemInCollection needs a serviceCtx'));
+      assert(props.name, util.format('updateItemInCollection needs a prop.name, props is: %j', props));
+      assert(query['@id'], util.format('updateItemInCollection query needs an @id to search for %j', props));
       assert(!util.isArray(updateItem), util.format('updateItem must be an object: %j', updateItem));
 
       col = this.getCollection(serviceCtx, props.name);
@@ -147,8 +147,8 @@ function MemoryRepo() {
     removeAllFromCollection: function removeAllFromCollection(serviceCtx, props, callback) {
       var count, col;
 
-      assert(serviceCtx, util.format('update needs a serviceCtx'));
-      assert(props.name, util.format('cannot remove from collection with props.name undefined, props is: %j', props));
+      assert(serviceCtx, util.format('removeAllFromCollection needs a serviceCtx'));
+      assert(props.name, util.format('removeAllFromCollection cannot remove from collection with props.name undefined, props is: %j', props));
 
       col = this.getCollection(serviceCtx, props.name);
       assert(col, util.format('removeAllFromCollection could not find collection? props:%j', props));
