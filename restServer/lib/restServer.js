@@ -226,20 +226,31 @@ function createRestService(props) {
       },
 
       function (req, res, next) {
-        handler.post(req, res, function (err, data, statusCode) {
+        handler.post(req, res, function (err, data, props) {
           if (err) {
             logger.logJSON('error', { serviceType: serviceName, action: 'pnServiceService-POST-Handler-ERROR',
                             path: versionedPath, error: err, svcRequest: req }, loggingMD);
             assert(!err, util.format('pnServiceSerice - Unexpected ERROR: %j - processing POST on: %s', err, versionedPath));
             return next((new restify.BadRequestError(err)));
           } else {
-            // send the data - expected to be json
-            res.setHeader('content-type', 'application/json');
 
-            if (!statusCode) {
+            if (!props) {
+              res.setHeader('content-type', 'application/json');
               res.status(HttpStatus.OK);
+            } else if (props.v2) {
+              if (props.contentType) {
+                res.setHeader('content-type', props.contentType);
+              } else {
+                res.setHeader('content-type', 'application/json');
+              }
+
+              if (props.statusCode) {
+                res.status(props.statusCode);
+              } else {
+                res.status(HttpStatus.OK);
+              }
             } else {
-              res.status(statusCode);
+              res.status(props); // must be old style and param is a status code
             }
 
             if (!data) {
