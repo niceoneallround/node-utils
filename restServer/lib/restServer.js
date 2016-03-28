@@ -237,7 +237,7 @@ function createRestService(props) {
             if (!props) {
               res.setHeader('content-type', 'application/json');
               res.status(HttpStatus.OK);
-            } else if (props.v2) {
+            } else if ((props.contentType) || (props.statusCode)) {//FIXME one all calls to this routine are updated then remove
               if (props.contentType) {
                 res.setHeader('content-type', props.contentType);
               } else {
@@ -250,7 +250,7 @@ function createRestService(props) {
                 res.status(HttpStatus.OK);
               }
             } else {
-              res.status(props); // must be old style and param is a status code
+              assert(false, util.format('register post handler old format change to pass in a props:%j', props));
             }
 
             if (!data) {

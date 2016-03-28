@@ -123,7 +123,7 @@ describe('restServer Tests', function () {
       });
     });
 
-    it('3.1 register a POST handler on a path that returns data and uses default status', function (done) {
+    it('3.1 register a POST handler on a path that returns data and uses default props', function (done) {
 
       var handler31 = {}, postData = { hello: 'world2' }, responseData = { post: 'response' };
 
@@ -148,13 +148,13 @@ describe('restServer Tests', function () {
       });
     }); //it 3.1
 
-    it('3.2 register a POST handler on a path that returns 200 and some data in the response', function (done) {
+    it('3.2 register a POST handler on a path that has props.statusCode', function (done) {
 
       var handler32 = {}, postData = { hello: 'world2' }, responseData = { post: 'response' };
 
       handler32.post = function (req, res, cb) {
         req.body.should.have.property('hello');
-        return cb(null, responseData, HttpStatus.ACCEPTED);
+        return cb(null, responseData, { statusCode: HttpStatus.ACCEPTED });
       };
 
       restService3.registerPOSTHandler('/path_ok32', handler32);
@@ -168,6 +168,31 @@ describe('restServer Tests', function () {
 
         res.header('content-type').should.be.equal('application/json');
         res.statusCode.should.be.equal(HttpStatus.ACCEPTED);
+        data.should.have.property('post', 'response');
+        done();
+      });
+    }); //it 3.2
+
+    it('3.3 register a POST handler on a path that has props.contentType', function (done) {
+
+      var handler33 = {}, postData = { hello: 'world2' }, responseData = { post: 'response' };
+
+      handler33.post = function (req, res, cb) {
+        req.body.should.have.property('hello');
+        return cb(null, responseData, { contentType: 'text/plain' });
+      };
+
+      restService3.registerPOSTHandler('/path_ok33', handler33);
+
+      client.post('/baseURL/v1/path_ok33', postData, function (err, req, res, data) {
+        assert(!err, util.format('Unexpected error starting on POST: %j', err));
+        assert(data, 'No data passed from server');
+
+        //console.log('StatusCode:%d -- headers:%j', res.statusCode, res.headers);
+        //console.log('response data string:%j', data);
+
+        res.header('content-type').should.be.equal('text/plain');
+        res.statusCode.should.be.equal(HttpStatus.OK);
         data.should.have.property('post', 'response');
         done();
       });

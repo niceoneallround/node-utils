@@ -1,6 +1,6 @@
 {
   "name": "node-utils",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "Contains a set of utils",
   "main": "Gruntfile.js",
   "scripts": {
