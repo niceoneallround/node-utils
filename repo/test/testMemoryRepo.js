@@ -163,19 +163,24 @@ describe('Memory Repo tests', function () {
       };
 
       return repo.promises.createCollection(serviceCtx, props)
-        .then(
+        .then(//result of create 3 #1
           function (created) {
             assert(created, 'repo was not created');
 
             // check collection size
+            console.log('....');
             return repo.promises.sizeOfCollection(serviceCtx, props)
-              .then(
-                function (size) {
-                  assert((size === 0), util.format('expected size to be zero got:%s', size));
-                }
-              );
-          }
-        );
+        .then(//result of sizeOf #2
+            function (size) {
+              assert((size === 0), util.format('expected size to be zero got:%s', size));
+
+              return repo.promises.insertIntoCollection(serviceCtx, props, [data])
+        .then(//result of insert #3
+            function (insertedData) {
+              assert(insertedData.length === 1, util.format('expected one row back after insert got:%j', insertedData));
+            }); // #3
+            }); // #2
+          }); // #1
     }); // 3.1
   }); // describe 2
 });
