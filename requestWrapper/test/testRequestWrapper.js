@@ -27,7 +27,6 @@ describe('restServer Tests', function () {
               uri.should.equal('/test41');
               requestBody.should.be.equal(jwtM);
               this.req.headers.should.have.property('content-type', 'text/plain');
-              console.log('---headers:%j', this.req.headers);
               return 'what-is-this';
             });
 
@@ -38,10 +37,41 @@ describe('restServer Tests', function () {
         assert(!err, util.format('Unexpected error starting on POST: %j', err));
         response.should.have.property('statusCode', HttpStatus.OK);
         body.should.be.equal('what-is-this');
-        console.log('response:%j', response);
         done();
       });
-    }); //it 4.1
+    }); //it 1.1
+
+  }); // describe 1
+
+  describe('2 test GET JWT', function () {
+
+    it('2.1 should be able get a JWT from a URL', function (done) {
+      var props, url = 'https://bogus.webshield.io/test21',
+          jwtM = '7282822882-bogus',
+          nockScope;
+
+      // nock out the POST call
+      nock.cleanAll(); // remove any left over nocks
+
+      // nock out the GET for the home document
+      nockScope = nock('https://bogus.webshield.io')
+            .log(console.log)
+            .get('/test21')
+            .reply(HttpStatus.OK, function (uri, requestBody) {
+              uri.should.equal('/test21');
+              assert(!requestBody, util.format('Did not expect a request body:%j', requestBody));
+              return jwtM;
+            });
+
+      props = {};
+      props.url = url;
+      requestWrapper.getJWT(props, function (err, response, body) {
+        assert(!err, util.format('Unexpected error starting on POST: %j', err));
+        response.should.have.property('statusCode', HttpStatus.OK);
+        body.should.be.equal(jwtM);
+        done();
+      });
+    }); //it 1.1
 
   }); // describe 1
 
