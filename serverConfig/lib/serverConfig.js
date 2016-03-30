@@ -27,6 +27,7 @@ function create(overrides) {
   var c = {}, tmp;
 
   c.MODE = process.env.MODE;
+  c.passedInOverrides = overrides;
 
   //
   // If no mode default to production
@@ -99,6 +100,13 @@ function create(overrides) {
   c.AUDIT_URL = 'not-set';
   if (process.env.AUDIT_URL) {
     c.AUDIT_URL = process.env.AUDIT_URL;
+  }
+
+  c.METADATA_SERVICE_URL = 'not-set';
+  if ((overrides) && (overrides.METADATA_SERVICE_URL)) {
+    c.METADATA_SERVICE_URL = overrides.METADATA_SERVICE_URL;
+  } else if (process.env.METADATA_SERVICE_URL) {
+    c.METADATA_SERVICE_URL = process.env.METADATA_SERVICE_URL;
   }
 
   c.getHost = function () {

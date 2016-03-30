@@ -266,10 +266,8 @@ describe('Server Config Utils Tests', function () {
 
   describe('12 test TLS params', function () {
 
-    it('11.1 check overrides work', function () {
-      var c, overrides;
-
-      overrides = {};
+    it('12.1 check overrides work', function () {
+      var c, overrides = {};
       overrides.SERVER_TLS_CERT_FILE = 'override1';
       overrides.SERVER_TLS_ENCODED_KEY_FILE = 'override2';
       overrides.AWS_KMS_REGION = 'override3';
@@ -279,6 +277,16 @@ describe('Server Config Utils Tests', function () {
       c.should.have.property('AWS_KMS_REGION', 'override3');
       c.should.have.property('INBOUND_TLS_ON');
       c.should.have.property('OUTBOUND_TLS_ON');
+    });
+  });
+
+  describe('13 test METADATA_SERVICE_URL', function () {
+    it('13.1 check overrides work', function () {
+      var c, overrides = {};
+
+      overrides.METADATA_SERVICE_URL = 'override1';
+      c = configUtils.create(overrides);
+      c.should.have.property('METADATA_SERVICE_URL', 'override1');
     });
   });
 
