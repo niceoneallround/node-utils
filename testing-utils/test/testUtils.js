@@ -40,6 +40,8 @@ describe('Test the test Utils', function () {
       rsp.should.have.property('headers');
       rsp.setHeader('foo', 'bar');
       rsp.headers.should.have.property('foo', 'bar');
+      rsp.setHeader('content-type', 'text/plain');
+      rsp.headers.should.have.property('content-type', 'text/plain');
     }); //it 3.1
   }); // describe 3
 
