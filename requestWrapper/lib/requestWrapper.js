@@ -63,12 +63,12 @@ function postJWT(props, callback) {
 } // post
 
 //
-// Utitility routine to fetch a JWT
+// Utitility routine to GET
 // *props - will base on request options
 // *data - the jsonld to send
 // *callback(err, response, body)
 //
-function getJWT(props, callback) {
+function get(props, callback) {
   'use strict';
 
   // create request options
@@ -105,9 +105,22 @@ function getJWT(props, callback) {
       return callback(err, response, body);
     }); // request
   });
-} // post
+} // get
+
+//
+// Utitility routine to fetch a JWT
+// *props - will base on request options
+// *data - the jsonld to send
+// *callback(err, response, body)
+//
+function getJWT(props, callback) {
+  'use strict';
+  return get(props, callback);
+}
 
 module.exports = {
+
+  get: get,
 
   getJWT: getJWT,
   postJWT: postJWT

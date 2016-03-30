@@ -71,8 +71,38 @@ describe('restServer Tests', function () {
         body.should.be.equal(jwtM);
         done();
       });
-    }); //it 1.1
+    }); //it 2.1
+  }); // describe 2
 
-  }); // describe 1
+  describe('3 test GET JWT', function () {
+
+    it('3.1 should be able get a URL', function (done) {
+      var props, url = 'https://bogus.webshield.io/test31',
+          body = '7282822882-bogus',
+          nockScope;
+
+      // nock out the POST call
+      nock.cleanAll(); // remove any left over nocks
+
+      // nock out the GET for the home document
+      nockScope = nock('https://bogus.webshield.io')
+            .log(console.log)
+            .get('/test31')
+            .reply(HttpStatus.OK, function (uri, requestBody) {
+              uri.should.equal('/test31');
+              assert(!requestBody, util.format('Did not expect a request body:%j', requestBody));
+              return body;
+            });
+
+      props = {};
+      props.url = url;
+      requestWrapper.getJWT(props, function (err, response, body) {
+        assert(!err, util.format('Unexpected error starting on POST: %j', err));
+        response.should.have.property('statusCode', HttpStatus.OK);
+        body.should.be.equal(body);
+        done();
+      });
+    }); //it 2.1
+  }); // describe 3
 
 }); // describe
