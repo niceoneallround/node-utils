@@ -59,7 +59,19 @@ function createDummyServiceCtx(props, callback) {
   return callback(ctx);
 }
 
+function createDummyResponseObject() {
+  'use strict';
+  var rsp = {};
+  rsp.headers = {};
+  rsp.setHeader = function (key, value) {
+    rsp.headers[key] = value;
+  };
+
+  return rsp;
+}
+
 module.exports = {
+  createDummyResponseObject: createDummyResponseObject,
   createDummyServiceCtx: createDummyServiceCtx,
   getTestServiceConfig: getTestServiceConfig
 };
