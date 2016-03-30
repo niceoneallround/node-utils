@@ -186,14 +186,69 @@ function createRestService(props) {
       function (req, res, next) {
         handler.get(req, res, function (err, data) {
           if (err) {
-            logger.logJSON('error', { serviceType: serviceName, action: 'pnServiceService-GET-Handler-ERROR',
+            logger.logJSON('error', { serviceType: serviceName, action: 'GET-Handler-ERROR',
                             path: versionedPath, error: err }, loggingMD);
-            assert.fail(util.format('pnServiceSerice - Unexpected ERROR: %j - processing GET on: %s', err, versionedPath));
+            assert.fail(util.format('Unexpected ERROR: %j - processing GET on: %s', err, versionedPath));
             return next((new restify.BadRequestError(err)));
           } else {
             // if not set then default to json
             if (!res.getHeader('content-type')) {
               res.setHeader('content-type', 'application/json');
+            }
+
+            if (!res.statusCode) {
+              res.statusCode = HttpStatus.OK;
+            }
+
+            res.send(data);
+            return next();
+          }
+        });
+      }
+    );
+  }
+
+  function registerGETJWTHandler(path, handler) {
+
+    var versionedPath;
+
+    if (baseURL) {
+      versionedPath = baseURL + URLversion;
+    } else {
+      versionedPath = URLversion;
+    }
+
+    // if a path passed in the append
+    if (path) {
+      versionedPath =  versionedPath + path;
+    }
+
+    assert(handler, 'No handler passed to registerGETJWTHandler');
+    assert(handler.get, util.format('No get method on handler:%j', handler));
+
+    logger.logJSON('info', { serviceType: serviceName, action: 'Registered-GETJWT-Handler', path: versionedPath }, loggingMD);
+
+    restifyServer.get(
+      versionedPath,
+      function (req, res, next) { // jshint ignore:line
+        loggingHandler(req, res, next, 'GET-on-path', versionedPath);
+      },
+
+      function (req, res, next) {
+        handler.get(req, res, function (err, data) {
+          if (err) {
+            logger.logJSON('error', { serviceType: serviceName, action: 'GETJWT-Handler-ERROR',
+                            path: versionedPath, error: err }, loggingMD);
+            assert.fail(util.format('Unexpected ERROR: %j - processing GETJWt on: %s', err, versionedPath));
+            return next((new restify.BadRequestError(err)));
+          } else {
+            // if not set then default to json
+            if (!res.getHeader('content-type')) {
+              res.setHeader('content-type', 'text/plain');
+            }
+
+            if (!res.statusCode) {
+              res.statusCode = HttpStatus.OK;
             }
 
             res.send(data);
@@ -231,29 +286,74 @@ function createRestService(props) {
       function (req, res, next) {
         handler.post(req, res, function (err, data, props) {
           if (err) {
-            logger.logJSON('error', { serviceType: serviceName, action: 'pnServiceService-POST-Handler-ERROR',
+            logger.logJSON('error', { serviceType: serviceName, action: 'POST-Handler-ERROR',
                             path: versionedPath, error: err, svcRequest: req }, loggingMD);
-            assert(!err, util.format('pnServiceSerice - Unexpected ERROR: %j - processing POST on: %s', err, versionedPath));
+            assert(!err, util.format('Unexpected ERROR: %j - processing POST on: %s', err, versionedPath));
             return next((new restify.BadRequestError(err)));
           } else {
 
-            if (!props) {
-              res.setHeader('content-type', 'application/json');
-              res.status(HttpStatus.OK);
-            } else if ((props.contentType) || (props.statusCode)) {//FIXME one all calls to this routine are updated then remove
-              if (props.contentType) {
-                res.setHeader('content-type', props.contentType);
-              } else {
-                res.setHeader('content-type', 'application/json');
-              }
+            if (props) {
+              assert.fail(
+                'Code no longer pass props to set the status code or header, set directly if want to overide default:%s', props);
+            }
 
-              if (props.statusCode) {
-                res.status(props.statusCode);
-              } else {
-                res.status(HttpStatus.OK);
-              }
+            if (!res.statusCode) {
+              res.statusCode = HttpStatus.OK;
+            }
+
+            if (!res.getHeader('content-type')) {
+              res.setHeader('content-type', 'application/json');
+            }
+
+            if (!data) {
+              res.send();
             } else {
-              assert(false, util.format('register post handler old format change to pass in a props:%j', props));
+              res.send(data);
+            }
+
+            return next();
+          }
+        });
+      }
+    );
+  }
+
+  function registerPOSTJWTHandler(path, handler) {
+
+    var versionedPath;
+
+    assert(handler, 'No handler passed to registerPOSTJWTHandler');
+    assert(handler.post, util.format('No post method on handler:%j', handler));
+
+    if (baseURL) {
+      versionedPath = baseURL + URLversion + path;
+    } else {
+      versionedPath = URLversion + path;
+    }
+
+    logger.logJSON('info', { serviceType: serviceName, action: 'Registered-POST-JWT-Handler', path: versionedPath }, loggingMD);
+
+    restifyServer.post(
+      versionedPath,
+      function (req, res, next) { // jshint ignore:line
+        loggingHandler(req, res, next, 'Recieved-POST-on', versionedPath);
+      },
+
+      function (req, res, next) {
+        handler.post(req, res, function (err, data) {
+          if (err) {
+            logger.logJSON('error', { serviceType: serviceName, action: 'POST-JWT-Handler-ERROR',
+                            path: versionedPath, error: err, svcRequest: req }, loggingMD);
+            assert(!err, util.format('Unexpected ERROR: %j - processing POSTJWT on: %s', err, versionedPath));
+            return next((new restify.BadRequestError(err)));
+          } else {
+
+            if (!res.statusCode) {
+              res.statusCode = HttpStatus.OK;
+            }
+
+            if (!res.getHeader('content-type')) {
+              res.setHeader('content-type', 'text/plain');
             }
 
             if (!data) {
@@ -272,7 +372,9 @@ function createRestService(props) {
   thisService = {
     logger: getLogger,
     registerGETHandler: registerGETHandler,
+    registerGETJWTHandler: registerGETJWTHandler,
     registerPOSTHandler: registerPOSTHandler,
+    registerPOSTJWTHandler: registerPOSTJWTHandler,
     start: start,
     stop: stop };
 
