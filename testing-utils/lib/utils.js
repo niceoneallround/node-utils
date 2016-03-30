@@ -24,6 +24,10 @@ function getTestServiceConfig(props) {
     overrides.PORT_INSIDE_DOCKER = overrides.PORT;
   }
 
+  if ((props) && (props.METADATA_SERVICE_URL)) {
+    overrides.METADATA_SERVICE_URL = props.METADATA_SERVICE_URL;
+  }
+
   // the JWT usage requires a secret so set one up here that is used across all tests, it
   // can be set by the env JWT_SECRET hence name here
   overrides.crypto = {};
