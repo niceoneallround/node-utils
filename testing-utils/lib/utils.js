@@ -28,6 +28,10 @@ function getTestServiceConfig(props) {
     overrides.METADATA_SERVICE_URL = props.METADATA_SERVICE_URL;
   }
 
+  if ((props) && (props.PRIVACY_BROKER_URL)) {
+    overrides.PRIVACY_BROKER_URL = props.PRIVACY_BROKER_URL;
+  }
+
   // the JWT usage requires a secret so set one up here that is used across all tests, it
   // can be set by the env JWT_SECRET hence name here
   overrides.crypto = {};
