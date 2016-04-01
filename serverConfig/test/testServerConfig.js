@@ -290,4 +290,14 @@ describe('Server Config Utils Tests', function () {
     });
   });
 
+  describe('14 test PRIVACY_BROKER_URL', function () {
+    it('14.1 check overrides work', function () {
+      var c, overrides = {};
+
+      overrides.PRIVACY_BROKER_URL = 'override1';
+      c = configUtils.create(overrides);
+      c.should.have.property('PRIVACY_BROKER_URL', 'override1');
+    });
+  });
+
 });

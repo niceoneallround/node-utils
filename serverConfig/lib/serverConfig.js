@@ -109,6 +109,13 @@ function create(overrides) {
     c.METADATA_SERVICE_URL = process.env.METADATA_SERVICE_URL;
   }
 
+  c.PRIVACY_BROKER_URL = 'not-set';
+  if ((overrides) && (overrides.PRIVACY_BROKER_URL)) {
+    c.PRIVACY_BROKER_URL = overrides.PRIVACY_BROKER_URL;
+  } else if (process.env.PRIVACY_BROKER_URL) {
+    c.PRIVACY_BROKER_URL = process.env.PRIVACY_BROKER_URL;
+  }
+
   c.getHost = function () {
     return getHost(c);
   };
