@@ -300,4 +300,14 @@ describe('Server Config Utils Tests', function () {
     });
   });
 
+  describe('15 test REFERENCE_SOURCE_PROXY_URL', function () {
+    it('15.1 check overrides work', function () {
+      var c, overrides = {};
+
+      overrides.REFERENCE_SOURCE_PROXY_URL = 'override1';
+      c = configUtils.create(overrides);
+      c.should.have.property('REFERENCE_SOURCE_PROXY_URL', 'override1');
+    });
+  });
+
 });
