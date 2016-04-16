@@ -20,9 +20,22 @@ function postJWT(props, callback) {
   'use strict';
 
   // create request options
+  // note props can have a map of headers to add
   function createRequestOptions(props, next) {
+    var headers;
     assert(props.url, util.format('props.url missing:%j', props));
     assert(props.jwt, util.format('props.jwt missing:%j', props));
+
+    headers = {
+      'Content-Type': 'text/plain', // was not sure so put this
+      'Content-Length': Buffer.byteLength(props.jwt)
+    };
+
+    if (props.headers) {
+      props.headers.forEach(function (value, key) {
+        headers[key] = value;
+      });
+    }
 
     if (props.tls) {
       assert(false, 'restserver - Add code for tls path');
@@ -35,7 +48,8 @@ function postJWT(props, callback) {
           body: props.jwt,
           requestCert:        true,
           rejectUnauthorized: false, // added this as no ability to check the cert returned by Aetna as no chain
-          agent: false
+          agent: false,
+          headers: headers
         }); // next
     } else {
       return next(null,
@@ -43,10 +57,7 @@ function postJWT(props, callback) {
           method: 'POST',
           body: props.jwt,
           url: props.url,
-          headers: {
-            'Content-Type': 'text/plain', // was not sure so put this
-            'Content-Length': Buffer.byteLength(props.jwt)
-          }
+          headers: headers
         }); // next
     }
   } // createRequestOptions
