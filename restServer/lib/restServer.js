@@ -349,6 +349,8 @@ function createRestService(props) {
           } else {
 
             if (!res.statusCode) {
+              logger.logJSON('error', { serviceType: serviceName, action: 'POST-JWT-Handler-Default-Status-Code-to-OK',
+                              path: versionedPath, svcRequestId: req['@id'] }, loggingMD);
               res.statusCode = HttpStatus.OK;
             }
 

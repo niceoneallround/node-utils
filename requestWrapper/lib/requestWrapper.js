@@ -20,7 +20,7 @@ function postJWT(props, callback) {
   'use strict';
 
   // create request options
-  // note props can have a map of headers to add
+  // note props can have a Map of headers to add
   function createRequestOptions(props, next) {
     var headers;
     assert(props.url, util.format('props.url missing:%j', props));
