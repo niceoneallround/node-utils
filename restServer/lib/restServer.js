@@ -298,6 +298,8 @@ function createRestService(props) {
             }
 
             if (!res.statusCode) {
+              logger.logJSON('error', { serviceType: serviceName, action: 'POST-Handler-Setting-Status-Code-to-Default-OK',
+                              path: versionedPath, svcRequestId: req['@id'] }, loggingMD);
               res.statusCode = HttpStatus.OK;
             }
 
@@ -349,7 +351,7 @@ function createRestService(props) {
           } else {
 
             if (!res.statusCode) {
-              logger.logJSON('error', { serviceType: serviceName, action: 'POST-JWT-Handler-Default-Status-Code-to-OK',
+              logger.logJSON('error', { serviceType: serviceName, action: 'POST-JWT-Handler-Setting-Status-Code-to-Default-OK',
                               path: versionedPath, svcRequestId: req['@id'] }, loggingMD);
               res.statusCode = HttpStatus.OK;
             }
