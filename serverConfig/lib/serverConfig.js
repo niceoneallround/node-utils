@@ -123,6 +123,13 @@ function create(overrides) {
     c.REFERENCE_SOURCE_PROXY_URL = process.env.REFERENCE_SOURCE_PROXY_URL;
   }
 
+  c.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL = 'not-set';
+  if ((overrides) && (overrides.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL)) {
+    c.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL = overrides.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL;
+  } else if (process.env.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL) {
+    c.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL = process.env.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL;
+  }
+
   c.getHost = function () {
     return getHost(c);
   };
