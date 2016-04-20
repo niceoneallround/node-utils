@@ -36,6 +36,10 @@ function getTestServiceConfig(props) {
     overrides.REFERENCE_SOURCE_PROXY_URL = props.REFERENCE_SOURCE_PROXY_URL;
   }
 
+  if ((props) && (props.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL)) {
+    overrides.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL = props.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL;
+  }
+
   // the JWT usage requires a secret so set one up here that is used across all tests, it
   // can be set by the env JWT_SECRET hence name here
   overrides.crypto = {};
