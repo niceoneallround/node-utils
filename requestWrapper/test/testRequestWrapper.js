@@ -6,7 +6,7 @@ var assert = require('assert'),
   should = require('should'),
   util = require('util');
 
-describe('restServer Tests', function () {
+describe('requestWrapper Tests', function () {
   'use strict';
 
   describe('1 test POST JWT', function () {
@@ -115,7 +115,7 @@ describe('restServer Tests', function () {
       // nock out the POST call
       nock.cleanAll(); // remove any left over nocks
 
-      // nock out the GET for the home document
+      // nock out the POST for the home document
       nockScope = nock('https://bogus.webshield.io')
             .log(console.log)
             .post('/test41')
