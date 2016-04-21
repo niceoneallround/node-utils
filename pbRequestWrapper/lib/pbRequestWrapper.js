@@ -63,7 +63,7 @@ callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
   // post the passed in JWT to the Privacy Broker, wait for return and pass back to caller in the POST reponse
   //
   requestWrapper.postJWT(postProps, function (err, response, returnJWT) {
-    return callback(null, response, returnJWT);
+    return callback(err, response, returnJWT);
   });
 };
 
