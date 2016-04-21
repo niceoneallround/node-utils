@@ -21,7 +21,6 @@ describe('pbRequestWrapper Tests', function () {
       props.domainIdParam = 'fake-domain';
       props.loggerMsgId = '11';
       props.logMsgServiceName = 'test11';
-      props.logMsgPrefix = 'a-prefix';
       props.logger = { logJSON: function (mode, msg) { console.log('%s %j', mode, msg); } };
 
       // nock out the POST

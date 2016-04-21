@@ -49,15 +49,14 @@ callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
   'use strict';
 
   assert(props.logger, util.format('props.logger is mising:%j', props));
-  assert(props.loggerMsgId, util.format('props.loggerMsgId is mising - used to track:%j', props));
-  assert(props.logMsgPrefix, util.format('props.logMsgPrefix is mising:%j', props));
+  assert(props.loggerMsgId, util.format('props.loggerMsgId is missing - used to track:%j', props));
   assert(props.logMsgServiceName, util.format('props.logMsgServiceName is mising:%j', props));
 
   var postProps = {};
   postProps.jwt = sendJWT;
   postProps.url = postUrl;
 
-  props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: props.logMsgPrefix + '-POST-Privacy-Broker',
+  props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'POST-to-Privacy-Broker',
                     domainIdParam: props.domainIdParam,
                     logId: props.loggerMsgId, url: postProps.url, jwt: sendJWT }, loggingMD);
 
