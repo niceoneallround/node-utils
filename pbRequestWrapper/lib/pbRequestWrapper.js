@@ -1,17 +1,27 @@
 /*jslint node: true, vars: true */
 
 //
-//  Provide a set of promises to perform operations on the metadata service
+// Provides util routines to http access the Privacy Broker - mainly encapsualtes the paths
+// later may add more
 //
 
 var assert = require('assert'),
-    loggingMD = { fileName: 'pbWrapper.js' },
+    loggingMD = { fileName: 'pbRequestWrapper.js' },
     requestWrapper = require('../../requestWrapper/lib/requestWrapper'),
     util = require('util'),
     callbacks = {},
     promises = {},
+    utils = {},
     PRIVACY_BROKER_DOMAIN_PATH = '/v1/domains',
     PRIVACY_BROKER_PP_PATH = '/privacy_pipe';
+
+//
+// expose the path as used in testing for nocks
+//
+utils.generateCreatePipePathUrl = function generateCreatePipePathUrl(domainIdParam) {
+  'use strict';
+  return PRIVACY_BROKER_DOMAIN_PATH + '/' + domainIdParam + PRIVACY_BROKER_PP_PATH;
+};
 
 promises.postCreatePrivacyPipeJWT  = function postCreatePrivacyPipeJWT(props, pbUrl, ppJWT) {
   'use strict';
@@ -35,9 +45,10 @@ callbacks.postCreatePrivacyPipeJWT = function postCreatePrivacyPipeJWT(props, pb
   assert(pbUrl, 'postCreatePrivacyPipe pbUrl param is missing');
   assert(props.domainIdParam, util.format('props.domainIdParam is missing: %j', props));
 
-  var postUrl = pbUrl + PRIVACY_BROKER_DOMAIN_PATH +
+  var postUrl = pbUrl + utils.generateCreatePipePathUrl(props.domainIdParam);
+  /*PRIVACY_BROKER_DOMAIN_PATH +
                   '/' + props.domainIdParam +
-                  PRIVACY_BROKER_PP_PATH;
+                  PRIVACY_BROKER_PP_PATH;*/
 
   return callbacks.postJWT(props, postUrl, ppJWT, callback);
 };
@@ -69,5 +80,6 @@ callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
 
 module.exports = {
   callbacks: callbacks,
-  promises: promises
+  promises: promises,
+  utils: utils
 };

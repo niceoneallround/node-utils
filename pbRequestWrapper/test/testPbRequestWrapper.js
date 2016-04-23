@@ -15,7 +15,8 @@ describe('pbRequestWrapper Tests', function () {
       var props,
           ppJWT = 'a-fake-jwt',
           nockScope,
-          pbUrl = 'https://test11.pb.bogus.webshield.io';
+          pbUrl = 'https://test11.pb.bogus.webshield.io',
+          domainIdParam = 'fake-domain';
 
       props = {};
       props.domainIdParam = 'fake-domain';
@@ -26,7 +27,7 @@ describe('pbRequestWrapper Tests', function () {
       // nock out the POST
       nockScope = nock(pbUrl)
             .log(console.log)
-            .post('/v1/domains/fake-domain/privacy_pipe')
+            .post(pbRequestWrapper.utils.generateCreatePipePathUrl(domainIdParam))
             .reply(HttpStatus.OK, function (uri, requestBody) {
               requestBody.should.be.equal(ppJWT);
               this.req.headers.should.have.property('content-type', 'text/plain');
@@ -45,8 +46,9 @@ describe('pbRequestWrapper Tests', function () {
       var props,
           ppJWT = 'a-fake-jwt',
           nockScope,
-          pbUrl = 'http://test12.pb.bogus.webshield.io',
-          promiseResponse;
+          pbUrl = 'http://test12.pb.bogus.webshield.io', pbPath,
+          promiseResponse,
+          domainIdParam = 'fake-domain';
 
       props = {};
       props.domainIdParam = 'fake-domain';
@@ -56,9 +58,10 @@ describe('pbRequestWrapper Tests', function () {
       props.logger = { logJSON: function (mode, msg) { console.log('%s %j', mode, msg); } };
 
       // nock out the POST
+      pbPath = pbRequestWrapper.utils.generateCreatePipePathUrl(domainIdParam);
       nockScope = nock(pbUrl)
             .log(console.log)
-            .post('/v1/domains/fake-domain/privacy_pipe')
+            .post(pbPath) //'/v1/domains/fake-domain/privacy_pipe')
             .reply(HttpStatus.OK, function (uri, requestBody) {
               requestBody.should.be.equal(ppJWT);
               this.req.headers.should.have.property('content-type', 'text/plain');
