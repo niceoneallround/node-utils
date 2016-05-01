@@ -320,4 +320,14 @@ describe('Server Config Utils Tests', function () {
     });
   });
 
+  describe('17 test DOMAIN_NAME', function () {
+    it('17.1 check overrides work', function () {
+      var c, overrides = {};
+
+      overrides.DOMAIN_NAME = 'override1';
+      c = configUtils.create(overrides);
+      c.should.have.property('DOMAIN_NAME', 'override1');
+    });
+  });
+
 });

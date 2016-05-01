@@ -130,6 +130,13 @@ function create(overrides) {
     c.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL = process.env.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL;
   }
 
+  c.DOMAIN_NAME = 'not-set';
+  if ((overrides) && (overrides.DOMAIN_NAME)) {
+    c.DOMAIN_NAME = overrides.DOMAIN_NAME;
+  } else if (process.env.DOMAIN_NAME) {
+    c.DOMAIN_NAME = process.env.DOMAIN_NAME;
+  }
+
   c.getHost = function () {
     return getHost(c);
   };
