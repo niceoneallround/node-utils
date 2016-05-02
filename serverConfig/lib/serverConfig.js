@@ -116,6 +116,13 @@ function create(overrides) {
     c.PRIVACY_BROKER_URL = process.env.PRIVACY_BROKER_URL;
   }
 
+  c.PRIVACY_NODE_URL = 'not-set';
+  if ((overrides) && (overrides.PRIVACY_NODE_URL)) {
+    c.PRIVACY_NODE_URL = overrides.PRIVACY_NODE_URL;
+  } else if (process.env.PRIVACY_NODE_URL) {
+    c.PRIVACY_NODE_URL = process.env.PRIVACY_NODE_URL;
+  }
+
   c.REFERENCE_SOURCE_PROXY_URL = 'not-set';
   if ((overrides) && (overrides.REFERENCE_SOURCE_PROXY_URL)) {
     c.REFERENCE_SOURCE_PROXY_URL = overrides.REFERENCE_SOURCE_PROXY_URL;

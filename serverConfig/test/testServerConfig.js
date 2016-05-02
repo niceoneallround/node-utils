@@ -330,4 +330,14 @@ describe('Server Config Utils Tests', function () {
     });
   });
 
+  describe('18 test PRIVACY_NODE_URL', function () {
+    it('18.1 check overrides work', function () {
+      var c, overrides = {};
+
+      overrides.PRIVACY_NODE_URL = 'override1';
+      c = configUtils.create(overrides);
+      c.should.have.property('PRIVACY_NODE_URL', 'override1');
+    });
+  });
+
 });
