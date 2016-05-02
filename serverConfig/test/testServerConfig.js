@@ -340,4 +340,14 @@ describe('Server Config Utils Tests', function () {
     });
   });
 
+  describe('18 test API_GATEWAY_URL', function () {
+    it('18.1 check overrides work', function () {
+      var c, overrides = {};
+
+      overrides.API_GATEWAY_URL = 'override1';
+      c = configUtils.create(overrides);
+      c.should.have.property('API_GATEWAY_URL', 'override1');
+    });
+  });
+
 });

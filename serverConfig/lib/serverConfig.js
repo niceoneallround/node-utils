@@ -102,6 +102,13 @@ function create(overrides) {
     c.AUDIT_URL = process.env.AUDIT_URL;
   }
 
+  c.API_GATEWAY_URL = 'not-set';
+  if ((overrides) && (overrides.API_GATEWAY_URL)) {
+    c.API_GATEWAY_URL = overrides.API_GATEWAY_URL;
+  } else if (process.env.API_GATEWAY_URL) {
+    c.API_GATEWAY_URL = process.env.API_GATEWAY_URL;
+  }
+
   c.METADATA_SERVICE_URL = 'not-set';
   if ((overrides) && (overrides.METADATA_SERVICE_URL)) {
     c.METADATA_SERVICE_URL = overrides.METADATA_SERVICE_URL;

@@ -24,6 +24,10 @@ function getTestServiceConfig(props) {
     overrides.PORT_INSIDE_DOCKER = overrides.PORT;
   }
 
+  if ((props) && (props.API_GATEWAY_URL)) {
+    overrides.API_GATEWAY_URL = props.API_GATEWAY_URL;
+  }
+
   if ((props) && (props.DOMAIN_NAME)) {
     overrides.DOMAIN_NAME = props.DOMAIN_NAME;
   }

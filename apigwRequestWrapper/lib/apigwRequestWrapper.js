@@ -23,6 +23,9 @@ utils.generateCreatePipePathUrl = function generateCreatePipePathUrl(domainIdPar
   return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_PP_PATH;
 };
 
+//
+// props.domainIdParam
+//
 promises.postCreatePrivacyPipeJWT  = function postCreatePrivacyPipeJWT(props, apigwUrl, ppJWT) {
   'use strict';
   return new Promise(function (resolve, reject) {
@@ -37,7 +40,7 @@ promises.postCreatePrivacyPipeJWT  = function postCreatePrivacyPipeJWT(props, ap
 };
 
 //
-//
+// props.domainIdParam
 //
 callbacks.postCreatePrivacyPipeJWT = function postCreatePrivacyPipeJWT(props, apigwUrl, ppJWT, callback) {
   'use strict';
