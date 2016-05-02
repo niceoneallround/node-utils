@@ -24,12 +24,20 @@ function getTestServiceConfig(props) {
     overrides.PORT_INSIDE_DOCKER = overrides.PORT;
   }
 
+  if ((props) && (props.DOMAIN_NAME)) {
+    overrides.DOMAIN_NAME = props.DOMAIN_NAME;
+  }
+
   if ((props) && (props.METADATA_SERVICE_URL)) {
     overrides.METADATA_SERVICE_URL = props.METADATA_SERVICE_URL;
   }
 
   if ((props) && (props.PRIVACY_BROKER_URL)) {
     overrides.PRIVACY_BROKER_URL = props.PRIVACY_BROKER_URL;
+  }
+
+  if ((props) && (props.PRIVACY_NODE_URL)) {
+    overrides.PRIVACY_NODE_URL = props.PRIVACY_NODE_URL;
   }
 
   if ((props) && (props.REFERENCE_SOURCE_PROXY_URL)) {
