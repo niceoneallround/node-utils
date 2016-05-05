@@ -116,6 +116,13 @@ function create(overrides) {
     c.METADATA_SERVICE_URL = process.env.METADATA_SERVICE_URL;
   }
 
+  c.IDENTITY_SYNDICATE_URL = 'not-set';
+  if ((overrides) && (overrides.IDENTITY_SYNDICATE_URL)) {
+    c.IDENTITY_SYNDICATE_URL = overrides.IDENTITY_SYNDICATE_URL;
+  } else if (process.env.IDENTITY_SYNDICATE_URL) {
+    c.IDENTITY_SYNDICATE_URL = process.env.IDENTITY_SYNDICATE_URLL;
+  }
+
   c.PRIVACY_BROKER_URL = 'not-set';
   if ((overrides) && (overrides.PRIVACY_BROKER_URL)) {
     c.PRIVACY_BROKER_URL = overrides.PRIVACY_BROKER_URL;

@@ -350,4 +350,14 @@ describe('Server Config Utils Tests', function () {
     });
   });
 
+  describe('19 test IDENTITY_SYNDICATE_URL', function () {
+    it('19.1 check overrides work', function () {
+      var c, overrides = {};
+
+      overrides.IDENTITY_SYNDICATE_URL = 'override1';
+      c = configUtils.create(overrides);
+      c.should.have.property('IDENTITY_SYNDICATE_URL', 'override1');
+    });
+  });
+
 });

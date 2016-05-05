@@ -36,6 +36,10 @@ function getTestServiceConfig(props) {
     overrides.METADATA_SERVICE_URL = props.METADATA_SERVICE_URL;
   }
 
+  if ((props) && (props.IDENTITY_SYNDICATE_URL)) {
+    overrides.IDENTITY_SYNDICATE_URL = props.IDENTITY_SYNDICATE_URL;
+  }
+
   if ((props) && (props.PRIVACY_BROKER_URL)) {
     overrides.PRIVACY_BROKER_URL = props.PRIVACY_BROKER_URL;
   }
