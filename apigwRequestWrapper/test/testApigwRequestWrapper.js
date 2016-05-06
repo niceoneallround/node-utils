@@ -81,4 +81,47 @@ describe('apigwRequestWrapper Tests', function () {
     }); //it 1.2
   }); // describe 1
 
+  describe('2 test get is jobs', function () {
+
+    it('2.1 get the JOB using a promise', function () {
+      var props,
+          fetchJobNockScope,
+          apigwUrl = 'http://test22.apigw.bogus.webshield.io', jobPath,
+          promiseResponse,
+          domainIdParam = 'fake-domain', jobIdParam = 'fake-job';
+
+      props = {};
+      props.domainIdParam = domainIdParam;
+      props.jobIdParam = jobIdParam;
+      props.loggerMsgId = '12';
+      props.logMsgServiceName = 'test21';
+      props.logMsgPrefix = 'a-prefix';
+      props.logger = { logJSON: function (mode, msg) { console.log('%s %j', mode, msg); } };
+
+      // nock out the GET from the wrapper to the APIGW
+      jobPath = apigwRequestWrapper.utils.generateGetIsJobPathUrl(domainIdParam, jobIdParam);
+      fetchJobNockScope = nock(apigwUrl)
+          .log(console.log)
+          .get(jobPath)
+          .reply(function () { // not used uri, requestBody) {
+            return [
+              HttpStatus.OK,
+              'dont-care-jwt',
+              { 'content-type': 'text/plain' }
+            ];
+          });
+
+      promiseResponse = apigwRequestWrapper.promises.getIsJobJWT(props, apigwUrl);
+      return promiseResponse
+        .then(function (response) {
+          response.should.have.property('statusCode', HttpStatus.OK);
+          response.body.should.be.equal('dont-care-jwt');
+          return;
+        })
+        .catch(function (err) {
+          assert(false, util.format('Unexpected error get isJob as a promise: %j', err));
+        });
+    }); //it 2.1
+  }); // describe 2
+
 }); // describe

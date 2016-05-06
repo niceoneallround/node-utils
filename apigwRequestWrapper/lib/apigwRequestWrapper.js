@@ -13,7 +13,12 @@ var assert = require('assert'),
     promises = {},
     utils = {},
     APIGW_DOMAIN_PATH = '/v1/domains',
+    APIGW_IS_JOB_PATH = '/jobs',  // prefixed by /v1/domains/:domainId
     APIGW_PP_PATH = '/privacy_pipe';
+
+//-------------------------------
+// Privacy Pipe Requests
+//------------------------------
 
 //
 // expose the path as used in testing for nocks
@@ -53,13 +58,75 @@ callbacks.postCreatePrivacyPipeJWT = function postCreatePrivacyPipeJWT(props, ap
   return callbacks.postJWT(props, postUrl, ppJWT, callback);
 };
 
+//----------------------
+// Get Identity Syndicate Syndication Jobs
+//----------------------
+
+//
+// expose the path as used in testing for nocks
+//
+utils.generateGetIsJobPathUrl = function generateGetIsJobPathUrl(domainIdParam, jobIdParam) {
+  'use strict';
+  return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_IS_JOB_PATH + '/' + jobIdParam;
+};
+
+promises.getIsJobJWT = function getIsJobJWT(props, apigwUrl) {
+  'use strict';
+  return new Promise(function (resolve, reject) {
+    callbacks.getIsJobJWT(props, apigwUrl, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
+callbacks.getIsJobJWT = function getIsJobJWT(props, apigwUrl, callback) {
+  'use strict';
+  assert(apigwUrl, 'getIsJobJWT apigwUrl param is missing');
+  assert(props.domainIdParam, util.format('getIsJobJWT props.domainIdParam is missing: %j', props));
+  assert(props.jobIdParam, util.format('getIsJobJWT props.jobIdParam is missing: %j', props));
+
+  var getUrl = apigwUrl + utils.generateGetIsJobPathUrl(props.domainIdParam, props.jobIdParam);
+
+  return callbacks.getJWT(props, getUrl, callback);
+};
+
+//-----------------------------
+// general
+//----------------
+
+// fetch the JWT using the passed in url
+callbacks.getJWT = function getJWT(props, getUrl, callback) {
+  'use strict';
+  assert(getUrl, 'getUrl param missing');
+  assert(props, 'props param missing');
+  assert(callback, 'callback missing');
+
+  assert(props.logger, util.format('props.logger is missing:%j', props));
+  assert(props.loggerMsgId, util.format('props.loggerMsgId is missing - used to track:%j', props));
+  assert(props.logMsgServiceName, util.format('props.logMsgServiceName is mising:%j', props));
+
+  var getProps = { url: getUrl };
+
+  props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'GET-to-API-GATEWAY',
+                    domainIdParam: props.domainIdParam,
+                    logId: props.loggerMsgId, url: getProps.url }, loggingMD);
+
+  requestWrapper.getJWT(getProps, function (err, response, returnJWT) {
+    return callback(err, response, returnJWT);
+  });
+};
+
 //
 // Post JWT to the apigw and pass result to the callback
 //
 callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
   'use strict';
 
-  assert(props.logger, util.format('props.logger is mising:%j', props));
+  assert(props.logger, util.format('props.logger is missing:%j', props));
   assert(props.loggerMsgId, util.format('props.loggerMsgId is missing - used to track:%j', props));
   assert(props.logMsgServiceName, util.format('props.logMsgServiceName is mising:%j', props));
 
@@ -71,8 +138,8 @@ callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
                     domainIdParam: props.domainIdParam,
                     logId: props.loggerMsgId, url: postProps.url, jwt: sendJWT }, loggingMD);
 
-  requestWrapper.postJWT(postProps, function (err, response, returnJWT) {
-    return callback(err, response, returnJWT);
+  requestWrapper.postJWT(postProps, function (err, response, resultJWT) {
+    return callback(err, response, resultJWT);
   });
 };
 
