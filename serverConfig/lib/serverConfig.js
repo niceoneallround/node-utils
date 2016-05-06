@@ -120,7 +120,7 @@ function create(overrides) {
   if ((overrides) && (overrides.IDENTITY_SYNDICATE_URL)) {
     c.IDENTITY_SYNDICATE_URL = overrides.IDENTITY_SYNDICATE_URL;
   } else if (process.env.IDENTITY_SYNDICATE_URL) {
-    c.IDENTITY_SYNDICATE_URL = process.env.IDENTITY_SYNDICATE_URLL;
+    c.IDENTITY_SYNDICATE_URL = process.env.IDENTITY_SYNDICATE_URL;
   }
 
   c.PRIVACY_BROKER_URL = 'not-set';
