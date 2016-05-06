@@ -13,7 +13,7 @@ var assert = require('assert'),
     promises = {},
     utils = {},
     APIGW_DOMAIN_PATH = '/v1/domains',
-    APIGW_IS_JOB_PATH = '/jobs',  // prefixed by /v1/domains/:domainId
+    APIGW_IS_JOB_PATH = '/is/jobs',  // prefixed by /v1/domains/:domainId
     APIGW_PP_PATH = '/privacy_pipe';
 
 //-------------------------------
