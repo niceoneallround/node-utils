@@ -217,10 +217,10 @@ function create(overrides) {
   c.crypto.jwt = {};
   c.crypto.jwt.issuer = c.HOSTNAME;
   c.crypto.jwt.type = 'HS256';
+  c.crypto.jwt.secret = process.env.JWT_SECRET;
   if ((overrides) && (overrides.crypto) && (overrides.crypto.jwt) && (overrides.crypto.jwt.JWT_SECRET)) {
+    console.log('In config OVERRIDING crypto.jwt.secret value:%s to:%s', c.crypto.jwt.secret, overrides.crypto.jwt.JWT_SECRET);
     c.crypto.jwt.secret = overrides.crypto.jwt.JWT_SECRET;
-  } else if (process.env.JWT_SECRET) {
-    c.crypto.jwt.secret = process.env.JWT_SECRET;
   }
 
   return c;
