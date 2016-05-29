@@ -11,7 +11,7 @@ var assert = require('assert'),
     util = require('util');
 
 //
-// Utitility routine to POST to a URL
+// Utitility routine to POST a JWT to a URL
 // *props - will base on request options
 // *data - the jsonld to send
 // *callback(err, response, body)
@@ -71,7 +71,72 @@ function postJWT(props, callback) {
       return callback(err, response, body);
     }); // request
   });
-} // post
+} // postJWT
+
+//
+// Utitility routine to POST a JSON to a URL
+// *props - will base on request options
+// *data - the jsonld to send
+// *callback(err, response, body)
+//
+function postJSON(props, callback) {
+  'use strict';
+
+  // create request options
+  // note props can have a Map of headers to add
+  function createRequestOptions(props, next) {
+    var headers, jsonS;
+    assert(props.url, util.format('props.url missing:%j', props));
+    assert(props.json, util.format('props.json missing:%j', props));
+
+    jsonS =  JSON.stringify(props.json);
+
+    headers = {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(jsonS)
+    };
+
+    if (props.headers) {
+      props.headers.forEach(function (value, key) {
+        headers[key] = value;
+      });
+    }
+
+    if (props.tls) {
+      assert(false, 'restserver - Add code for tls path');
+      return next(null,
+        {
+          key:    'foobar', // key from the protected store
+          cert:   'foobar', //protectedStore.serverTlsCertBuffer(),
+          url: props.url,
+          method: 'POST',
+          body: jsonS,
+          requestCert:        true,
+          rejectUnauthorized: false, // added this as no ability to check the cert returned by Aetna as no chain
+          agent: false,
+          headers: headers
+        }); // next
+    } else {
+      return next(null,
+        {
+          method: 'POST',
+          body: jsonS,
+          url: props.url,
+          headers: headers
+        }); // next
+    }
+  } // createRequestOptions
+
+  createRequestOptions(props, function (err, requestOpts) {
+    // turn on request debug
+    //require('request').debug = true;
+    request(requestOpts, function (err, response, body) {
+
+      // just return the body which may be a JWT and let caller deal with
+      return callback(err, response, body);
+    }); // request
+  });
+} // postJSON
 
 //
 // Utitility routine to GET
@@ -134,5 +199,7 @@ module.exports = {
   get: get,
 
   getJWT: getJWT,
-  postJWT: postJWT
+  postJWT: postJWT,
+
+  postJSON: postJSON
 };

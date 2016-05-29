@@ -137,8 +137,42 @@ describe('requestWrapper Tests', function () {
         body.should.be.equal('what-is-this');
         done();
       });
-    }); //it 1.1
+    }); //it 4.1
 
-  }); // describe 1
+  }); // describe 4
+
+  describe('5 test POST JSON', function () {
+
+    it('5.1 should be able to post JSON to another URL', function (done) {
+      var props, url = 'https://bogus.webshield.io/test51',
+          json = { id: 'some_json' },
+          nockScope;
+
+      // nock out the POST call
+      nock.cleanAll(); // remove any left over nocks
+
+      // nock out the GET for the home document
+      nockScope = nock('https://bogus.webshield.io')
+            .log(console.log)
+            .post('/test51')
+            .reply(HttpStatus.OK, function (uri, requestBody) {
+              uri.should.equal('/test51');
+              requestBody.should.have.property('id', 'some_json');
+              this.req.headers.should.have.property('content-type', 'application/json');
+              return 'what-is-this';
+            });
+
+      props = {};
+      props.url = url;
+      props.json = json;
+      requestWrapper.postJSON(props, function (err, response, body) {
+        assert(!err, util.format('Unexpected error starting on POST: %j', err));
+        response.should.have.property('statusCode', HttpStatus.OK);
+        body.should.be.equal('what-is-this');
+        done();
+      });
+    }); //it 5.1
+
+  }); // describe 5
 
 }); // describe
