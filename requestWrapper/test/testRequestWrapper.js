@@ -175,4 +175,38 @@ describe('requestWrapper Tests', function () {
 
   }); // describe 5
 
+  describe('6 test POST text with query params', function () {
+
+    it('6.1 should be able to post a URL with query params', function (done) {
+      var props, url = 'https://bogus.webshield.io/test61?param1=1&param2=2',
+          nockScope;
+
+      // nock out the POST call
+      nock.cleanAll(); // remove any left over nocks
+
+      // nock out the GET for the home document
+      nockScope = nock('https://bogus.webshield.io')
+            .log(console.log)
+            .post('/test61')
+            .query({ param1: 1, param2: 2 })
+            .reply(HttpStatus.OK, function (uri, requestBody) {
+              uri.should.equal('/test61?param1=1&param2=2');
+              requestBody.should.be.equal('some_text');
+              this.req.headers.should.have.property('content-type', 'text/plain; charset=utf-8');
+              return 'what-is-this';
+            });
+
+      props = {};
+      props.url = url;
+      props.text = 'some_text';
+      requestWrapper.post(props, function (err, response, body) {
+        assert(!err, util.format('Unexpected error starting on POST: %j', err));
+        response.should.have.property('statusCode', HttpStatus.OK);
+        body.should.be.equal('what-is-this');
+        done();
+      });
+    }); //it 6.1
+
+  }); // describe 6
+
 }); // describe
