@@ -48,6 +48,7 @@ function createRestService(props) {
 
   // add the built in plugins - if do not add this then no body
   restifyServer.use(restify.bodyParser());
+  restifyServer.use(restify.queryParser());
 
   console.log('createRestService - created server and added the bodyParser');
 
