@@ -178,7 +178,7 @@ describe('requestWrapper Tests', function () {
   describe('6 test POST text with query params', function () {
 
     it('6.1 should be able to post a URL with query params', function (done) {
-      var props, url = 'https://bogus.webshield.io/test61?param1=1&param2=2',
+      var props, url = 'https://bogus.webshield.io/test61',
           nockScope;
 
       // nock out the POST call
@@ -199,6 +199,7 @@ describe('requestWrapper Tests', function () {
       props = {};
       props.url = url;
       props.text = 'some_text';
+      props.qs = { param1: 1, param2: 2 };
       requestWrapper.post(props, function (err, response, body) {
         assert(!err, util.format('Unexpected error starting on POST: %j', err));
         response.should.have.property('statusCode', HttpStatus.OK);

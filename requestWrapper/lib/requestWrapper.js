@@ -150,7 +150,7 @@ function post(props, callback) {
   // create request options
   // note props can have a Map of headers to add
   function createRequestOptions(props, next) {
-    var headers;
+    var headers, queryString;
     assert(props.url, util.format('props.url missing:%j', props));
     assert(props.text, util.format('props.text missing:%j', props));
 
@@ -165,6 +165,12 @@ function post(props, callback) {
       });
     }
 
+    if (props.qs) {
+      queryString = props.qs;
+    } else {
+      queryString = null;
+    }
+
     if (props.tls) {
       assert(false, 'restserver - Add code for tls path');
       return next(null,
@@ -174,6 +180,7 @@ function post(props, callback) {
           url: props.url,
           method: 'POST',
           body: props.text,
+          qs: queryString,
           requestCert:        true,
           rejectUnauthorized: false, // added this as no ability to check the cert returned by Aetna as no chain
           agent: false,
@@ -185,6 +192,7 @@ function post(props, callback) {
           method: 'POST',
           body: props.text,
           url: props.url,
+          qs: queryString,
           headers: headers
         }); // next
     }
