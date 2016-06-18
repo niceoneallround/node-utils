@@ -16,6 +16,82 @@ var assert = require('assert'),
     APIGW_IS_JOB_PATH = '/is/jobs',  // prefixed by /v1/domains/:domainId
     APIGW_PP_PATH = '/privacy_pipe';
 
+//------------------------
+// Domain requests
+//------------------------
+
+//
+// expose the path as used in testing for nocks
+//
+utils.generateFetchDomainPathUrl = function generateFetchDomainPathUrl(domainIdParam) {
+  'use strict';
+  return APIGW_DOMAIN_PATH + '/' + domainIdParam;
+};
+
+//
+// Fetch a domain using the domain id param
+// props.domainIdParam
+//
+callbacks.fetchDomainJWT = function fetchDomainJWT(props, apigwUrl, callback) {
+  'use strict';
+  assert(props, 'fetchDomain props param is missing');
+  assert(apigwUrl, 'fetchDomain apigwUrl param is missing');
+  assert(props.domainIdParam, util.format('props.domainIdParam is missing: %j', props));
+
+  var getUrl = apigwUrl + utils.generateFetchDomainPathUrl(props.domainIdParam);
+  return callbacks.getJWT(props, getUrl, callback);
+};
+
+// promise version of fetch just wraps callback
+promises.fetchDomainJWT  = function fetchDomainJWT(props, apigwUrl) {
+  'use strict';
+  return new Promise(function (resolve, reject) {
+    callbacks.fetchDomainJWT(props, apigwUrl, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
+//
+// create domain functions
+//
+utils.generateCreateDomainPathUrl = function generateCreateDomainPathUrl() {
+  'use strict';
+  return APIGW_DOMAIN_PATH;
+};
+
+//
+// Create a domain
+// props.domainJWT
+//
+callbacks.createDomainJWT = function createDomainJWT(props, apigwUrl, domainJWT, callback) {
+  'use strict';
+  assert(props, 'createDomain props param is missing');
+  assert(apigwUrl, 'createDomain apigwUrl param is missing');
+  assert(domainJWT, 'createDomain domainJWT param is missing');
+
+  var postUrl = apigwUrl + utils.generateCreateDomainPathUrl();
+  return callbacks.postJWT(props, postUrl, domainJWT, callback);
+};
+
+// promise version of create just wraps callback
+promises.createDomainJWT  = function createDomainJWT(props, apigwUrl, domainJWT) {
+  'use strict';
+  return new Promise(function (resolve, reject) {
+    callbacks.createDomainJWT(props, apigwUrl, domainJWT, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
 //-------------------------------
 // Privacy Pipe Requests
 //------------------------------
