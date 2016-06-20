@@ -14,6 +14,7 @@ var assert = require('assert'),
     utils = {},
     APIGW_DOMAIN_PATH = '/v1/domains',
     APIGW_IS_JOB_PATH = '/is/jobs',  // prefixed by /v1/domains/:domainId
+    APIGW_METADATA_PATH = '/metadata', // '/v1/domains/' + domainIdParam + '/metadata';
     APIGW_PP_PATH = '/privacy_pipe';
 
 //------------------------
@@ -90,6 +91,83 @@ promises.createDomainJWT  = function createDomainJWT(props, apigwUrl, domainJWT)
       }
     });
   });
+};
+
+//---------------------------
+// Metadata Requests
+//-------------------------
+
+utils.generateFetchMetadataPathUrl = function generateFetchMetadataPathUrl(domainIdParam, mdIdParam) {
+  'use strict';
+  return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_METADATA_PATH + '/' + mdIdParam;
+};
+
+//
+// Fetch metadata
+// props.domainIdParam
+// props.mdIdParam
+//
+callbacks.fetchMetadataJWT = function fetchMetadataJWT(props, apigwUrl, callback) {
+  'use strict';
+  assert(props, 'fetchDomain props param is missing');
+  assert(apigwUrl, 'fetchDomain apigwUrl param is missing');
+  assert(props.domainIdParam, util.format('props.domainIdParam is missing: %j', props));
+  assert(props.mdIdParam, util.format('props.mdIdParam is missing: %j', props));
+
+  var getUrl = apigwUrl + utils.generateFetchMetadataPathUrl(props.domainIdParam, props.mdIdParam);
+  return callbacks.getJWT(props, getUrl, callback);
+};
+
+// promise version of fetch just wraps callback
+promises.fetchMetadataJWT  = function fetchMetadataJWT(props, apigwUrl) {
+  'use strict';
+  return new Promise(function (resolve, reject) {
+    callbacks.fetchMetadataJWT(props, apigwUrl, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
+//
+// expose the path as used in testing for nocks
+//
+utils.generatePostMetadataPathUrl = function generatePostMetadataPathUrl(domainIdParam) {
+  'use strict';
+  return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_METADATA_PATH;
+};
+
+//
+// props.domainIdParam
+//
+promises.postMetadataJWT  = function postMetadataJWT(props, apigwUrl, mdJWT) {
+  'use strict';
+  return new Promise(function (resolve, reject) {
+    callbacks.postMetadataJWT(props, apigwUrl, mdJWT, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
+//
+// props.domainIdParam
+//
+callbacks.postMetadataJWT = function postMetadataJWT(props, apigwUrl, mdJWT, callback) {
+  'use strict';
+  assert(mdJWT, 'postMetadata mdJWT param is missing');
+  assert(apigwUrl, 'postMetadata apigwUrl param is missing');
+  assert(props.domainIdParam, util.format('props.domainIdParam is missing: %j', props));
+
+  var postUrl = apigwUrl + utils.generatePostMetadataPathUrl(props.domainIdParam);
+
+  return callbacks.postJWT(props, postUrl, mdJWT, callback);
 };
 
 //-------------------------------
