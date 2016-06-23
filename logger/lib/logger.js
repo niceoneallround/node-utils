@@ -161,11 +161,12 @@ function create(props) {
     // if contains metadata  then pretty it up and print
     //
     if (json.metadata) {
+      var str = JSON.stringify(json.metadata, null, 2);
       if (msg) {
         log(level, json.serviceType + '-' + json.action + '\nSVC_MESSAGE_ID:%s METADATA: %s',
-                [id, JSON.stringify(json.metadata, null, 2)], md);
+                [id, str], md);
       } else {
-        log(level, '\nMETADATA: %s', [JSON.stringify(json.metadata, null, 2)], md);
+        log(level, '\nMETADATA: %s', [str], md);
       }
     }
 

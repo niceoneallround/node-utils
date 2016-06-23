@@ -30,7 +30,7 @@ describe('Logger Tests', function () {
   });
 
   it('log some JSON no 3rd party logging', function () {
-    var json = { serviceType: 'UP', error:'ouch' };
+    var json = { serviceType: 'UP', error: 'ouch' };
     logSomeJSON(loggerFactory.create(), json);
   });
 
@@ -40,7 +40,7 @@ describe('Logger Tests', function () {
   });
 
   it('log some JSON also using log entries', function () {
-    var json = { serviceType: 'UP', error:'ouch' };
+    var json = { serviceType: 'UP', error: 'ouch' };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
@@ -75,7 +75,7 @@ describe('Logger Tests', function () {
   });
 
   it('log some JSON with metadata', function () {
-    var json = { serviceType: 'UP', action: 'metadataOnly', metadata: { id: 'nice', type: ['a'] } };
+    var json = { serviceType: 'UP', action: 'metadataOnly', metadata: { id: 'nice', type: ['a'], obj: [{ a: 1 }] } };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
