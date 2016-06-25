@@ -221,7 +221,12 @@ callbacks.postCreatePrivacyPipeJWT = function postCreatePrivacyPipeJWT(props, ap
 //
 utils.generateGetIsJobPathUrl = function generateGetIsJobPathUrl(domainIdParam, jobIdParam) {
   'use strict';
-  return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_IS_JOB_PATH + '/' + jobIdParam;
+
+  if (!jobIdParam) {
+    return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_IS_JOB_PATH;
+  } else {
+    return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_IS_JOB_PATH + '/' + jobIdParam;
+  }
 };
 
 promises.getIsJobJWT = function getIsJobJWT(props, apigwUrl) {
@@ -241,7 +246,6 @@ callbacks.getIsJobJWT = function getIsJobJWT(props, apigwUrl, callback) {
   'use strict';
   assert(apigwUrl, 'getIsJobJWT apigwUrl param is missing');
   assert(props.domainIdParam, util.format('getIsJobJWT props.domainIdParam is missing: %j', props));
-  assert(props.jobIdParam, util.format('getIsJobJWT props.jobIdParam is missing: %j', props));
 
   var getUrl = apigwUrl + utils.generateGetIsJobPathUrl(props.domainIdParam, props.jobIdParam);
 
