@@ -99,7 +99,12 @@ promises.createDomainJWT  = function createDomainJWT(props, apigwUrl, domainJWT)
 
 utils.generateFetchMetadataPathUrl = function generateFetchMetadataPathUrl(domainIdParam, mdIdParam) {
   'use strict';
-  return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_METADATA_PATH + '/' + mdIdParam;
+
+  if (!mdIdParam) {
+    return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_METADATA_PATH;
+  } else {
+    return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_METADATA_PATH + '/' + mdIdParam;
+  }
 };
 
 //
@@ -112,9 +117,15 @@ callbacks.fetchMetadataJWT = function fetchMetadataJWT(props, apigwUrl, callback
   assert(props, 'fetchDomain props param is missing');
   assert(apigwUrl, 'fetchDomain apigwUrl param is missing');
   assert(props.domainIdParam, util.format('props.domainIdParam is missing: %j', props));
-  assert(props.mdIdParam, util.format('props.mdIdParam is missing: %j', props));
 
-  var getUrl = apigwUrl + utils.generateFetchMetadataPathUrl(props.domainIdParam, props.mdIdParam);
+  var getUrl;
+
+  if (!props.mdIdParam) {
+    getUrl = apigwUrl + utils.generateFetchMetadataPathUrl(props.domainIdParam);
+  } else {
+    getUrl = apigwUrl + utils.generateFetchMetadataPathUrl(props.domainIdParam, props.mdIdParam);
+  }
+
   return callbacks.getJWT(props, getUrl, callback);
 };
 

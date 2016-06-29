@@ -88,6 +88,45 @@ describe('Metadata operations apigwRequestWrapper Tests', function () {
           assert(false, util.format('Unexpected error POST create md: %j', err));
         });
     }); //it 1.2
+
+    it('1.3 fetch all metadata', function () {
+      var props,
+          fetchNockScope, mdPath,
+          apigwUrl = 'http://test11.apigw.bogus.webshield.io',
+          promiseResponse,
+          domainIdParam = 'fake-domain';
+
+      props = {};
+      props.domainIdParam = domainIdParam;
+      props.loggerMsgId = '12';
+      props.logMsgServiceName = 'test13';
+      props.logMsgPrefix = 'a-prefix';
+      props.logger = { logJSON: function (mode, msg) { console.log('%s %j', mode, msg); } };
+
+      // nock out the GET from the wrapper to the APIGW
+      mdPath = apigwRequestWrapper.utils.generateFetchMetadataPathUrl(domainIdParam);
+      fetchNockScope = nock(apigwUrl)
+          .log(console.log)
+          .get(mdPath)
+          .reply(function () { // not used uri, requestBody) {
+            return [
+              HttpStatus.OK,
+              'dont-care-jwt',
+              { 'content-type': 'text/plain' }
+            ];
+          });
+
+      promiseResponse = apigwRequestWrapper.promises.fetchMetadataJWT(props, apigwUrl);
+      return promiseResponse
+        .then(function (response) {
+          response.should.have.property('statusCode', HttpStatus.OK);
+          response.body.should.be.equal('dont-care-jwt');
+          return;
+        })
+        .catch(function (err) {
+          assert(false, util.format('Unexpected error fetchMetadataJWT as a promise: %j', err));
+        });
+    }); //it 1.1
   }); // describe 1
 
 }); // describe
