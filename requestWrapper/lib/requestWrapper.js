@@ -31,6 +31,7 @@ function postJWT(props, callback) {
       'Content-Length': Buffer.byteLength(props.jwt)
     };
 
+    // props.headers is a MAP;
     if (props.headers) {
       props.headers.forEach(function (value, key) {
         headers[key] = value;
@@ -96,6 +97,7 @@ function postJSON(props, callback) {
       'Content-Length': Buffer.byteLength(jsonS)
     };
 
+    // props.headers is a MAP
     if (props.headers) {
       props.headers.forEach(function (value, key) {
         headers[key] = value;
@@ -159,6 +161,7 @@ function post(props, callback) {
       'Content-Length': Buffer.byteLength(props.text)
     };
 
+    // props.headers is a MAP
     if (props.headers) {
       props.headers.forEach(function (value, key) {
         headers[key] = value;
@@ -218,9 +221,19 @@ function post(props, callback) {
 function get(props, callback) {
   'use strict';
 
+  var headers = null;
+
   // create request options
   function createRequestOptions(props, next) {
     assert(props.url, util.format('props.url missing:%j', props));
+
+    // props.headers is a MAP
+    if (props.headers) {
+      headers = {};
+      props.headers.forEach(function (value, key) {
+        headers[key] = value;
+      });
+    }
 
     if (props.tls) {
       assert(false, 'restserver - Add code for tls path');
@@ -232,13 +245,15 @@ function get(props, callback) {
           method: 'GET',
           requestCert:        true,
           rejectUnauthorized: false, // added this as no ability to check the cert returned by Aetna as no chain
-          agent: false
+          agent: false,
+          headers: headers
         }); // next
     } else {
       return next(null,
         {
           method: 'GET',
-          url: props.url
+          url: props.url,
+          headers: headers
         }); // next
     }
   } // createRequestOptions

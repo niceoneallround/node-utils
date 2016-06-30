@@ -210,4 +210,38 @@ describe('requestWrapper Tests', function () {
 
   }); // describe 6
 
+  describe('7 test GET with header params', function () {
+
+    it('7.1 should be able get a URL', function (done) {
+      var props, url = 'https://bogus.webshield.io/test71',
+          body = '7282822882-bogus',
+          nockScope;
+
+      // nock out the POST call
+      nock.cleanAll(); // remove any left over nocks
+
+      // nock out the GET for the home document
+      nockScope = nock('https://bogus.webshield.io')
+            .log(console.log)
+            .matchHeader('x-api-key', '23')
+            .get('/test71')
+            .reply(HttpStatus.OK, function (uri, requestBody) {
+              uri.should.equal('/test71');
+              assert(!requestBody, util.format('Did not expect a request body:%j', requestBody));
+              return body;
+            });
+
+      props = {};
+      props.url = url;
+      props.headers = new Map();
+      props.headers.set('x-api-key', '23');
+      requestWrapper.get(props, function (err, response, body) {
+        assert(!err, util.format('Unexpected error starting on POST: %j', err));
+        response.should.have.property('statusCode', HttpStatus.OK);
+        body.should.be.equal(body);
+        done();
+      });
+    }); //it 2.1
+  }); // describe 3
+
 }); // describe
