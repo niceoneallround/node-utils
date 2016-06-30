@@ -280,7 +280,7 @@ callbacks.getJWT = function getJWT(props, getUrl, callback) {
 
   var getProps = { url: getUrl };
 
-  props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'GET-to-API-GATEWAY',
+  props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'GET-to-API-GATEWAY-FROM-apigwRequestWrapper',
                     domainIdParam: props.domainIdParam,
                     logId: props.loggerMsgId, url: getProps.url }, loggingMD);
 
@@ -303,9 +303,9 @@ callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
   postProps.jwt = sendJWT;
   postProps.url = postUrl;
 
-  props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'POST-to-API-GATEWAY',
+  props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'POST-to-API-GATEWAY-FROM-apigwRequestWrapper',
                     domainIdParam: props.domainIdParam,
-                    logId: props.loggerMsgId, url: postProps.url, jwt: sendJWT }, loggingMD);
+                    logId: props.loggerMsgId, url: postProps.url }, loggingMD);
 
   requestWrapper.postJWT(postProps, function (err, response, resultJWT) {
     return callback(err, response, resultJWT);
