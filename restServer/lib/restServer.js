@@ -305,6 +305,8 @@ function createRestService(props) {
             }
 
             if (!res.getHeader('content-type')) {
+              logger.logJSON('error', { serviceType: serviceName, action: 'POST-Handler-Setting-Content-Type-to-Default-application-json',
+                              path: versionedPath }, loggingMD);
               res.setHeader('content-type', 'application/json');
             }
 
