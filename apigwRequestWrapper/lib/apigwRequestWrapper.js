@@ -14,7 +14,7 @@ var assert = require('assert'),
     utils = {},
     APIGW_DOMAIN_PATH = '/v1/domains',
     APIGW_IS_JOB_PATH = '/is/jobs',  // prefixed by /v1/domains/:domainId
-    APIGW_METADATA_PATH = '/metadata', // '/v1/domains/' + domainIdParam + '/metadata';
+    APIGW_METADATA_PATH = '/metadata',
     APIGW_PP_PATH = '/privacy_pipe';
 
 //------------------------
@@ -107,6 +107,20 @@ utils.generateFetchMetadataPathUrl = function generateFetchMetadataPathUrl(domai
   }
 };
 
+// THE AWSAPIGW DOES NOT PREFIX WITH DOMAIN
+utils.generateAWSGWFetchMetadataPathUrl = function generateAWGWFetchMetadataPathUrl(mdIdParam) {
+  'use strict';
+
+  //
+  // THIS DOES NOT USE THE DOMAIN
+  //
+  if (!mdIdParam) {
+    return APIGW_METADATA_PATH;
+  } else {
+    return APIGW_METADATA_PATH + '/' + mdIdParam;
+  }
+};
+
 //
 // Fetch metadata
 // props.domainIdParam
@@ -116,14 +130,22 @@ callbacks.fetchMetadataJWT = function fetchMetadataJWT(props, apigwUrl, callback
   'use strict';
   assert(props, 'fetchDomain props param is missing');
   assert(apigwUrl, 'fetchDomain apigwUrl param is missing');
-  assert(props.domainIdParam, util.format('props.domainIdParam is missing: %j', props));
 
   var getUrl;
 
-  if (!props.mdIdParam) {
-    getUrl = apigwUrl + utils.generateFetchMetadataPathUrl(props.domainIdParam);
+  if (!props.domainIdParam) { // THE AWSAPIGW does not prefix with domain
+    if (!props.mdIdParam) {
+      getUrl = apigwUrl + utils.generateAWSGWFetchMetadataPathUrl();
+    } else {
+      getUrl = apigwUrl + utils.generateAWSGWFetchMetadataPathUrl(props.mdIdParam);
+    }
+
   } else {
-    getUrl = apigwUrl + utils.generateFetchMetadataPathUrl(props.domainIdParam, props.mdIdParam);
+    if (!props.mdIdParam) {
+      getUrl = apigwUrl + utils.generateFetchMetadataPathUrl(props.domainIdParam);
+    } else {
+      getUrl = apigwUrl + utils.generateFetchMetadataPathUrl(props.domainIdParam, props.mdIdParam);
+    }
   }
 
   return callbacks.getJWT(props, getUrl, callback);
@@ -151,6 +173,15 @@ utils.generatePostMetadataPathUrl = function generatePostMetadataPathUrl(domainI
   return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_METADATA_PATH;
 };
 
+utils.generateAWSGWPostMetadataPathUrl = function generateAWSGWPostMetadataPathUrl() {
+  'use strict';
+
+  //
+  // THIS DOES NOT USE THE DOMAIN
+  //
+  return APIGW_METADATA_PATH;
+};
+
 //
 // props.domainIdParam
 //
@@ -174,9 +205,14 @@ callbacks.postMetadataJWT = function postMetadataJWT(props, apigwUrl, mdJWT, cal
   'use strict';
   assert(mdJWT, 'postMetadata mdJWT param is missing');
   assert(apigwUrl, 'postMetadata apigwUrl param is missing');
-  assert(props.domainIdParam, util.format('props.domainIdParam is missing: %j', props));
 
-  var postUrl = apigwUrl + utils.generatePostMetadataPathUrl(props.domainIdParam);
+  var postUrl;
+  if (!props.domainIdParam) {
+    postUrl = apigwUrl + utils.generateAWSGWPostMetadataPathUrl();
+
+  } else {
+    postUrl = apigwUrl + utils.generatePostMetadataPathUrl(props.domainIdParam);
+  }
 
   return callbacks.postJWT(props, postUrl, mdJWT, callback);
 };

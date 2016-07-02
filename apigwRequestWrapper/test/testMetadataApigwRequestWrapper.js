@@ -129,4 +129,125 @@ describe('Metadata operations apigwRequestWrapper Tests', function () {
     }); //it 1.1
   }); // describe 1
 
+  //-----------------------
+  // AWS APIGW versions
+  //-----------------------
+
+  describe('2 AWSGW path test fetch metadata', function () {
+
+    it('2.1 AWSGW fetch a metadata', function () {
+      var props,
+          fetchNockScope, mdPath,
+          apigwUrl = 'http://test11.apigw.bogus.webshield.io',
+          promiseResponse,
+          mdIdParam = 'fake-md';
+
+      // NO DOMAIN ID
+      props = {};
+      props.mdIdParam = mdIdParam;
+      props.loggerMsgId = '12';
+      props.logMsgServiceName = 'test11';
+      props.logMsgPrefix = 'a-prefix';
+      props.logger = { logJSON: function (mode, msg) { console.log('%s %j', mode, msg); } };
+
+      // nock out the GET from the wrapper to the APIGW
+      mdPath = apigwRequestWrapper.utils.generateAWSGWFetchMetadataPathUrl(mdIdParam);
+      fetchNockScope = nock(apigwUrl)
+          .log(console.log)
+          .get(mdPath)
+          .reply(function () { // not used uri, requestBody) {
+            return [
+              HttpStatus.OK,
+              'dont-care-jwt',
+              { 'content-type': 'text/plain' }
+            ];
+          });
+
+      promiseResponse = apigwRequestWrapper.promises.fetchMetadataJWT(props, apigwUrl);
+      return promiseResponse
+        .then(function (response) {
+          response.should.have.property('statusCode', HttpStatus.OK);
+          response.body.should.be.equal('dont-care-jwt');
+          return;
+        })
+        .catch(function (err) {
+          assert(false, util.format('Unexpected error fetchMetadataJWT as a promise: %j', err));
+        });
+    }); //it 2.1
+
+    it('2.2 AWSGW test create metadata should call APIGW URL on create metadata', function () {
+      var props,
+          mdJWT = 'a-fake-jwt', mdPath,
+          nockScope,
+          apigwUrl = 'http://test12.apigw.bogus.webshield.io',
+          promiseResponse;
+
+      props = {};
+      props.loggerMsgId = '12';
+      props.logMsgServiceName = 'test12';
+      props.logMsgPrefix = 'a-prefix';
+      props.logger = { logJSON: function (mode, msg) { console.log('%s %j', mode, msg); } };
+
+      // nock out the POST
+      mdPath = apigwRequestWrapper.utils.generateAWSGWFetchMetadataPathUrl();
+      nockScope = nock(apigwUrl)
+            .log(console.log)
+            .post(mdPath)
+            .reply(HttpStatus.OK, function (uri, requestBody) {
+              requestBody.should.be.equal(mdJWT);
+              this.req.headers.should.have.property('content-type', 'text/plain');
+              return 'return-fake-JWT';
+            });
+
+      promiseResponse = apigwRequestWrapper.promises.postMetadataJWT(props, apigwUrl, mdJWT);
+      return promiseResponse
+        .then(function (response) {
+          response.should.have.property('statusCode', HttpStatus.OK);
+          response.body.should.be.equal('return-fake-JWT');
+          return true;
+        })
+        .catch(function (err) {
+          assert(false, util.format('Unexpected error POST create md: %j', err));
+        });
+    }); //it 2.2
+
+    it('2.3 AWSGW fetch all metadata', function () {
+      var props,
+          fetchNockScope, mdPath,
+          apigwUrl = 'http://test11.apigw.bogus.webshield.io',
+          promiseResponse;
+
+      props = {};
+      props.loggerMsgId = '12';
+      props.logMsgServiceName = 'test13';
+      props.logMsgPrefix = 'a-prefix';
+      props.logger = { logJSON: function (mode, msg) { console.log('%s %j', mode, msg); } };
+
+      // nock out the GET from the wrapper to the APIGW
+      mdPath = apigwRequestWrapper.utils.generateAWSGWFetchMetadataPathUrl();
+      fetchNockScope = nock(apigwUrl)
+          .log(console.log)
+          .get(mdPath)
+          .reply(function () { // not used uri, requestBody) {
+            return [
+              HttpStatus.OK,
+              'dont-care-jwt',
+              { 'content-type': 'text/plain' }
+            ];
+          });
+
+      promiseResponse = apigwRequestWrapper.promises.fetchMetadataJWT(props, apigwUrl);
+      return promiseResponse
+        .then(function (response) {
+          response.should.have.property('statusCode', HttpStatus.OK);
+          response.body.should.be.equal('dont-care-jwt');
+          return;
+        })
+        .catch(function (err) {
+          assert(false, util.format('Unexpected error fetchMetadataJWT as a promise: %j', err));
+        });
+    }); //it 1.1
+
+  }); // describe 2
+
 }); // describe
