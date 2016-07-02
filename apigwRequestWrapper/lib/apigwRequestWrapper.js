@@ -15,6 +15,7 @@ var assert = require('assert'),
     APIGW_DOMAIN_PATH = '/v1/domains',
     APIGW_IS_JOB_PATH = '/is/jobs',  // prefixed by /v1/domains/:domainId
     APIGW_METADATA_PATH = '/metadata',
+    AWSGW_APIGW_METADATA_PATH = '/v1/metadata',
     APIGW_PP_PATH = '/privacy_pipe';
 
 //------------------------
@@ -115,9 +116,9 @@ utils.generateAWSGWFetchMetadataPathUrl = function generateAWGWFetchMetadataPath
   // THIS DOES NOT USE THE DOMAIN
   //
   if (!mdIdParam) {
-    return APIGW_METADATA_PATH;
+    return AWSGW_APIGW_METADATA_PATH;
   } else {
-    return APIGW_METADATA_PATH + '/' + mdIdParam;
+    return AWSGW_APIGW_METADATA_PATH + '/' + mdIdParam;
   }
 };
 
@@ -179,7 +180,7 @@ utils.generateAWSGWPostMetadataPathUrl = function generateAWSGWPostMetadataPathU
   //
   // THIS DOES NOT USE THE DOMAIN
   //
-  return APIGW_METADATA_PATH;
+  return AWSGW_APIGW_METADATA_PATH;
 };
 
 //
