@@ -16,7 +16,8 @@ var assert = require('assert'),
     APIGW_IS_JOB_PATH = '/is/jobs',  // prefixed by /v1/domains/:domainId
     APIGW_METADATA_PATH = '/metadata',
     AWSGW_APIGW_METADATA_PATH = '/v1/metadata',
-    APIGW_PP_PATH = '/privacy_pipe';
+    APIGW_PP_PATH = '/privacy_pipe',
+    AWSGW_APIGW_PP_PATH = '/v1/privacy_pipe';
 
 //------------------------
 // Domain requests
@@ -230,6 +231,11 @@ utils.generateCreatePipePathUrl = function generateCreatePipePathUrl(domainIdPar
   return APIGW_DOMAIN_PATH + '/' + domainIdParam + APIGW_PP_PATH;
 };
 
+utils.generateAWSGWCreatePipePathUrl = function generateAWSGWCreatePipePathUrl() {
+  'use strict';
+  return AWSGW_APIGW_PP_PATH;
+};
+
 //
 // props.domainIdParam
 //
@@ -253,9 +259,14 @@ callbacks.postCreatePrivacyPipeJWT = function postCreatePrivacyPipeJWT(props, ap
   'use strict';
   assert(ppJWT, 'postCreatePrivacyPipe ppJWT param is missing');
   assert(apigwUrl, 'postCreatePrivacyPipe apigwUrl param is missing');
-  assert(props.domainIdParam, util.format('props.domainIdParam is missing: %j', props));
 
-  var postUrl = apigwUrl + utils.generateCreatePipePathUrl(props.domainIdParam);
+  var postUrl;
+
+  if (!props.domainIdParam) {
+    postUrl = apigwUrl + utils.generateAWSGWCreatePipePathUrl();
+  } else {
+    postUrl = apigwUrl + utils.generateCreatePipePathUrl(props.domainIdParam);
+  }
 
   return callbacks.postJWT(props, postUrl, ppJWT, callback);
 };

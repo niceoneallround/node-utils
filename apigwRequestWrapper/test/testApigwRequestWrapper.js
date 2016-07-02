@@ -79,6 +79,35 @@ describe('apigwRequestWrapper Tests', function () {
           assert(false, util.format('Unexpected error POST create privacy pipe as a promise: %j', err));
         });
     }); //it 1.2
+
+    it('1.3 AWSGW no domainId should create a jwt and post to the pb using a callback', function (done) {
+      var props,
+          ppJWT = 'a-fake-jwt',
+          nockScope,
+          apigwUrl = 'https://test11.apigw.bogus.webshield.io';
+
+      props = {};
+      props.loggerMsgId = '11';
+      props.logMsgServiceName = 'test11';
+      props.logger = { logJSON: function (mode, msg) { console.log('%s %j', mode, msg); } };
+
+      // nock out the POST to the APIGW
+      nockScope = nock(apigwUrl)
+            .log(console.log)
+            .post(apigwRequestWrapper.utils.generateAWSGWCreatePipePathUrl())
+            .reply(HttpStatus.OK, function (uri, requestBody) {
+              requestBody.should.be.equal(ppJWT);
+              this.req.headers.should.have.property('content-type', 'text/plain');
+              return 'return-fake-JWT';
+            });
+
+      apigwRequestWrapper.callbacks.postCreatePrivacyPipeJWT(props, apigwUrl, ppJWT, function (err, response, outputJWT) {
+        assert(!err, util.format('Unexpected error starting on POST: %j', err));
+        response.should.have.property('statusCode', HttpStatus.OK);
+        outputJWT.should.be.equal('return-fake-JWT');
+        done();
+      });
+    }); //it 1.3
   }); // describe 1
 
   describe('2 test get is jobs', function () {
