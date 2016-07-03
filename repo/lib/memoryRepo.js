@@ -266,6 +266,18 @@ function MemoryRepo() {
       });
     },
 
+    queryCollection: function (serviceCtx, props) {
+      return new Promise(function (resolve, reject) {
+        repo.queryCollection(serviceCtx, props, function (err, retData) {
+          if (!err) {
+            return resolve(retData);
+          } else {
+            return reject(err);
+          }
+        });
+      });
+    },
+
     sizeOfCollection: function (serviceCtx, props) {
       return new Promise(function (resolve, reject) {
         repo.sizeOfCollection(serviceCtx, props, function (err, size) {
