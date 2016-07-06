@@ -342,4 +342,67 @@ describe('restServer Tests', function () {
     }); //it 5.2
   }); // describe 5
 
+  describe('6 Internal API Tests', function () {
+
+    var restService6, props = {};
+
+    before(function (done) {
+      props.name = 'Test 2';
+      props.baseURL = '/baseURL';
+      props.URLversion = 'v1';
+      props.port = 3106;
+
+      // setup the api key
+      props.internalApiKey = {};
+      props.internalApiKey.enabled = '1';
+      props.internalApiKey.key = '567';
+      props.internalApiKey.name = 'x-pn-hard-coded-api-key';
+      restService6 = restServiceFactory.create(props);
+
+      restService6.start(function (err) {
+        assert(!err, util.format('Unexpected error starting service2: %j', err));
+        done();
+      });
+    });
+
+    it('6.1 register a handler on a path  response, and GET with no api key should be FORBIDDEN', function (done) {
+
+      var handler61 = {}, sendData = { get: 'hello' }, client, client2;
+
+      handler61.get = function (req, res, cb) {
+        assert(req, 'No req passed to handler');
+        assert(res, 'No res passed to handler');
+        return cb(null, sendData);
+      };
+
+      restService6.registerGETHandler('/path_61', handler61);
+
+      client = restify.createJsonClient({ url: 'http://localhost:' + props.port });
+      client.get('/baseURL/v1/path_61', function (err, req, res, data) {
+        assert(err, util.format('Unexpected error starting on GET: %j', err));
+        assert(req, 'No req passed from client');
+        assert(res, 'No res passed from client');
+        assert(data, 'No data passed from server');
+
+        res.statusCode.should.be.equal(HttpStatus.FORBIDDEN);
+        data.should.be.equal('FORBIDDEN');
+
+        // call again with api key and should be ok
+        client2 = restify.createJsonClient(
+            { url: 'http://localhost:' + props.port,
+              headers: { 'x-pn-hard-coded-api-key': '567' } });
+        client2.get('/baseURL/v1/path_61', function (err, req, res, data) {
+          assert(!err, util.format('Unexpected error starting on GET: %j', err));
+          assert(req, 'No req passed from client');
+          assert(res, 'No res passed from client');
+          assert(data, 'No data passed from server');
+
+          res.statusCode.should.be.equal(HttpStatus.OK);
+          done();
+        });
+      });
+    }); //it 6.1
+
+  }); // describe 6
+
 }); // describe

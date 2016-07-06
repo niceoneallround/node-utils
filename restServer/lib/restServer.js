@@ -31,7 +31,8 @@ function createRestService(props) {
       baseURL = null,
       URLversion,
       port,
-      host = '0.0.0.0'; // for docker bind to this can overide with props.host
+      host = '0.0.0.0', // for docker bind to this can overide with props.host
+      internalApiKey = {};
 
   assert(props, 'createRestService requires props');
   assert(props.name, util.format('createRestService props must have a name param:%j', props));
@@ -79,6 +80,48 @@ function createRestService(props) {
 
   if (props.host) {
     host = props.host;
+  }
+
+  //
+  // Check if any of the internal API key are enabled - these are controlled by
+  // - INTERNAL_API_KEY_NAME the header field name
+  // - INTERNAL_API_KEY the api key
+  // - INTERNAL_API_KEY_ENABLED 1 or 0
+  //
+  internalApiKey.enabled = process.env.INTERNAL_API_KEY_ENABLED;
+  if ((internalApiKey.enabled) && (internalApiKey.enabled === '1')) {
+    internalApiKey.key = process.env.INTERNAL_API_KEY;
+    internalApiKey.name = process.env.INTERNAL_API_KEY_NAME;
+    if (!internalApiKey.name) {
+      internalApiKey.name = 'x-pn-hard-coded-api-key';
+    }
+
+    logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Internal-API-Key-Enabled',
+          internalApiKey: internalApiKey }, loggingMD);
+  } else {
+    if (props.internalApiKey) {
+      internalApiKey = props.internalApiKey;
+
+      logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Internal-API-Key-Enabled-Via-Props-Override',
+            internalApiKey: internalApiKey }, loggingMD);
+    }
+  }
+
+  // check API key if all good continue with next otherwise return forbidden
+  function checkInternalApiKey(req) {
+    var value;
+    if ((internalApiKey.enabled) && (internalApiKey.enabled === '1')) {
+      if (req.headers) {
+        value = req.headers[internalApiKey.name];
+        if (value === internalApiKey.key) {
+          return HttpStatus.OK;
+        } else {
+          return HttpStatus.FORBIDDEN;
+        }
+      }
+    } else {
+      return HttpStatus.OK;
+    }
   }
 
   //
@@ -185,6 +228,18 @@ function createRestService(props) {
       },
 
       function (req, res, next) {
+        var s = checkInternalApiKey(req);
+        if (s !== HttpStatus.OK) {
+
+          logger.logJSON('info', { serviceType: serviceName,
+                                  action: 'Get-on-path-FORBIDDEN', path: versionedPath,
+                                  headers: req.headers }, loggingMD);
+
+          res.statusCode = s;
+          res.send('FORBIDDEN');
+          return next();
+        }
+
         handler.get(req, res, function (err, data) {
           if (err) {
             logger.logJSON('error', { serviceType: serviceName, action: 'GET-Handler-ERROR',
@@ -236,6 +291,18 @@ function createRestService(props) {
       },
 
       function (req, res, next) {
+        var s = checkInternalApiKey(req);
+        if (s !== HttpStatus.OK) {
+
+          logger.logJSON('info', { serviceType: serviceName,
+                                  action: 'GetJWT-on-path-FORBIDDEN', path: versionedPath,
+                                  headers: req.headers }, loggingMD);
+
+          res.statusCode = s;
+          res.send('FORBIDDEN');
+          return next();
+        }
+
         handler.get(req, res, function (err, data) {
           if (err) {
             logger.logJSON('error', { serviceType: serviceName, action: 'GETJWT-Handler-ERROR',
@@ -285,6 +352,18 @@ function createRestService(props) {
       },
 
       function (req, res, next) {
+        var s = checkInternalApiKey(req);
+        if (s !== HttpStatus.OK) {
+
+          logger.logJSON('info', { serviceType: serviceName,
+                                  action: 'POST-on-path-FORBIDDEN', path: versionedPath,
+                                  headers: req.headers }, loggingMD);
+
+          res.statusCode = s;
+          res.send('FORBIDDEN');
+          return next();
+        }
+
         handler.post(req, res, function (err, data, props) {
           if (err) {
             logger.logJSON('error', { serviceType: serviceName, action: 'POST-Handler-ERROR',
@@ -345,6 +424,18 @@ function createRestService(props) {
       },
 
       function (req, res, next) {
+        var s = checkInternalApiKey(req);
+        if (s !== HttpStatus.OK) {
+
+          logger.logJSON('info', { serviceType: serviceName,
+                                  action: 'POSTJWT-on-path-FORBIDDEN', path: versionedPath,
+                                  headers: req.headers }, loggingMD);
+
+          res.statusCode = s;
+          res.send('FORBIDDEN');
+          return next();
+        }
+
         handler.post(req, res, function (err, data) {
           if (err) {
             logger.logJSON('error', { serviceType: serviceName, action: 'POST-JWT-Handler-ERROR',
