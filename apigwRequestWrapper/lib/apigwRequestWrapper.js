@@ -326,7 +326,21 @@ callbacks.getJWT = function getJWT(props, getUrl, callback) {
   assert(props.loggerMsgId, util.format('props.loggerMsgId is missing - used to track:%j', props));
   assert(props.logMsgServiceName, util.format('props.logMsgServiceName is mising:%j', props));
 
-  var getProps = { url: getUrl };
+  var getProps = { url: getUrl }, apiKey, apiKeyName;
+
+  //
+  // Check to see if there is a need to add an API key for now do at this low level
+  //
+  apiKey = process.env.API_GATEWAY_API_KEY;
+  if (apiKey) {
+    apiKeyName = process.env.API_GATEWAY_API_KEY_NAME;
+    getProps.headers = new Map();
+    getProps.header[apiKeyName] = apiKey;
+
+    props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'GET-to-API-GATEWAY-FROM-apigwRequestWrapper-ADDED-API-KEY',
+                      logId: props.loggerMsgId, url: getProps.url,
+                      key: getProps.headers }, loggingMD);
+  }
 
   if (!props.domainIdParam) {
     props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'GET-to-API-GATEWAY-FROM-apigwRequestWrapper',
@@ -352,9 +366,23 @@ callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
   assert(props.loggerMsgId, util.format('props.loggerMsgId is missing - used to track:%j', props));
   assert(props.logMsgServiceName, util.format('props.logMsgServiceName is mising:%j', props));
 
-  var postProps = {};
+  var postProps = {}, apiKey, apiKeyName;
   postProps.jwt = sendJWT;
   postProps.url = postUrl;
+
+  //
+  // Check to see if there is a need to add an API key for now do at this low level
+  //
+  apiKey = process.env.API_GATEWAY_API_KEY;
+  if (apiKey) {
+    apiKeyName = process.env.API_GATEWAY_API_KEY_NAME;
+    postProps.headers = new Map();
+    postProps.header[apiKeyName] = apiKey;
+
+    props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'POST-to-API-GATEWAY-FROM-apigwRequestWrapper-ADDED-API-KEY',
+                      logId: props.loggerMsgId, url: postProps.url,
+                      key: postProps.headers }, loggingMD);
+  }
 
   if (!props.domainIdParam) {
     props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'POST-to-API-GATEWAY-FROM-apigwRequestWrapper',
