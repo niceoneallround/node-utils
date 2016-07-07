@@ -335,7 +335,7 @@ callbacks.getJWT = function getJWT(props, getUrl, callback) {
   if (apiKey) {
     apiKeyName = process.env.API_GATEWAY_API_KEY_NAME;
     getProps.headers = new Map();
-    getProps.header.set(apiKeyName, apiKey);
+    getProps.headers.set(apiKeyName, apiKey);
 
     props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'GET-to-API-GATEWAY-FROM-apigwRequestWrapper-ADDED-API-KEY',
                       logId: props.loggerMsgId, url: getProps.url, keyName: apiKeyName, key: apiKey }, loggingMD);
@@ -376,7 +376,7 @@ callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
   if (apiKey) {
     apiKeyName = process.env.API_GATEWAY_API_KEY_NAME;
     postProps.headers = new Map();
-    postProps.header.set(apiKeyName, apiKey);
+    postProps.headers.set(apiKeyName, apiKey);
 
     props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'POST-to-API-GATEWAY-FROM-apigwRequestWrapper-ADDED-API-KEY',
                       logId: props.loggerMsgId, url: postProps.url, keyName: apiKeyName, key: apiKey }, loggingMD);
