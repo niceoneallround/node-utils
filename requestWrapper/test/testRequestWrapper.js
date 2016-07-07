@@ -241,7 +241,18 @@ describe('requestWrapper Tests', function () {
         body.should.be.equal(body);
         done();
       });
-    }); //it 2.1
-  }); // describe 3
+    }); //it 7.1
+  }); // describe 7
+
+  describe('8 test generate basic auth token ', function () {
+
+    it('8.1 test it', function () {
+      var username = 'rich', password = 'richer', result;
+
+      result = requestWrapper.generateBasicAuthTokenForHeader(username, password);
+      result.should.be.equal('Basic ' + new Buffer(username + ':' + password).toString('base64'));
+
+    }); //it 8.1
+  }); // describe 8
 
 }); // describe

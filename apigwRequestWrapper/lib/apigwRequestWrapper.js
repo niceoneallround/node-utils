@@ -342,12 +342,12 @@ callbacks.getJWT = function getJWT(props, getUrl, callback) {
   }
 
   if (!props.domainIdParam) {
-    props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'GET-to-API-GATEWAY-FROM-apigwRequestWrapper',
-                      logId: props.loggerMsgId, url: getProps.url }, loggingMD);
+    props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'GET-to-API-GATEWAY-FROM-apigwRequestWrapper-NO-DomainId',
+                      logId: props.loggerMsgId, url: getProps.url, keyName: apiKeyName, key: apiKey }, loggingMD);
   } else {
     props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'GET-to-API-GATEWAY-FROM-apigwRequestWrapper',
                       domainIdParam: props.domainIdParam,
-                      logId: props.loggerMsgId, url: getProps.url }, loggingMD);
+                      logId: props.loggerMsgId, url: getProps.url, keyName: apiKeyName, key: apiKey }, loggingMD);
   }
 
   requestWrapper.getJWT(getProps, function (err, response, returnJWT) {
@@ -383,12 +383,12 @@ callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
   }
 
   if (!props.domainIdParam) {
-    props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'POST-to-API-GATEWAY-FROM-apigwRequestWrapper',
-                    logId: props.loggerMsgId, url: postProps.url }, loggingMD);
+    props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'POST-to-API-GATEWAY-FROM-apigwRequestWrapper-NO-DomainId',
+                    logId: props.loggerMsgId, url: postProps.url, keyName: apiKeyName, key: apiKey }, loggingMD);
   } else {
     props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: 'POST-to-API-GATEWAY-FROM-apigwRequestWrapper',
                     domainIdParam: props.domainIdParam,
-                    logId: props.loggerMsgId, url: postProps.url }, loggingMD);
+                    logId: props.loggerMsgId, url: postProps.url, keyName: apiKeyName, key: apiKey }, loggingMD);
   }
 
   requestWrapper.postJWT(postProps, function (err, response, resultJWT) {

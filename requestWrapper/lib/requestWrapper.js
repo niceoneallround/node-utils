@@ -280,7 +280,23 @@ function getJWT(props, callback) {
   return get(props, callback);
 }
 
+//
+// Create a Basic auth token that is of the format
+//  Basic <username:password in base64 encoded format>
+//
+// Put in http header Authorization
+//
+function generateBasicAuthTokenForHeader(username, password) {
+  'use strict';
+  assert(username, 'generateBasicAuthTokenForHeader username param missing');
+  assert(password, 'generateBasicAuthTokenForHeader password param missing');
+
+  return 'Basic ' + new Buffer(username + ':' + password).toString('base64');
+}
+
 module.exports = {
+
+  generateBasicAuthTokenForHeader: generateBasicAuthTokenForHeader,
 
   get: get,
   post: post,
