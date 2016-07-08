@@ -166,7 +166,7 @@ function create(props) {
         log(level, json.serviceType + '-' + json.action + '\nSVC_MESSAGE_ID:%s METADATA: %s',
                 [id, str], md);
       } else {
-        //log(level, '\nMETADATA: %s', [str], md); was not display nested objects
+        log(level, '\nMETADATA: %s', [str], md);
         console.log(json.metadata);
       }
     }
@@ -179,8 +179,8 @@ function create(props) {
         log(level, json.serviceType + '-' + json.action + 'SVC_MESSAGE_ID:%s \nDATA: %s',
                 [id, JSON.stringify(json.data, null, 2)], md);
       } else {
-        //log(level, '\nDATA: %s', [JSON.stringify(json.data, null, 2)], md); was not display nested objects
-        console.log(json.data);
+        log(level, '\nDATA: %s', [JSON.stringify(json.data, null, 2)], md);
+        console.log(json.data); // ADD MORE
       }
     }
   }
