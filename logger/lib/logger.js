@@ -109,7 +109,7 @@ function create(props) {
   // - logJSON('error',{ serviceType: '', action: '', error: {err: '', errMsg: ''}}, loggingMD)
   //
   function logJSON(level, json, md) {
-    var id, msg;
+    var id, msg, str;
 
     // log message if any pretty stuff then print that afterwards
     //log(level, '%j', [json], md);
@@ -161,13 +161,12 @@ function create(props) {
     // if contains metadata  then pretty it up and print
     //
     if (json.metadata) {
-      var str = JSON.stringify(json.metadata, null, 2);
+      str = JSON.stringify(json.metadata, null, 2);
       if (msg) {
         log(level, json.serviceType + '-' + json.action + '\nSVC_MESSAGE_ID:%s METADATA: %s',
                 [id, str], md);
       } else {
         log(level, '\nMETADATA: %s', [str], md);
-        console.log(json.metadata);
       }
     }
 
@@ -175,11 +174,12 @@ function create(props) {
     // if contains data then pretty it up and print
     //
     if (json.data) {
+      str = JSON.stringify(json.data, null, 2);
       if (msg) {
         log(level, json.serviceType + '-' + json.action + 'SVC_MESSAGE_ID:%s \nDATA: %s',
-                [id, JSON.stringify(json.data, null, 2)], md);
+                [id, str], md);
       } else {
-        log(level, '\nDATA: %s', [JSON.stringify(json.data, null, 2)], md);
+        log(level, '\nDATA: %s', [str], md);
         console.log(json.data); // ADD MORE
       }
     }
