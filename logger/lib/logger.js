@@ -180,7 +180,8 @@ function create(props) {
                 [id, str], md);
       } else {
         log(level, '\nDATA: %s', [str], md);
-        console.log(json.data); // ADD MORE
+
+        //console.log(json.data); // ADD MORE
       }
     }
   }
