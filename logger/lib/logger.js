@@ -94,6 +94,15 @@ function create(props) {
   }
 
   //
+  // Used to log a progress message
+  //
+  function logProgress(msg) {
+    console.log('***************');
+    console.log('********** %s  --- md:%j', msg);
+    console.log('***************');
+  }
+
+  //
   // Log json format message
   // *level - the level
   // *json - the message
@@ -188,6 +197,7 @@ function create(props) {
 
   thisLogger = {
     log: log,
+    logProgress: logProgress,
     logJSON: logJSON };
 
   return thisLogger;

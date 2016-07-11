@@ -25,6 +25,11 @@ describe('Logger Tests', function () {
     logger.logJSON('info', json, md);
   }
 
+  it('log progress', function () {
+    var logger = loggerFactory.create();
+    logger.logProgress('heya');
+  });
+
   it('log some stuff no 3rd party logging', function () {
     logSomeStuff(loggerFactory.create(), 'test1');
   });
