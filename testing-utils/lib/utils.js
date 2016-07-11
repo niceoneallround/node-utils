@@ -81,6 +81,12 @@ function createDummyServiceCtx(props, callback) {
     logJSON: function (part1, part2, part3) { // write out
       console.log('dummyServiceContext dummmy logging', part1, part2, part3);
       return 1;
+    },
+
+    logProgress: function (msg) {
+      console.log('**********');
+      console.log('****** dummy progress:%s', msg);
+      console.log('**********');
     }
   };
 
