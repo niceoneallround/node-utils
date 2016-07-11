@@ -98,7 +98,7 @@ function create(props) {
   //
   function logProgress(msg) {
     console.log('***************');
-    console.log('********** %s  --- md:%j', msg);
+    console.log('********** %s', msg);
     console.log('***************');
   }
 
