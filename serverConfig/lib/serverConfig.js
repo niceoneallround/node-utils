@@ -144,11 +144,22 @@ function create(overrides) {
     c.REFERENCE_SOURCE_PROXY_URL = process.env.REFERENCE_SOURCE_PROXY_URL;
   }
 
+  //
+  // Lets add some that are specific to the RSP - FIXME these should be moved to
+  // the rsp - did not add there was need to add overrides code
+  //
   c.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL = 'not-set';
   if ((overrides) && (overrides.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL)) {
     c.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL = overrides.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL;
   } else if (process.env.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL) {
     c.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL = process.env.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL;
+  }
+
+  c.REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL = 'not-set';
+  if ((overrides) && (overrides.REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL)) {
+    c.REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL = overrides.REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL;
+  } else if (process.env.REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL) {
+    c.REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL = process.env.REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL;
   }
 
   c.DOMAIN_NAME = 'not-set';
