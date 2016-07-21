@@ -360,4 +360,14 @@ describe('Server Config Utils Tests', function () {
     });
   });
 
+  describe('20 test REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL', function () {
+    it('20.1 check overrides work', function () {
+      var c, overrides = {};
+
+      overrides.REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL = 'override1';
+      c = configUtils.create(overrides);
+      c.should.have.property('REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL', 'override1');
+    });
+  });
+
 });
