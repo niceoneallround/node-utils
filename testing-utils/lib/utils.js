@@ -16,6 +16,10 @@ function getTestServiceConfig(props) {
   overrides.MODE = 'DEV';
   overrides.HOSTNAME = 'localhost';
 
+  //
+  // FIXME bogus should just get all the keys and move across
+  // avoids many errors
+
   if ((props) && (props.port)) {
     overrides.PORT = props.port;
     overrides.PORT_INSIDE_DOCKER = props.port;
@@ -54,6 +58,10 @@ function getTestServiceConfig(props) {
 
   if ((props) && (props.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL)) {
     overrides.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL = props.REFERENCE_SOURCE_POST_SUBJECT_QUERY_URL;
+  }
+
+  if ((props) && (props.REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL)) {
+    overrides.REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL = props.REFERENCE_SOURCE_POST_BACK_QUERY_RESULTS_URL;
   }
 
   // the JWT usage requires a secret so set one up here that is used across all tests, it
