@@ -28,9 +28,23 @@ describe('restServer Tests', function () {
     });
 
     it('1.1 should be able to stop the service', function (done) {
-      restService1.stop(function (err) {
-        assert(!err, util.format('Unexpected error stopping service: %j', err));
-        done();
+
+      //create a server to stop
+      var props = {}, restServer2Stop;
+      props.name = 'Test 1';
+      props.baseURL = '/baseURL';
+      props.URLversion = 'v1';
+      props.port = 3199;
+      restServer2Stop = restServiceFactory.create(props);
+
+      restServer2Stop.start(function (err) {
+        assert(!err, util.format('Unexpected error starting service: %j', err));
+
+        console.log('*********** stopping server');
+        restServer2Stop.stop(function (err) {
+          assert(!err, util.format('Unexpected error stopping service: %j', err));
+          done();
+        });
       });
     }); //it 1.1
 

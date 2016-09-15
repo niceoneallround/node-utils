@@ -189,6 +189,7 @@ function createRestService(props) {
   //
   function stop(callback) {
     logger.logJSON('info', { serviceType: serviceName, action: 'Service-Stop' }, loggingMD);
+    restifyServer.close();
     return callback(null);
   }
 
