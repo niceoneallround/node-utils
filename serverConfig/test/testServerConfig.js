@@ -370,4 +370,19 @@ describe('Server Config Utils Tests', function () {
     });
   });
 
+  describe('21 test VERIFY_JWT', function () {
+    it('21.1 should be true as default', function () {
+      let c = configUtils.create({});
+      c.should.have.property('VERIFY_JWT', true);
+    });
+
+    it('21.2 check overrides work', function () {
+      let c, overrides = {};
+
+      overrides.VERIFY_JWT = 'false';
+      c = configUtils.create(overrides);
+      c.should.have.property('VERIFY_JWT', false);
+    });
+  });
+
 });

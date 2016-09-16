@@ -225,6 +225,20 @@ function create(overrides) {
 
   // setup the crypto configuration
   c.crypto = {};
+
+  // by Default verify JWT
+  c.VERIFY_JWT = true;
+  if ((overrides) && (overrides.VERIFY_JWT)) {
+    if (overrides.VERIFY_JWT.toLowerCase() === 'false') {
+      c.VERIFY_JWT = false;
+    }
+  } else if (process.env.VERIFY_JWT) {
+    if (process.env.VERIFY_JWT.toLowerCase() === 'false') {
+      c.VERIFY_JWT = false;
+    }
+  }
+
+  // by default use HS256
   c.crypto.jwt = {};
   c.crypto.jwt.issuer = c.HOSTNAME;
   c.crypto.jwt.type = 'HS256';
