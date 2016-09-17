@@ -1,17 +1,21 @@
 /*jslint node: true, vars: true */
 
-var assert = require('assert'),
-    collectionId = 0,
-    util = require('util'),
-    _ServiceType = 'node-utils/memoryRepo',
-    loggingMD = {
-        ServiceType: _ServiceType,
-        FileName: 'factory.js' },
-    _ = require('underscore');
+const assert = require('assert');
+const util = require('util');
+const _ServiceType = 'node-utils/memoryRepo';
+const loggingMD = { ServiceType: _ServiceType, FileName: 'factory.js' };
+const _ = require('underscore');
+
+var collectionId = 0; // as an in-memory repo ok to reset if stop/start
 
 //
-// Create a memory repo -  basically a map of collections where the key is client supplied for example
-// domain.datamodel
+// The memory repo supports the creation of collections identified by name.
+//
+// Each collection is a map of <key, value> and supports access by key, or a
+// query that uses a function to scan over the values.
+//
+// Typically the key is the @id, and the value is a JSON-LD node, but can be
+// anything
 //
 function MemoryRepo() {
   'use strict';
@@ -25,8 +29,6 @@ function MemoryRepo() {
   repo = {
 
     // nothing to do for a memory repo
-    // callback
-    //  *err
     configure: function configureRepo(serviceCtx, props, callback) {
       assert(serviceCtx, util.format('configure needs a serviceCtx'));
       assert(props, util.format('configure needs a props'));
@@ -34,15 +36,14 @@ function MemoryRepo() {
       callback(null);
     },
 
-    // find the collection by its name - the client decides the name for example domain.datamodel
+    // find the collection by its name - the client decides the name for example METADATA
     getCollection: function (serviceCtx, name) {
-      var result, keys;
       assert(serviceCtx, util.format('getCollection needs a serviceCtx'));
       assert(name, util.format('getCollection needs a name:%s', name));
 
-      result = collections[name];
+      let result = collections[name];
       if (!result) {
-        keys = _.keys(collections);
+        let keys = _.keys(collections);
         assert.fail(util.format('MemoryRepo-cannotFindCollection:%s - collections:%s - collectionNames:%j - collections:%j',
                 name, (keys.length - 1), keys, collections));
       }
@@ -55,15 +56,13 @@ function MemoryRepo() {
     //  **name the collection name
     // @callback(err. created)
     createCollection: function createCollection(serviceCtx, props, callback) {
-      var created = false, col;
-
       assert(serviceCtx, util.format('createCollection needs a serviceCtx'));
       assert(props.name, util.format('cannot create collection with props.name undefined, props is: %j', props));
 
-      // if collection already exists then this is a nop otherwise initalize to empty array
-      col = collections[props.name];
+      let created = false, col = collections[props.name];
       if (!col) {
-        collections[props.name] = [];
+        // A new collection so add to the collections and initialize to empty map
+        collections[props.name] = new Map();
         created = true;
       }
 
@@ -72,32 +71,35 @@ function MemoryRepo() {
       callback(null, created);
     },
 
-    // insert the jsonld data into the named collection
-    // update
+    // insert the data into the named collection
     //
-    // *data an array of items to add
+    // *data - the data to add into the collection of the form {key: <the key>, value: <the value to add> }
+    //          - can be an array of entries or a singleton
     // *props - describes collection
     //  **name the collection name
     // *callback
     //   **err
-    //   **rows inserted
+    //   **data - data that was passed in
     insertIntoCollection: function insertIntoCollection(serviceCtx, props, data, callback) {
-      var col, i;
       assert(serviceCtx, util.format('insertIntoCollection needs a serviceCtx'));
       assert(props.name, util.format('insertIntoCollection needs a prop.name, props is: %j', props));
-      assert(util.isArray(data), util.format('insertIntoCollection data must be an array: %j', data));
 
-      col = this.getCollection(serviceCtx, props.name);
+      let col = this.getCollection(serviceCtx, props.name);
       assert(col, util.format('insertIntoCollection could not find collection? props:%j', props));
 
-      if (data.length === 0) {
-        return callback(null, []);
-      } else {
-        for (i = 0; i < data.length; i++) {
-          col.push(data[i]);
+      if (Array.isArray(data)) {
+        for (let i = 0; i < data.length; i++) {
+          assert(data[i].key, util.format('insertIntoCollection no key passed in:%j', data[i]));
+          assert(data[i].value, util.format('insertIntoCollection no value passed in:%j', data[i]));
+          col.set(data[i].key, data[i].value);
         }
 
         return callback(null, data);
+      } else {
+        assert(data.key, util.format('insertIntoCollection no key passed in:%j', data));
+        assert(data.value, util.format('insertIntoCollection no value passed in:%j', data));
+        col.set(data.key, data.value);
+        return callback(null, [data]); // always return a collection
       }
     },
 
@@ -109,7 +111,7 @@ function MemoryRepo() {
     //  **err
     //  **rows updated
     //
-    updateItemInCollection: function updateItemInCollection(serviceCtx, props, query, updateItem, callback) {
+    /* REMOVE UNTIL NEED updateItemInCollection: function updateItemInCollection(serviceCtx, props, query, updateItem, callback) {
       var updatedCount = 0, col, i;
 
       assert(serviceCtx, util.format('updateItemInCollection needs a serviceCtx'));
@@ -136,7 +138,7 @@ function MemoryRepo() {
       }
 
       return callback(null, updatedCount);
-    },
+    }, */
 
     // remove all documents from a collection
     // *props - describes collection
@@ -155,12 +157,12 @@ function MemoryRepo() {
 
       // just replace with empty array
       count = collections[props.name].length;
-      collections[props.name] = [];
+      collections[props.name] = new Map();
 
       callback(null, count);
     },
 
-    // Query for data within a collection
+    // Query for data within a collection by @id
     // *props - describes collection
     //  **name the collection name
     //  **query - optional - the restriction to apply, for now only support @id
@@ -168,30 +170,24 @@ function MemoryRepo() {
     //  *err
     //  *results collection
     queryCollection: function queryCollection(serviceCtx, props, callback) {
-      // create a new array and copy items
-      var results = [], i, col, query = null;
-
       assert(serviceCtx, util.format('queryCollection needs a serviceCtx'));
       assert(props.name, util.format('queryCollection with props.name undefined, props is: %j', props));
+      assert(!props.query, util.format('queryCollection passed props.query do not use pass props.key: %j', props));
 
-      col = this.getCollection(serviceCtx, props.name);
+      let col = this.getCollection(serviceCtx, props.name);
       assert(col, util.format('queryCollection could not find collection? props:%j', props));
 
-      query = props.query;
-      for (i = 0; i < col.length; i++) {
-        if (!query) {
-          // return whole collection
-          results.push(col[i]);
-        } else {
-          if (col[i]['@id']) {
-            if (col[i]['@id'] === query['@id']) {
-              results.push(col[i]);
-            }
-          }
-        }
-      }
+      if (props.key) {
+        return callback(null, [col.get(props.key)]); // always return a collection
+      } else {
+        // return all the values
+        let results = [];
+        col.forEach(function (value) {
+          results.push(value);
+        });
 
-      return callback(null, results);
+        return callback(null, results);
+      }
     },
 
     // query for items within a collection, use a passed in function to determine if valid
@@ -202,20 +198,17 @@ function MemoryRepo() {
     //  *err
     //  *results collection
     queryCollectionByFunc: function queryCollectionByFunc(serviceCtx, props, compareFunc, callback) {
-      // create a new array and copy items
-      var col, results = [], i;
-
       assert(serviceCtx, util.format('queryCollection needs a serviceCtx'));
       assert(props.name, util.format('queryCollection with props.name undefined, props is: %j', props));
 
-      col = this.getCollection(serviceCtx, props.name);
+      let results = [], col = this.getCollection(serviceCtx, props.name);
       assert(col, util.format('queryCollection could not find collection? props:%j', props));
 
-      for (i = 0; i < col.length; i++) {
-        if (compareFunc(col[i])) {
-          results.push(col[i]);
+      col.forEach(function (value) {
+        if (compareFunc(value)) {
+          results.push(value);
         }
-      }
+      });
 
       return callback(null, results);
     },
@@ -234,7 +227,7 @@ function MemoryRepo() {
       var col = this.getCollection(serviceCtx, props.name);
       assert(col, util.format('sizeOfCollection could not find collection? props:%j', props));
 
-      return callback(null, col.length);
+      return callback(null, col.size);
 
     }
   }; // repo

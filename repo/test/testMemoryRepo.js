@@ -4,10 +4,10 @@
 // Test the memory repo
 //
 //
-var assert = require('assert'),
-    should = require('should'),
-    memoryRepo = require('../lib/memoryRepo'),
-    util = require('util');
+const assert = require('assert');
+const should = require('should');
+const memoryRepo = require('../lib/memoryRepo');
+const util = require('util');
 
 describe('Memory Repo tests', function () {
   'use strict';
@@ -19,10 +19,8 @@ describe('Memory Repo tests', function () {
         }
       };
 
-  data = {};
-  data['@id'] = '_:id1';
-  data2 = {};
-  data2['@id'] = '_:id2';
+  data = { '@id': 'id1', bogus: 'some data' };
+  data2 = { '@id': 'id2', bogus: 'some data 2' };
 
   function createNewRepo(callback) {
     var repo = memoryRepo.create();
@@ -53,7 +51,7 @@ describe('Memory Repo tests', function () {
 
     it('2.1 should support create collection, insert into it and fetch from it', function (done) {
 
-      var props = {
+      let props = {
         name: 'test.com/http://id.webshield.io/com/test/datamodel_1'
       };
 
@@ -67,27 +65,30 @@ describe('Memory Repo tests', function () {
           assert((results.length === 0), util.format('expected results to be zero got: %j', results));
 
           // add an item to the collection
-          repo.insertIntoCollection(serviceCtx, props, [data], function (err, rowsInserted) {
+          repo.insertIntoCollection(serviceCtx, props, { key: data['@id'], value: data }, function (err, rowsInserted) {
             assert(!err, util.format('unexpected err'));
             rowsInserted.length.should.be.equal(1);
+            rowsInserted[0].should.have.property('key', data['@id']);
 
             // query and make sure data now there
+            props.key = data['@id'];
             repo.queryCollection(serviceCtx, props, function (err, results) {
               assert(!err, util.format('unexpected err'));
-              assert((results.length === 1), util.format('expected results to be 2 got: %j', results));
+              assert((results.length === 1), util.format('expected results to be 1 got: %j', results));
 
               // add one more and check
-              repo.insertIntoCollection(serviceCtx, props, [data2], function (err, rowsInserted) {
+              repo.insertIntoCollection(serviceCtx, props, [{ key: data2['@id'], value: data2 }], function (err, rowsInserted) {
                 assert(!err, util.format('unexpected err'));
                 rowsInserted.length.should.be.equal(1);
 
                 // query and make sure data now 2 rows
+                props.key = null;
                 repo.queryCollection(serviceCtx, props, function (err, results) {
                   assert(!err, util.format('unexpected err'));
                   assert((results.length === 2), util.format('expected results to be zero got: %j', results));
 
                   // query by id
-                  props.query = { '@id': data2['@id'] };
+                  props.key = data2['@id'];
                   repo.queryCollection(serviceCtx, props, function (err, results) {
                     var compareFunc;
                     assert(!err, util.format('unexpected err'));
@@ -130,7 +131,7 @@ describe('Memory Repo tests', function () {
         assert(created, 'expected created to be true');
 
         // add an item to the collection
-        repo.insertIntoCollection(serviceCtx, props, [data], function (err, rowsInserted) {
+        repo.insertIntoCollection(serviceCtx, props, { key: data['@id'], value: data }, function (err, rowsInserted) {
           assert(!err, util.format('unexpected err'));
           rowsInserted.length.should.be.equal(1);
 
@@ -168,17 +169,16 @@ describe('Memory Repo tests', function () {
             assert(created, 'repo was not created');
 
             // check collection size
-            console.log('....');
             return repo.promises.sizeOfCollection(serviceCtx, props)
         .then(//result of sizeOf #2
             function (size) {
               assert((size === 0), util.format('expected size to be zero got:%s', size));
 
-              return repo.promises.insertIntoCollection(serviceCtx, props, [data])
+              return repo.promises.insertIntoCollection(serviceCtx, props, { key: data['@id'], value: data })
         .then(//result of insert #3
             function (insertedData) {
-              assert(insertedData.length === 1, util.format('expected one row back after insert got:%j', insertedData));
-            }); // #3
+                assert((insertedData.length === 1), util.format('expected one row back after insert got:%j', insertedData));
+              }); // #3
             }); // #2
           }); // #1
     }); // 3.1
