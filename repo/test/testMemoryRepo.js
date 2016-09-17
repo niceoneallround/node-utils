@@ -144,6 +144,25 @@ describe('Memory Repo tests', function () {
         });
       });
     }); // 2.2
+
+    it('2.3 should return an empty set if cannot find by key', function (done) {
+
+      var props = {
+        name: 'test.com/http://id.webshield.io/com/test/23'
+      };
+
+      repo.createCollection(serviceCtx, props, function (err, created) {
+        assert(!err, util.format('unexpected err'));
+        assert(created, 'expected created to be true');
+
+        props.key = 'http://not_found';
+        repo.queryCollection(serviceCtx, props, function (err, results) {
+          assert(!err, util.format('unexpected err'));
+          assert((results.length === 0), util.format('expected results to be zero got: %j', results));
+          done();
+        });
+      });
+    }); // 2.2
   }); // describe 2
 
   describe('3 create collection tests with Promises', function () {

@@ -178,7 +178,12 @@ function MemoryRepo() {
       assert(col, util.format('queryCollection could not find collection? props:%j', props));
 
       if (props.key) {
-        return callback(null, [col.get(props.key)]); // always return a collection
+        let result = col.get(props.key);
+        if (!result) {
+          return callback(null, []);
+        } else {
+          return callback(null, [result]); // always return a collection
+        }
       } else {
         // return all the values
         let results = [];
