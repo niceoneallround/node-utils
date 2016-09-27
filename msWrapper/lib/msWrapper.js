@@ -4,12 +4,12 @@
 //  Provide a set of promises to perform operations on the metadata service
 //
 
-var assert = require('assert'),
-    loggingMD = { fileName: 'msWrapper.js' },
-    HttpStatus = require('http-status'),
-    requestWrapper = require('../../requestWrapper/lib/requestWrapper'),
-    util = require('util'),
-    promises = {};
+const assert = require('assert');
+const HttpStatus = require('http-status');
+const requestWrapper = require('../../requestWrapper/lib/requestWrapper');
+const util = require('util');
+
+var promises = {};
 
 // return the metadata JWT
 promises.promiseMetadata = function promiseMetadata(mdId, msUrl, props) {
@@ -37,10 +37,10 @@ function internalFetchMetadataFromMS(mdId, msUrl, props, callback) {
   assert(props.logMsgServiceName, util.format('props.logMsgServiceName is mising:%j', props));
   assert(callback, 'callback missing');
 
-  var getProps = {};
+  const loggingMD = { ServiceType: props.logMsgServiceName, FileName: 'node-utils/msWrapper.js' };
 
   // convert the mdId into a format that can be added to a URL
-  getProps.url = msUrl;
+  let getProps = { url: msUrl };
 
   props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: props.logMsgPrefix + '-GET-Metadata-Start',
                       getProps: getProps, mdId: mdId, id: props.loggerMsgId }, loggingMD);
@@ -53,19 +53,24 @@ function internalFetchMetadataFromMS(mdId, msUrl, props, callback) {
     }
 
     switch (response.statusCode) {
-      case HttpStatus.OK:
+      case HttpStatus.OK: {
         props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action: props.logMsgPrefix + '-GET-Metadata-Success',
                           getProps: getProps, mdId: mdId, id: props.loggerMsgId,
                           returnedStatusCode: response.statusCode, returnedHeaders: response.headers }, loggingMD);
         return callback(null, outputJWT);
-      case HttpStatus.NOT_FOUND:
-        props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action:  props.logMsgPrefix + '-GET-Metadata-ERROR-No-Metadata-Found',
+      }
+
+      case HttpStatus.NOT_FOUND: {
+        props.logger.logJSON('info', { serviceType: props.logMsgServiceName, action:  props.logMsgPrefix + '-GET-Metadata-ERROR-NOT-FOUND',
                   getProps: getProps, mdId: mdId, id: props.loggerMsgId,
                   returnedStatusCode: response.statusCode, returnedHeaders: response.headers }, loggingMD);
         return callback(HttpStatus.NOT_FOUND, null, null);
-      default:
+      }
+
+      default: {
         return callback(util.format('%s-%s-GetMetadata-%s-Error-Unexpected status code:%s',
                         props.logMsgServiceName, props.logMsgPrefix, mdId, response.statusCode), null, null);
+      }
 
     }
   });
