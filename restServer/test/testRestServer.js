@@ -1,422 +1,510 @@
 /*jslint node: true, vars: true */
-var assert = require('assert'),
-  loggerFactory = require('../../logger/lib/logger'),
-  HttpStatus = require('http-status'),
-  restServiceFactory = require('../lib/restServer'),
-  restify = require('restify'),
-  should = require('should'),
-  util = require('util');
+const assert = require('assert');
+const loggerFactory = require('../../logger/lib/logger');
+const HttpStatus = require('http-status');
+const request = require('request');
+const restServiceFactory = require('../lib/restServer');
+const should = require('should');
+const util = require('util');
 
-describe('restServer Tests', function () {
+describe('1 restServer mgmt tests', function () {
   'use strict';
 
-  describe('1 management tests', function () {
-    var restService1;
+  it('1.1 should be able to stop the service', function (done) {
 
-    before(function (done) {
-      var props = {};
-      props.name = 'Test 1';
-      props.baseURL = '/baseURL';
-      props.URLversion = 'v1';
-      props.port = 3100;
-      restService1 = restServiceFactory.create(props);
+    //create a server to stop
+    let props = {
+      name: 'Test 11',
+      baseURL: '/baseURL',
+      URLversion: 'v1',
+      port: 3201 };
 
-      restService1.start(function (err) {
-        assert(!err, util.format('Unexpected error starting service: %j', err));
+    let restServer2Stop = restServiceFactory.create(props);
+
+    restServer2Stop.start(function (err) {
+      assert(!err, util.format('Unexpected error starting service: %j', err));
+
+      console.log('*********** stopping server');
+      restServer2Stop.stop(function (err) {
+        assert(!err, util.format('Unexpected error stopping service: %j', err));
         done();
       });
     });
+  }); //it 1.1
 
-    it('1.1 should be able to stop the service', function (done) {
+  it('1.2 should be able to create with passed in logger', function (done) {
 
-      //create a server to stop
-      var props = {}, restServer2Stop;
-      props.name = 'Test 1';
-      props.baseURL = '/baseURL';
-      props.URLversion = 'v1';
-      props.port = 3199;
-      restServer2Stop = restServiceFactory.create(props);
+    //create a server to stop
+    let props = {
+      name: 'Test 11',
+      baseURL: '/baseURL',
+      logger: loggerFactory.create(null),
+      URLversion: 'v1',
+      port: 3202 };
 
-      restServer2Stop.start(function (err) {
-        assert(!err, util.format('Unexpected error starting service: %j', err));
+    let restService2 = restServiceFactory.create(props);
 
-        console.log('*********** stopping server');
-        restServer2Stop.stop(function (err) {
-          assert(!err, util.format('Unexpected error stopping service: %j', err));
-          done();
-        });
-      });
-    }); //it 1.1
+    restService2.logger().should.be.equal(props.logger);
+    done();
 
-    it('1.2 should be able to create with passed in logger', function (done) {
-      var restService2, props = {};
+  }); //it 1.2
 
-      props.name = 'test 1.2';
-      props.logger = loggerFactory.create(null);
-      props.baseURL = '/baseURL';
-      props.URLversion = 'v1';
-      props.port = 3200;
-      restService2 = restServiceFactory.create(props);
+}); // describe 1
 
-      restService2.logger().should.be.equal(props.logger);
+describe('2 restServer GET handler tests', function () {
+  'use strict';
+
+  let restService2;
+  let props = {};
+  props.name = 'Test 2';
+  props.baseURL = '/baseURL';
+  props.URLversion = 'v1';
+  props.port = 3101;
+
+  before(function (done) {
+    restService2 = restServiceFactory.create(props);
+    restService2.start(function (err) {
+      assert(!err, util.format('Unexpected error starting service2: %j', err));
       done();
-
-    }); //it 1.2
-
-  }); // describe 1
-
-  describe('2 GET handler tests', function () {
-
-    var restService2, client;
-
-    before(function (done) {
-      var props = {};
-      props.name = 'Test 2';
-      props.baseURL = '/baseURL';
-      props.URLversion = 'v1';
-      props.port = 3101;
-      restService2 = restServiceFactory.create(props);
-
-      restService2.start(function (err) {
-        assert(!err, util.format('Unexpected error starting service2: %j', err));
-        client = restify.createJsonClient({ url: 'http://localhost:' + props.port });
-        done();
-      });
     });
+  });
 
-    it('2.1 register a handler on a path that returns 200 response, and GET it', function (done) {
+  after(function (done) {
+    restService2.stop(function (err) {
+      assert(!err, util.format('Unexpected error stopping service: %j', err));
+      done();
+    });
+  });
 
-      var handler21 = {}, sendData = { get: 'hello' };
+  it('2.1 register a handler on a path that returns 200 response, and GET it', function (done) {
 
-      handler21.get = function (req, res, cb) {
-        assert(req, 'No req passed to handler');
-        assert(res, 'No res passed to handler');
-        return cb(null, sendData);
-      };
+    let handler21 = {};
+    let sendData = { get: 'hello' };
+    let uri = 'http://localhost:' + props.port + '/baseURL/v1/path_21';
 
-      restService2.registerGETHandler('/path_21', handler21);
+    handler21.get = function (req, res, cb) {
+      assert(req, 'No req passed to handler');
+      assert(res, 'No res passed to handler');
+      return cb(null, sendData);
+    };
 
-      client.get('/baseURL/v1/path_21', function (err, req, res, data) {
-        assert(!err, util.format('Unexpected error starting on GET: %j', err));
-        assert(req, 'No req passed from client');
-        assert(res, 'No res passed from client');
-        assert(data, 'No data passed from server');
+    restService2.registerGETHandler('/path_21', handler21);
 
+    request(
+      { method: 'GET',
+        uri: uri,
+        json: true,
+      },
+      function (err, res, body) {
+        assert(!err, util.format('should not have been an error:%s', err));
         res.statusCode.should.be.equal(HttpStatus.OK);
         res.header('content-type').should.be.equal('application/json');
-
-        //console.log('StatusCode:%d -- headers:%j', res.statusCode, res.headers);
-        //console.log('response data json:%j', data);
-
-        data.should.have.property('get');
-        data.should.have.property('get', 'hello');
+        body.should.have.property('get', 'hello');
         done();
-      });
-    }); //it 2.1
+      }
+    );
+  }); //it 2.1
 
-    it('2.2 register a handler on a path that returns text/plain and GET it', function (done) {
+  it('2.2 register a handler on a path that returns text/plain and GET it', function (done) {
 
-      var handler22 = {}, sendData = { get: 'hello' };
+    let handler22 = {};
+    let sendData = 'hello';
+    let uri = 'http://localhost:' + props.port + '/baseURL/v1/path_22';
 
-      handler22.get = function (req, res, cb) {
-        assert(req, 'No req passed to handler');
-        assert(res, 'No res passed to handler');
-        res.setHeader('content-type', 'text/plain');
-        return cb(null, sendData);
-      };
+    handler22.get = function (req, res, cb) {
+      assert(req, 'No req passed to handler');
+      assert(res, 'No res passed to handler');
+      res.setHeader('content-type', 'text/plain');
+      return cb(null, sendData);
+    };
 
-      restService2.registerGETHandler('/path_22', handler22);
+    restService2.registerGETHandler('/path_22', handler22);
 
-      client.get('/baseURL/v1/path_22', function (err, req, res, data) {
-        assert(!err, util.format('Unexpected error starting on GET: %j', err));
-        assert(req, 'No req passed from client');
-        assert(res, 'No res passed from client');
-        assert(data, 'No data passed from server');
-
+    request(
+      { method: 'GET',
+        uri: uri
+      },
+      function (err, res, body) {
+        assert(!err, util.format('should not have been an error:%s', err));
         res.statusCode.should.be.equal(HttpStatus.OK);
         res.header('content-type').should.be.equal('text/plain');
-        data.should.have.property('get');
-        data.should.have.property('get', 'hello');
+        body.should.be.equal('hello');
+        console.log(body);
         done();
-      });
-    }); //it 2.1
-  }); // describe 2
+      }
+    );
+  }); //it 2.2
+}); // describe 2
 
-  describe('3 POST handler tests', function () {
+describe('3 restServer POST handler tests', function () {
+  'use strict';
 
-    var restService3, client;
+  let restService3;
+  let props = {};
+  props.name = 'Test 3';
+  props.baseURL = '/baseURL';
+  props.URLversion = 'v1';
+  props.port = 3102;
 
-    before(function (done) {
-      var props = {};
-      props.name = 'Test 3';
-      props.baseURL = '/baseURL';
-      props.URLversion = 'v1';
-      props.port = 3102;
-      restService3 = restServiceFactory.create(props);
+  before(function (done) {
+    restService3 = restServiceFactory.create(props);
 
-      // start the service
-      restService3.start(function (err) {
-        assert(!err, util.format('Unexpected error starting service2: %j', err));
-
-        client = restify.createJsonClient({ url: 'http://localhost:' + props.port });
-        done();
-      });
+    // start the service
+    restService3.start(function (err) {
+      assert(!err, util.format('Unexpected error starting service2: %j', err));
+      done();
     });
+  });
 
-    it('3.1 register a POST handler on a path that returns data and uses default props', function (done) {
+  after(function (done) {
+    restService3.stop(function (err) {
+      assert(!err, util.format('Unexpected error stopping service: %j', err));
+      done();
+    });
+  });
 
-      var handler31 = {}, postData = { hello: 'world2' }, responseData = { post: 'response' };
+  it('3.1 register a POST handler on a path by default should return OK and application/json', function (done) {
 
-      handler31.post = function (req, res, cb) {
-        req.body.should.have.property('hello');
-        return cb(null, responseData);
-      };
+    let handler31 = {};
+    let postData = { hello: 'world2' };
+    let responseData = { back2U: 'response' };
+    let uri = 'http://localhost:' + props.port + '/baseURL/v1/path_ok31';
 
-      restService3.registerPOSTHandler('/path_ok31', handler31);
+    handler31.post = function (req, res, cb) {
+      req.body.should.have.property('hello');
+      return cb(null, responseData);
+    };
 
-      client.post('/baseURL/v1/path_ok31', postData, function (err, req, res, data) {
-        assert(!err, util.format('Unexpected error starting on POST: %j', err));
-        assert(data, 'No data passed from server');
-        res.header('content-type').should.be.equal('application/json');
+    restService3.registerPOSTHandler('/path_ok31', handler31);
+
+    request(
+      { method: 'POST',
+        uri: uri,
+        json: true,
+        body: postData
+      },
+      function (err, res, body) {
+        assert(!err, util.format('should not have been an error:%s', err));
         res.statusCode.should.be.equal(HttpStatus.OK);
-        data.should.have.property('post', 'response');
+        res.header('content-type').should.be.equal('application/json');
+        body.should.have.property('back2U', 'response');
         done();
-      });
-    }); //it 3.1
+      }
+    );
+  }); //it 3.1
 
-    it('3.2 register a POST handler on a path that overrides defaults', function (done) {
+  it('3.2 register a POST handler on a path that overrides to return ACCEPTED and text/plain', function (done) {
 
-      var handler32 = {}, postData = { hello: 'world2' }, responseData = { post: 'response' };
+    let handler32 = {};
+    let postData = { hello: 'world2' };
+    let responseData = 'test-string';
+    let uri = 'http://localhost:' + props.port + '/baseURL/v1/path_ok32';
 
-      handler32.post = function (req, res, cb) {
-        req.body.should.have.property('hello');
-        res.statusCode = HttpStatus.ACCEPTED;
-        res.setHeader('content-type', 'text/plain');
-        return cb(null, responseData);
-      };
+    handler32.post = function (req, res, cb) {
+      req.body.should.have.property('hello');
+      res.statusCode = HttpStatus.ACCEPTED;
+      res.setHeader('content-type', 'text/plain');
+      return cb(null, responseData);
+    };
 
-      restService3.registerPOSTHandler('/path_ok32', handler32);
+    restService3.registerPOSTHandler('/path_ok32', handler32);
 
-      client.post('/baseURL/v1/path_ok32', postData, function (err, req, res, data) {
-        assert(!err, util.format('Unexpected error starting on POST: %j', err));
-        assert(data, 'No data passed from server');
-        res.header('content-type').should.be.equal('text/plain');
+    request(
+      { method: 'POST',
+        uri: uri,
+        json: true,
+        body: postData
+      },
+      function (err, res, body) {
+        assert(!err, util.format('should not have been an error:%s', err));
         res.statusCode.should.be.equal(HttpStatus.ACCEPTED);
-        data.should.have.property('post', 'response');
+        res.header('content-type').should.be.equal('text/plain');
+        body.should.be.equal(responseData);
         done();
-      });
-    }); //it 3.2
-  }); // describe 3
+      }
+    );
+  }); //it 3.2
+}); // describe 3
 
-  describe('4 GETJWT handler tests', function () {
+describe('4 restServer GETJWT handler tests', function () {
+  'use strict';
 
-    var restService2, client;
+  let restService2;
+  let props = {};
+  props.name = 'Test 2';
+  props.baseURL = '/baseURL';
+  props.URLversion = 'v1';
+  props.port = 3103;
 
-    before(function (done) {
-      var props = {};
-      props.name = 'Test 2';
-      props.baseURL = '/baseURL';
-      props.URLversion = 'v1';
-      props.port = 3103;
-      restService2 = restServiceFactory.create(props);
+  before(function (done) {
+    var props = {};
+    props.name = 'Test 2';
+    props.baseURL = '/baseURL';
+    props.URLversion = 'v1';
+    props.port = 3103;
+    restService2 = restServiceFactory.create(props);
 
-      restService2.start(function (err) {
-        assert(!err, util.format('Unexpected error starting service2: %j', err));
-        client = restify.createJsonClient({ url: 'http://localhost:' + props.port });
-        done();
-      });
+    restService2.start(function (err) {
+      assert(!err, util.format('Unexpected error starting service2: %j', err));
+      done();
     });
+  });
 
-    it('4.1 register a handler on a path that returns defaults, and GET it', function (done) {
+  after(function (done) {
+    restService2.stop(function (err) {
+      assert(!err, util.format('Unexpected error stopping service: %j', err));
+      done();
+    });
+  });
 
-      var handler41 = {}, sendData = { get: 'hello' };
+  it('4.1 should be able register a GET JWT handler on a path and if called get back OK and text/plain', function (done) {
 
-      handler41.get = function (req, res, cb) {
-        assert(req, 'No req passed to handler');
-        assert(res, 'No res passed to handler');
-        return cb(null, sendData);
-      };
+    let handler41 = {};
+    let responseData = 'hello';
+    let uri = 'http://localhost:' + props.port + '/baseURL/v1/path_41';
 
-      restService2.registerGETJWTHandler('/path_41', handler41);
+    handler41.get = function (req, res, cb) {
+      assert(req, 'No req passed to handler');
+      assert(res, 'No res passed to handler');
+      return cb(null, responseData);
+    };
 
-      client.get('/baseURL/v1/path_41', function (err, req, res, data) {
-        assert(!err, util.format('Unexpected error starting on GET: %j', err));
-        assert(req, 'No req passed from client');
-        assert(res, 'No res passed from client');
-        assert(data, 'No data passed from server');
+    restService2.registerGETJWTHandler('/path_41', handler41);
 
+    request(
+      { method: 'GET',
+        uri: uri
+      },
+      function (err, res, body) {
+        assert(!err, util.format('should not have been an error:%s', err));
         res.statusCode.should.be.equal(HttpStatus.OK);
         res.header('content-type').should.be.equal('text/plain');
-        data.should.have.property('get');
-        data.should.have.property('get', 'hello');
+        body.should.be.equal('hello');
+        console.log(body);
         done();
-      });
-    }); //it 4.1
+      }
+    );
+  }); //it 4.1
 
-    it('4.2 register a handler on a path that overrides defaults', function (done) {
+  it('4.2 should be able register a GET JWT handler on a path and if called overrides default status and content type', function (done) {
 
-      var handler42 = {}, sendData = { get: 'hello' };
+    let handler42 = {};
+    let responseData = { get: 'hello' };
+    let uri = 'http://localhost:' + props.port + '/baseURL/v1/path_42';
 
-      handler42.get = function (req, res, cb) {
-        assert(req, 'No req passed to handler');
-        assert(res, 'No res passed to handler');
-        res.statusCode = HttpStatus.ACCEPTED;
-        res.setHeader('content-type', 'application/json');
-        return cb(null, sendData);
-      };
+    handler42.get = function (req, res, cb) {
+      assert(req, 'No req passed to handler');
+      assert(res, 'No res passed to handler');
+      res.statusCode = HttpStatus.ACCEPTED;
+      res.setHeader('content-type', 'application/json');
+      return cb(null, responseData);
+    };
 
-      restService2.registerGETJWTHandler('/path_42', handler42);
+    restService2.registerGETJWTHandler('/path_42', handler42);
 
-      client.get('/baseURL/v1/path_42', function (err, req, res, data) {
-        assert(!err, util.format('Unexpected error starting on GET: %j', err));
-        assert(req, 'No req passed from client');
-        assert(res, 'No res passed from client');
-        assert(data, 'No data passed from server');
-
+    request(
+      { method: 'GET',
+        uri: uri,
+        json: true
+      },
+      function (err, res, body) {
+        assert(!err, util.format('should not have been an error:%s', err));
         res.statusCode.should.be.equal(HttpStatus.ACCEPTED);
         res.header('content-type').should.be.equal('application/json');
-        data.should.have.property('get');
-        data.should.have.property('get', 'hello');
+        body.should.have.property('get', 'hello');
         done();
-      });
-    }); //it 4.2
-  }); // describe 4
+      }
+    );
 
-  describe('5 POSTJWT handler tests', function () {
+  }); //it 4.2
+}); // describe 4
 
-    var restService3, client;
+describe('5 restServer POSTJWT handler tests', function () {
+  'use strict';
 
-    before(function (done) {
-      var props = {};
-      props.name = 'Test 5';
-      props.baseURL = '/baseURL';
-      props.URLversion = 'v1';
-      props.port = 3104;
-      restService3 = restServiceFactory.create(props);
+  let restService3;
+  let props = {};
+  props.name = 'Test 5';
+  props.baseURL = '/baseURL';
+  props.URLversion = 'v1';
+  props.port = 3104;
 
-      // start the service
-      restService3.start(function (err) {
-        assert(!err, util.format('Unexpected error starting service2: %j', err));
-
-        client = restify.createJsonClient({ url: 'http://localhost:' + props.port });
-        done();
-      });
+  before(function (done) {
+    restService3 = restServiceFactory.create(props);
+    restService3.start(function (err) {
+      assert(!err, util.format('Unexpected error starting service2: %j', err));
+      done();
     });
+  });
 
-    it('5.1 register a POSTJWT handler on a path that returns data and uses default props', function (done) {
+  after(function (done) {
+    restService3.stop(function (err) {
+      assert(!err, util.format('Unexpected error stopping service: %j', err));
+      done();
+    });
+  });
 
-      var handler51 = {}, postData = { hello: 'world2' }, responseData = { post: 'response' };
+  it('5.1 register a POSTJWT handler on a path that returns data and uses default status and content-type', function (done) {
 
-      handler51.post = function (req, res, cb) {
-        req.body.should.have.property('hello');
-        return cb(null, responseData);
-      };
+    let handler51 = {};
+    let postData = 'jwt1';
+    let responseData = 'jwt2';
+    let uri = 'http://localhost:' + props.port + '/baseURL/v1/path_51';
 
-      restService3.registerPOSTJWTHandler('/path_51', handler51);
+    handler51.post = function (req, res, cb) {
+      req.headers['content-type'].should.be.equal('text/plain');
+      req.body.should.be.equal(postData);
+      return cb(null, responseData);
+    };
 
-      client.post('/baseURL/v1/path_51', postData, function (err, req, res, data) {
-        assert(!err, util.format('Unexpected error starting on POST: %j', err));
-        assert(data, 'No data passed from server');
+    restService3.registerPOSTJWTHandler('/path_51', handler51);
 
-        //console.log('StatusCode:%d -- headers:%j', res.statusCode, res.headers);
-        //console.log('response data string:%j', data);
-
-        res.header('content-type').should.be.equal('text/plain');
+    request(
+      { method: 'POST',
+        uri: uri,
+        body: postData,
+        headers: {
+          'content-type': 'text/plain',
+        }
+      },
+      function (err, res, body) {
+        assert(!err, util.format('should not have been an error:%s', err));
         res.statusCode.should.be.equal(HttpStatus.OK);
-        data.should.have.property('post', 'response');
+        res.header('content-type').should.be.equal('text/plain');
+        body.should.be.equal(responseData);
         done();
-      });
-    }); //it 3.1
+      }
+    );
+  }); //it 3.1
 
-    it('5.2 register a POST handler on a path that overrides defaults', function (done) {
+  it('5.2 register a POSTJWT handler that overrides defaults OK and text/plain - i.e. returns an error', function (done) {
 
-      var handler52 = {}, postData = { hello: 'world2' }, responseData = { post: 'response' };
+    let handler52 = {};
+    let postData = 'jwt1';
+    let responseData = { error: '1' };
+    let uri = 'http://localhost:' + props.port + '/baseURL/v1/path_52';
 
-      handler52.post = function (req, res, cb) {
-        req.body.should.have.property('hello');
-        res.statusCode = HttpStatus.ACCEPTED;
-        res.setHeader('content-type', 'application/json');
-        return cb(null, responseData);
-      };
+    handler52.post = function (req, res, cb) {
+      req.headers['content-type'].should.be.equal('text/plain');
+      req.body.should.be.equal(postData);
+      res.statusCode = HttpStatus.ACCEPTED;
+      res.setHeader('content-type', 'application/json');
+      return cb(null, responseData);
+    };
 
-      restService3.registerPOSTJWTHandler('/path_52', handler52);
+    restService3.registerPOSTJWTHandler('/path_52', handler52);
 
-      client.post('/baseURL/v1/path_52', postData, function (err, req, res, data) {
-        assert(!err, util.format('Unexpected error starting on POST: %j', err));
-        assert(data, 'No data passed from server');
-
-        //console.log('StatusCode:%d -- headers:%j', res.statusCode, res.headers);
-        //console.log('response data string:%j', data);
-
-        res.header('content-type').should.be.equal('application/json');
+    request(
+      { method: 'POST',
+        uri: uri,
+        body: postData,
+        headers: {
+          'content-type': 'text/plain',
+        }
+      },
+      function (err, res, body) {
+        assert(!err, util.format('should not have been an error:%s', err));
         res.statusCode.should.be.equal(HttpStatus.ACCEPTED);
-        data.should.have.property('post', 'response');
+        res.header('content-type').should.be.equal('application/json');
+        let json = JSON.parse(body);
+        json.should.have.property('error', '1');
         done();
-      });
-    }); //it 5.2
-  }); // describe 5
+      }
+    );
+  }); //it 5.2
+}); // describe 5
 
-  describe('6 Internal API Tests', function () {
+describe('6 restServer APIKEY Tests', function () {
+  'use strict';
 
-    var restService6, props = {};
+  let restService6;
+  let props = {};
+  props.name = 'Test 2';
+  props.baseURL = '/baseURL';
+  props.URLversion = 'v1';
+  props.port = 3106;
 
-    before(function (done) {
-      props.name = 'Test 2';
-      props.baseURL = '/baseURL';
-      props.URLversion = 'v1';
-      props.port = 3106;
+  before(function (done) {
+    // setup the api key
+    props.internalApiKey = {};
+    props.internalApiKey.enabled = '1';
+    props.internalApiKey.key = '567';
+    props.internalApiKey.name = 'x-pn-hard-coded-api-key';
+    restService6 = restServiceFactory.create(props);
 
-      // setup the api key
-      props.internalApiKey = {};
-      props.internalApiKey.enabled = '1';
-      props.internalApiKey.key = '567';
-      props.internalApiKey.name = 'x-pn-hard-coded-api-key';
-      restService6 = restServiceFactory.create(props);
-
-      restService6.start(function (err) {
-        assert(!err, util.format('Unexpected error starting service2: %j', err));
-        done();
-      });
+    restService6.start(function (err) {
+      assert(!err, util.format('Unexpected error starting service2: %j', err));
+      done();
     });
+  });
 
-    it('6.1 register a handler on a path  response, and GET with no api key should be FORBIDDEN', function (done) {
+  after(function (done) {
+    restService6.stop(function (err) {
+      console.log('STOPPPPPING');
+      assert(!err, util.format('Unexpected error stopping service: %j', err));
+      done();
+    });
+  });
 
-      var handler61 = {}, sendData = { get: 'hello' }, client, client2;
+  it('6.1 should return FORBIDDEN if call path with no API key - server started with APIKey', function (done) {
 
-      handler61.get = function (req, res, cb) {
-        assert(req, 'No req passed to handler');
-        assert(res, 'No res passed to handler');
-        return cb(null, sendData);
-      };
+    let handler61 = {};
+    let sendData = { get: 'hello' };
+    let uri = 'http://localhost:' + props.port + '/baseURL/v1/path_61';
 
-      restService6.registerGETHandler('/path_61', handler61);
+    handler61.get = function (req, res, cb) {
+      assert(req, 'No req passed to handler');
+      assert(res, 'No res passed to handler');
+      return cb(null, sendData);
+    };
 
-      client = restify.createJsonClient({ url: 'http://localhost:' + props.port });
-      client.get('/baseURL/v1/path_61', function (err, req, res, data) {
-        assert(err, util.format('Unexpected error starting on GET: %j', err));
-        assert(req, 'No req passed from client');
-        assert(res, 'No res passed from client');
-        assert(data, 'No data passed from server');
+    restService6.registerGETHandler('/path_61', handler61);
 
+    request(
+      { method: 'GET',
+        uri: uri,
+        json: true,
+      },
+      function (err, res, body) {
+        assert(!err, util.format('should not have been an error:%s', err));
         res.statusCode.should.be.equal(HttpStatus.FORBIDDEN);
-        data.should.be.equal('FORBIDDEN');
+        res.header('content-type').should.be.equal('text/plain');
+        body.should.be.equal('FORBIDDEN');
+        done();
+      }
+    );
+  }); //it 6.1
 
-        // call again with api key and should be ok
-        client2 = restify.createJsonClient(
-            { url: 'http://localhost:' + props.port,
-              headers: { 'x-pn-hard-coded-api-key': '567' } });
-        client2.get('/baseURL/v1/path_61', function (err, req, res, data) {
-          assert(!err, util.format('Unexpected error starting on GET: %j', err));
-          assert(req, 'No req passed from client');
-          assert(res, 'No res passed from client');
-          assert(data, 'No data passed from server');
+  it('6.2 should return OK if call path with API key - server started with APIKey', function (done) {
 
-          res.statusCode.should.be.equal(HttpStatus.OK);
-          done();
-        });
-      });
-    }); //it 6.1
+    let handler62 = {};
+    let sendData = { get: 'hello' };
+    let uri = 'http://localhost:' + props.port + '/baseURL/v1/path_62';
 
-  }); // describe 6
+    handler62.get = function (req, res, cb) {
+      assert(req, 'No req passed to handler');
+      assert(res, 'No res passed to handler');
+      return cb(null, sendData);
+    };
 
-}); // describe
+    restService6.registerGETHandler('/path_62', handler62);
+
+    request(
+      { method: 'GET',
+        uri: uri,
+        json: true,
+        headers: {
+          'x-pn-hard-coded-api-key': '567'
+        }
+      },
+      function (err, res, body) {
+        assert(!err, util.format('should not have been an error:%s', err));
+        res.statusCode.should.be.equal(HttpStatus.OK);
+        res.header('content-type').should.be.equal('application/json');
+        body.should.have.property('get', 'hello');
+        done();
+      }
+    );
+  }); //it 6.2
+
+}); // describe 6

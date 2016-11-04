@@ -6,7 +6,8 @@ var assert = require('assert'),
   should = require('should'),
   util = require('util');
 
-describe('requestWrapper Tests', function () {
+// have many names to can pick up when filter mocha
+describe('requestWrapper requestwrapper Tests', function () {
   'use strict';
 
   describe('1 test POST JWT', function () {

@@ -6,7 +6,7 @@ var assert = require('assert'),
   should = require('should'),
   util = require('util');
 
-describe('restServer Tests', function () {
+describe('mswrapper Tests', function () {
   'use strict';
 
   describe('1 test GET Metadata', function () {

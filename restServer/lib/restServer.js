@@ -238,6 +238,7 @@ function createRestService(props) {
                                   headers: req.headers }, loggingMD);
 
           res.statusCode = s;
+          res.setHeader('content-type', 'text/plain');
           res.send('FORBIDDEN');
           return next();
         }
@@ -301,6 +302,7 @@ function createRestService(props) {
                                   headers: req.headers }, loggingMD);
 
           res.statusCode = s;
+          res.setHeader('content-type', 'text/plain');
           res.send('FORBIDDEN');
           return next();
         }
@@ -362,6 +364,7 @@ function createRestService(props) {
                                   headers: req.headers }, loggingMD);
 
           res.statusCode = s;
+          res.setHeader('content-type', 'text/plain');
           res.send('FORBIDDEN');
           return next();
         }
@@ -434,6 +437,7 @@ function createRestService(props) {
                                   headers: req.headers }, loggingMD);
 
           res.statusCode = s;
+          res.setHeader('content-type', 'text/plain');
           res.send('FORBIDDEN');
           return next();
         }
