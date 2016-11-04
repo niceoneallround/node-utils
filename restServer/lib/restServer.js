@@ -5,12 +5,12 @@
 // point rest service
 //
 
-var assert = require('assert'),
-    loggerFactory = require('../../logger/lib/logger'),
-    loggingMD = { fileName: 'restService.js' },
-    HttpStatus = require('http-status'),
-    restify = require('restify'),
-    util = require('util');
+const assert = require('assert');
+const loggerFactory = require('../../logger/lib/logger');
+const loggingMD = { fileName: 'restService.js' };
+const HttpStatus = require('http-status');
+const restify = require('restify');
+const util = require('util');
 
 //
 // create a service - non blocking
@@ -144,7 +144,7 @@ function createRestService(props) {
     restifyServer.on('uncaughtException', function (p1, p2, p3, p4) {
       if (p4 instanceof assert.AssertionError) {
         logger.logJSON('error', { serviceType: serviceName,
-                action: 'RestServer-Crashing-assert-AssertionError', errString:p4 }, loggingMD);
+                action: 'RestServer-Crashing-assert-AssertionError', errString: p4 }, loggingMD);
       } else {
         logger.logJSON('error', { serviceType: serviceName,
                 action: 'RestServer-Crashing-Unknown-Error',
@@ -173,11 +173,12 @@ function createRestService(props) {
         res.send(statusMsg);
       });
 
-      logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Started',
-                               address: restifyServer.address(),
-                               serverName: restifyServer.name, restifyServerUrl:restifyServer.url,
-                               baseURL: baseURL, URLversion: URLversion, port: port,
-                               serviceName: serviceName, serviceVersion: props.serviceVersionNumber }, loggingMD);
+      logger.logJSON('info',
+        { serviceType: serviceName, action: 'RestServer-Started',
+          address: restifyServer.address(),
+          serverName: restifyServer.name, restifyServerUrl: restifyServer.url,
+          baseURL: baseURL, URLversion: URLversion, port: port,
+          serviceName: serviceName, serviceVersion: props.serviceVersionNumber }, loggingMD);
 
       return startedCallback(null);
 
@@ -353,7 +354,7 @@ function createRestService(props) {
       },
 
       function (req, res, next) {
-        var s = checkInternalApiKey(req);
+        let s = checkInternalApiKey(req);
         if (s !== HttpStatus.OK) {
 
           logger.logJSON('info', { serviceType: serviceName,
