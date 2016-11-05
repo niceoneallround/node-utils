@@ -6,6 +6,7 @@
 //
 
 const assert = require('assert');
+const fs = require('fs');
 const loggerFactory = require('../../logger/lib/logger');
 const loggingMD = { fileName: 'restService.js' };
 const HttpStatus = require('http-status');
@@ -21,6 +22,20 @@ const util = require('util');
 // props.serviceVersionNumber - optional if exists added to status message
 //      on '/' - not used for url versioning
 //
+// Internal API controls - if enabled each GET or POST must contain the header key and api key
+// props.internalAPIKey.enabled - '1' or 'O'
+//  - can be overridden by process.env.INTERNAL_API_KEY_ENABLED
+// props.internalAPIKey.name - the name of header property, if not supplied default is 'x-pn-hard-coded-api-key'
+//  - can be overriden by process.env.INTERNAL_API_KEY_NAME
+// props.internalAPIKey.key - the api key value
+//  - can be override by process.env.INTERNAL_API_KEY
+//
+// TLS controls
+// Can be turned off with process.env.TLS_DISABLED: '1' - by default enabled
+// props.certficate: the file holding the certificate
+// props.key: the file holding the key
+//
+
 function createRestService(props) {
   'use strict';
 
@@ -40,19 +55,6 @@ function createRestService(props) {
   serviceName = props.name;
   loggingMD.ServiceType = props.name;
 
-  //
-  // create the underlying RestServer and install any middleware it needs before
-  // installing others - was running into issues with Promises and next being
-  // ignored if installed afterwards
-  //
-  restifyServer = restify.createServer();
-
-  // add the built in plugins - if do not add this then no body
-  restifyServer.use(restify.bodyParser());
-  restifyServer.use(restify.queryParser());
-
-  console.log('createRestService - created server and added the bodyParser');
-
   // if passed in a logger then use that over the one we have
   //
   if (props.logger) {
@@ -61,6 +63,42 @@ function createRestService(props) {
     // logger can handle a null logConfig
     logger = loggerFactory.create(props.logConfig);
   }
+
+  //
+  // create the underlying RestServer and install any middleware it needs before
+  // installing others - was running into issues with Promises and next being
+  // ignored if installed afterwards
+  //
+
+  //
+  // Determine if using TLS
+  //
+  if ((process.env.TLS_ENABLED === '1') || (props.TLSEnabled === '1')) {
+    assert(props.certificate, util.format('TLS enabled and no props.certificate passed in:%j', props));
+    assert(props.key, util.format('TLS enabled and no props.key passed in:%j', props));
+
+    logger.logJSON('info',
+          { serviceType: serviceName, action: 'RestServer-TLS-ENABLED',
+            certificate: props.certificate, key: props.key }, loggingMD);
+
+    restifyServer = restify.createServer({
+      certificate: fs.readFileSync(props.certificate),
+      key: fs.readFileSync(props.key)
+    });
+
+  } else {
+
+    logger.logJSON('info',
+          { serviceType: serviceName, action: 'RestServer-TLS-DISABLED' }, loggingMD);
+
+    restifyServer = restify.createServer();
+  }
+
+  console.log('createRestService - created server - adding: bodyParser; queryParser');
+
+  // add the built in plugins - if do not add this then no body
+  restifyServer.use(restify.bodyParser());
+  restifyServer.use(restify.queryParser());
 
   // check properties needed for paths
   assert(props.baseURL, util.format('RestServer.start No baseURL in props:%j', props));
