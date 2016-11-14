@@ -1,23 +1,42 @@
 /*jslint node: true, vars: true */
 
 //
-// Provides util routines to http access the Privacy Broker - mainly encapsualtes the paths
-// later may add more
+// Supports either the AWS API GATEWAY or the Internal API GATEWAY.
+//
+// Provides convenience promises and callbacks to access functionaility either
+// via the AWS API GATEWAY or the Internal API GATEWAY.
+//
+// Provides the following
+//  - Domains - FETCH, POST
+//  - Metadata - FETCH, POST
+//  - Privacy Pipe - POST
+//  - IS Jobs - FETCH; Poll jobs until either all are complete or exceed poll count, once complete returns fetched JOBS
+//
+// Domain ID as part of the path
+// - Due to problems with the AWS GATEWAY and passing the id parameter in the path i ended up creating
+//   an interface that did not need. FIXME see bug in repo as think probably way to go and use a header token
+//
+//
+// Authenticaiton
+// - For AWS the following envs can be used
+//   - API_GATEWAY_API_KEY
+//   - API_GATEWAY_API_KEY_NAME
 //
 
-var assert = require('assert'),
-    loggingMD = { fileName: 'apigwRequestWrapper.js' },
-    requestWrapper = require('../../requestWrapper/lib/requestWrapper'),
-    util = require('util'),
-    callbacks = {},
-    promises = {},
-    utils = {},
-    APIGW_DOMAIN_PATH = '/v1/domains',
-    APIGW_IS_JOB_PATH = '/is/jobs',  // prefixed by /v1/domains/:domainId
-    APIGW_METADATA_PATH = '/metadata',
-    AWSGW_APIGW_METADATA_PATH = '/v1/metadata',
-    APIGW_PP_PATH = '/privacy_pipe',
-    AWSGW_APIGW_PP_PATH = '/v1/privacy_pipe';
+const assert = require('assert');
+const loggingMD = { fileName: 'apigwRequestWrapper.js' };
+const requestWrapper = require('../../requestWrapper/lib/requestWrapper');
+const util = require('util');
+const APIGW_DOMAIN_PATH = '/v1/domains';
+const APIGW_IS_JOB_PATH = '/is/jobs';  // prefixed by /v1/domains/:domainId
+const APIGW_METADATA_PATH = '/metadata';
+const AWSGW_APIGW_METADATA_PATH = '/v1/metadata';
+const APIGW_PP_PATH = '/privacy_pipe';
+const AWSGW_APIGW_PP_PATH = '/v1/privacy_pipe';
+
+var callbacks = {};
+var promises = {};
+var utils = {};
 
 //------------------------
 // Domain requests
@@ -41,7 +60,7 @@ callbacks.fetchDomainJWT = function fetchDomainJWT(props, apigwUrl, callback) {
   assert(apigwUrl, 'fetchDomain apigwUrl param is missing');
   assert(props.domainIdParam, util.format('props.domainIdParam is missing: %j', props));
 
-  var getUrl = apigwUrl + utils.generateFetchDomainPathUrl(props.domainIdParam);
+  let getUrl = apigwUrl + utils.generateFetchDomainPathUrl(props.domainIdParam);
   return callbacks.getJWT(props, getUrl, callback);
 };
 
@@ -77,7 +96,7 @@ callbacks.createDomainJWT = function createDomainJWT(props, apigwUrl, domainJWT,
   assert(apigwUrl, 'createDomain apigwUrl param is missing');
   assert(domainJWT, 'createDomain domainJWT param is missing');
 
-  var postUrl = apigwUrl + utils.generateCreateDomainPathUrl();
+  let postUrl = apigwUrl + utils.generateCreateDomainPathUrl();
   return callbacks.postJWT(props, postUrl, domainJWT, callback);
 };
 
@@ -125,7 +144,7 @@ utils.generateAWSGWFetchMetadataPathUrl = function generateAWGWFetchMetadataPath
 
 //
 // Fetch metadata
-// props.domainIdParam
+// props.domainIdParam - optiona as the AWS API GW does not use
 // props.mdIdParam
 //
 callbacks.fetchMetadataJWT = function fetchMetadataJWT(props, apigwUrl, callback) {
@@ -133,9 +152,9 @@ callbacks.fetchMetadataJWT = function fetchMetadataJWT(props, apigwUrl, callback
   assert(props, 'fetchDomain props param is missing');
   assert(apigwUrl, 'fetchDomain apigwUrl param is missing');
 
-  var getUrl;
+  let getUrl;
 
-  if (!props.domainIdParam) { // THE AWSAPIGW does not prefix with domain
+  if (!props.domainIdParam) { // THE AWS APIGW does not prefix with domain
     if (!props.mdIdParam) {
       getUrl = apigwUrl + utils.generateAWSGWFetchMetadataPathUrl();
     } else {
@@ -201,14 +220,14 @@ promises.postMetadataJWT  = function postMetadataJWT(props, apigwUrl, mdJWT) {
 };
 
 //
-// props.domainIdParam
+// Format up the URL before calling more generic postJWT
 //
 callbacks.postMetadataJWT = function postMetadataJWT(props, apigwUrl, mdJWT, callback) {
   'use strict';
   assert(mdJWT, 'postMetadata mdJWT param is missing');
   assert(apigwUrl, 'postMetadata apigwUrl param is missing');
 
-  var postUrl;
+  let postUrl;
   if (!props.domainIdParam) {
     postUrl = apigwUrl + utils.generateAWSGWPostMetadataPathUrl();
 
@@ -253,14 +272,14 @@ promises.postCreatePrivacyPipeJWT  = function postCreatePrivacyPipeJWT(props, ap
 };
 
 //
-// props.domainIdParam
+// format up the URL before calling more generic POST JWT
 //
 callbacks.postCreatePrivacyPipeJWT = function postCreatePrivacyPipeJWT(props, apigwUrl, ppJWT, callback) {
   'use strict';
   assert(ppJWT, 'postCreatePrivacyPipe ppJWT param is missing');
   assert(apigwUrl, 'postCreatePrivacyPipe apigwUrl param is missing');
 
-  var postUrl;
+  let postUrl;
 
   if (!props.domainIdParam) {
     postUrl = apigwUrl + utils.generateAWSGWCreatePipePathUrl();
@@ -271,9 +290,9 @@ callbacks.postCreatePrivacyPipeJWT = function postCreatePrivacyPipeJWT(props, ap
   return callbacks.postJWT(props, postUrl, ppJWT, callback);
 };
 
-//----------------------
+//--------------------------------------
 // Get Identity Syndicate Syndication Jobs
-//----------------------
+//---------------------------------------
 
 //
 // expose the path as used in testing for nocks
@@ -306,10 +325,53 @@ callbacks.getIsJobJWT = function getIsJobJWT(props, apigwUrl, callback) {
   assert(apigwUrl, 'getIsJobJWT apigwUrl param is missing');
   assert(props.domainIdParam, util.format('getIsJobJWT props.domainIdParam is missing: %j', props));
 
-  var getUrl = apigwUrl + utils.generateGetIsJobPathUrl(props.domainIdParam, props.jobIdParam);
+  let getUrl = apigwUrl + utils.generateGetIsJobPathUrl(props.domainIdParam, props.jobIdParam);
 
   return callbacks.getJWT(props, getUrl, callback);
 };
+
+//
+// FIXME WORK ON FIXING Poll for all jobs to complete or the max number of polls to be reached
+//
+// maxRetries - the maximum number of times to poll
+// wait - the amount of time to wait between polls
+// printStatus - true if want to print a status report
+// jwtOptions - parameters needed to decode the JWT - it does NOT verify
+//
+// Standard Ones needed by getIsJobs
+//
+callbacks.pollIsJobsComplete = function pollIsJobsComplete(props, apigwUrl, callback) {
+  'use strict';
+
+  waitForJobs(props, apigwUrl, false, 1, function (err, result) {
+    return callback(err, result);
+  });
+};
+
+function waitForJobs(props, apigwUrl, allJobsDone, waitCount, endedCB) {
+  'use strict';
+
+  if (allJobsDone) {
+    console.log('All jobs done');
+    return endedCB(null, 'theJobs');
+  } else if (waitCount > props.maxRetries) {
+    console.log('Waited Enough');
+    return endedCB(null, 'Waited long enough-from wait');
+  }
+
+  setTimeout(function () {
+    console.log('******* timer expired---');
+    return promises.getIsJobJWT(props, apigwUrl)
+      .then(function (rsp) {
+        console.log(rsp.body);
+        console.log('******* Calling Wait for Jobs again---%s', waitCount);
+        return waitForJobs(props, apigwUrl, false, waitCount + 1, endedCB);
+      })
+      .catch(function (err) {
+        console.log('ERROR - fetching jobs:', err);
+      });
+  }, props.wait);
+}
 
 //-----------------------------
 // general
@@ -326,14 +388,14 @@ callbacks.getJWT = function getJWT(props, getUrl, callback) {
   assert(props.loggerMsgId, util.format('props.loggerMsgId is missing - used to track:%j', props));
   assert(props.logMsgServiceName, util.format('props.logMsgServiceName is mising:%j', props));
 
-  var getProps = { url: getUrl }, apiKey, apiKeyName;
+  let getProps = { url: getUrl };
 
   //
   // Check to see if there is a need to add an API key for now do at this low level
   //
-  apiKey = process.env.API_GATEWAY_API_KEY;
+  let apiKey = process.env.API_GATEWAY_API_KEY;
+  let apiKeyName = process.env.API_GATEWAY_API_KEY_NAME;
   if (apiKey) {
-    apiKeyName = process.env.API_GATEWAY_API_KEY_NAME;
     getProps.headers = new Map();
     getProps.headers.set(apiKeyName, apiKey);
 
@@ -365,16 +427,16 @@ callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
   assert(props.loggerMsgId, util.format('props.loggerMsgId is missing - used to track:%j', props));
   assert(props.logMsgServiceName, util.format('props.logMsgServiceName is mising:%j', props));
 
-  var postProps = {}, apiKey, apiKeyName;
+  let postProps = {};
   postProps.jwt = sendJWT;
   postProps.url = postUrl;
 
   //
   // Check to see if there is a need to add an API key for now do at this low level
   //
-  apiKey = process.env.API_GATEWAY_API_KEY;
+  let apiKey = process.env.API_GATEWAY_API_KEY;
+  let apiKeyName = process.env.API_GATEWAY_API_KEY_NAME;
   if (apiKey) {
-    apiKeyName = process.env.API_GATEWAY_API_KEY_NAME;
     postProps.headers = new Map();
     postProps.headers.set(apiKeyName, apiKey);
 
