@@ -1,7 +1,6 @@
 /*jslint node: true, vars: true */
 
 //
-// Supports either the AWS API GATEWAY or the Internal API GATEWAY.
 //
 // Provides convenience promises and callbacks to access functionaility either
 // via the AWS API GATEWAY or the Internal API GATEWAY.
@@ -394,7 +393,15 @@ callbacks.getJWT = function getJWT(props, getUrl, callback) {
   // Check to see if there is a need to add an API key for now do at this low level
   //
   let apiKey = process.env.API_GATEWAY_API_KEY;
+  if (props.API_GATEWAY_API_KEY) {
+    apiKey = props.API_GATEWAY_API_KEY; // allow env to be override by a props
+  }
+
   let apiKeyName = process.env.API_GATEWAY_API_KEY_NAME;
+  if (props.API_GATEWAY_API_KEY_NAME) {
+    apiKeyName = props.API_GATEWAY_API_KEY_NAME; // allow env to be override by a props
+  }
+
   if (apiKey) {
     getProps.headers = new Map();
     getProps.headers.set(apiKeyName, apiKey);
@@ -435,7 +442,15 @@ callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
   // Check to see if there is a need to add an API key for now do at this low level
   //
   let apiKey = process.env.API_GATEWAY_API_KEY;
+  if (props.API_GATEWAY_API_KEY) {
+    apiKey = props.API_GATEWAY_API_KEY; // allow env to be override by a props
+  }
+
   let apiKeyName = process.env.API_GATEWAY_API_KEY_NAME;
+  if (props.API_GATEWAY_API_KEY_NAME) {
+    apiKeyName = props.API_GATEWAY_API_KEY_NAME; // allow env to be override by a props
+  }
+
   if (apiKey) {
     postProps.headers = new Map();
     postProps.headers.set(apiKeyName, apiKey);

@@ -6,7 +6,7 @@ var assert = require('assert'),
   should = require('should'),
   util = require('util');
 
-describe('Metadata operations apigwRequestWrapper Tests', function () {
+describe('APIGW-Metadata operations apigwRequestWrapper Tests', function () {
   'use strict';
 
   describe('1 test fetch metadata', function () {
