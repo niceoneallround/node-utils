@@ -141,8 +141,23 @@ utils.generateAWSGWFetchMetadataPathUrl = function generateAWGWFetchMetadataPath
   }
 };
 
+// promise version of fetch just wraps callback
+promises.fetchMetadataJWT  = function fetchMetadataJWT(props, apigwUrl) {
+  'use strict';
+  return new Promise(function (resolve, reject) {
+    callbacks.fetchMetadataJWT(props, apigwUrl, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
 //
-// Fetch metadata
+// Fetch metadata and return result there is NO processing of the result
+//
 // props.domainIdParam - optiona as the AWS API GW does not use
 // props.mdIdParam
 //
@@ -169,20 +184,6 @@ callbacks.fetchMetadataJWT = function fetchMetadataJWT(props, apigwUrl, callback
   }
 
   return callbacks.getJWT(props, getUrl, callback);
-};
-
-// promise version of fetch just wraps callback
-promises.fetchMetadataJWT  = function fetchMetadataJWT(props, apigwUrl) {
-  'use strict';
-  return new Promise(function (resolve, reject) {
-    callbacks.fetchMetadataJWT(props, apigwUrl, function (err, rsp) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rsp);
-      }
-    });
-  });
 };
 
 //

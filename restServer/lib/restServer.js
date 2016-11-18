@@ -289,7 +289,7 @@ function createRestService(props) {
             return next((new restify.BadRequestError(err)));
           } else {
             // if not set then default to json
-            if (!res.getHeader('content-type')) {
+            if ((!res.getHeader('content-type')) && (!res.getHeader('Content-type'))) {
               res.setHeader('content-type', 'application/json');
             }
 
@@ -353,7 +353,7 @@ function createRestService(props) {
             return next((new restify.BadRequestError(err)));
           } else {
             // if not set then default to json
-            if (!res.getHeader('content-type')) {
+            if ((!res.getHeader('content-type')) && (!res.getHeader('Content-type'))) {
               res.setHeader('content-type', 'text/plain');
             }
 
@@ -426,7 +426,7 @@ function createRestService(props) {
               res.statusCode = HttpStatus.OK;
             }
 
-            if (!res.getHeader('content-type')) {
+            if ((!res.getHeader('content-type')) && (!res.getHeader('Content-type'))) {
               logger.logJSON('error', { serviceType: serviceName, action: 'POST-Handler-Setting-Content-Type-to-Default-application-json',
                               path: versionedPath }, loggingMD);
               res.setHeader('content-type', 'application/json');
@@ -494,7 +494,9 @@ function createRestService(props) {
               res.statusCode = HttpStatus.OK;
             }
 
-            if (!res.getHeader('content-type')) {
+            // if the content-header has not been set then set to default of returning
+            // a jwt.
+            if ((!res.getHeader('content-type')) && (!res.getHeader('Content-type'))) {
               res.setHeader('content-type', 'text/plain');
             }
 

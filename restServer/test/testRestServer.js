@@ -413,6 +413,43 @@ describe('5 restServer POSTJWT handler tests', function () {
       }
     );
   }); //it 5.2
+
+  it('5.3 register a POSTJWT handler that overrides defaults OK and text/plain - i.e. returns an error', function (done) {
+
+    let handler52 = {};
+    let postData = 'jwt1';
+    let responseData = { error: '1' };
+    let uri = 'http://localhost:' + props.port + '/baseURL/v1/path_52';
+
+    handler52.post = function (req, res, cb) {
+      // note typo upper case is meant to be
+      req.headers['Content-type'].should.be.equal('text/plain');
+      req.body.should.be.equal(postData);
+      res.statusCode = HttpStatus.ACCEPTED;
+      res.setHeader('content-type', 'application/json');
+      return cb(null, responseData);
+    };
+
+    restService3.registerPOSTJWTHandler('/path_52', handler52);
+
+    request(
+      { method: 'POST',
+        uri: uri,
+        body: postData,
+        headers: {
+          'content-type': 'text/plain',
+        }
+      },
+      function (err, res, body) {
+        assert(!err, util.format('should not have been an error:%s', err));
+        res.statusCode.should.be.equal(HttpStatus.ACCEPTED);
+        res.header('content-type').should.be.equal('application/json');
+        let json = JSON.parse(body);
+        json.should.have.property('error', '1');
+        done();
+      }
+    );
+  }); //it 5.3
 }); // describe 5
 
 describe('6 restServer APIKEY Tests', function () {
