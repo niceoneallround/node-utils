@@ -98,6 +98,9 @@ function createDummyServiceCtx(props, callback) {
     }
   };
 
+  // add stats block
+  ctx.stats = {};
+
   return callback(ctx);
 }
 
