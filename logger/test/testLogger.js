@@ -85,7 +85,12 @@ describe('Logger Tests', function () {
   });
 
   it('log some JSON with data', function () {
-    var json = { serviceType: 'UP', action: 'metadataOnly', data: { id: 'nice', type: ['a'] } };
+    var json = { serviceType: 'UP', action: 'dataOnly', data: { id: 'nice', type: ['a'] } };
+    logSomeJSON(loggerFactory.create(props), json);
+  });
+
+  it('log error message', function () {
+    var json = { serviceType: 'UP', action: 'errorOnly', error: { id: 'nice', type: ['a'] } };
     logSomeJSON(loggerFactory.create(props), json);
   });
 

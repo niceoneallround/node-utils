@@ -134,6 +134,7 @@ function create(props) {
       msg = json.svcResponse;
     }
 
+    // find bits of message want to print
     if (msg) {
       id = msg['@id'];
       log(level, json.serviceType + '-' + json.action + '\nSVC_MESSAGE: %s', [JSON.stringify(msg, null, 2)], md);
@@ -147,7 +148,7 @@ function create(props) {
     //
     if (json.policy) {
       if (msg) {
-        log(level, json.serviceType + '-' + json.action + '\nSVC_MESSAGE_ID:%s POLICY: %s',
+        log(level, json.serviceType + '-' + json.action + 'MESSAGE_ID:%s \nPOLICY: %s',
                 [id, JSON.stringify(json.policy, null, 2)], md);
       } else {
         log(level, '\nPOLICY: %s', [JSON.stringify(json.policy, null, 2)], md);
@@ -159,8 +160,8 @@ function create(props) {
     //
     if (json.error) {
       if (msg) {
-        log(level, json.serviceType + '-' + json.action + '\nSVC_MESSAGE_ID:%s ERROR: %s',
-                [id, JSON.stringify(json.error, null, 2)], md);
+        log(level, json.serviceType + '-' + json.action + 'SVC_MESSAGE_ID:%s \nERROR: %s',
+            [id, JSON.stringify(json.error, null, 2)], md);
       } else {
         log(level, '\nERROR: %s', [JSON.stringify(json.error, null, 2)], md);
       }
