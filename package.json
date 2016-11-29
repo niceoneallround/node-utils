@@ -1,10 +1,11 @@
 {
   "name": "node-utils",
-  "version": "1.2.34",
+  "version": "1.2.35",
   "description": "Contains a set of utils",
   "main": "Gruntfile.js",
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "build": "gulp test"
   },
   "repository": {
     "type": "git",
