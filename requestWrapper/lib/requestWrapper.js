@@ -6,9 +6,9 @@
 //
 //  For now does not do much, maybe more in the future
 //
-var assert = require('assert'),
-    request = require('request'),
-    util = require('util');
+const assert = require('assert');
+const request = require('request');
+const util = require('util');
 
 //
 // Utitility routine to POST a JWT to a URL
@@ -22,11 +22,10 @@ function postJWT(props, callback) {
   // create request options
   // note props can have a Map of headers to add
   function createRequestOptions(props, next) {
-    var headers;
     assert(props.url, util.format('props.url missing:%j', props));
     assert(props.jwt, util.format('props.jwt missing:%j', props));
 
-    headers = {
+    let headers = {
       'Content-Type': 'text/plain', // was not sure so put this
       'Content-Length': Buffer.byteLength(props.jwt)
     };
@@ -86,13 +85,12 @@ function postJSON(props, callback) {
   // create request options
   // note props can have a Map of headers to add
   function createRequestOptions(props, next) {
-    var headers, jsonS;
     assert(props.url, util.format('props.url missing:%j', props));
     assert(props.json, util.format('props.json missing:%j', props));
 
-    jsonS =  JSON.stringify(props.json);
+    let jsonS =  JSON.stringify(props.json);
 
-    headers = {
+    let headers = {
       'Content-Type': 'application/json',
       'Content-Length': Buffer.byteLength(jsonS)
     };
@@ -152,11 +150,11 @@ function post(props, callback) {
   // create request options
   // note props can have a Map of headers to add
   function createRequestOptions(props, next) {
-    var headers, queryString;
+    let queryString;
     assert(props.url, util.format('props.url missing:%j', props));
     assert(props.text, util.format('props.text missing:%j', props));
 
-    headers = {
+    let headers = {
       'Content-Type': 'text/plain; charset=utf-8',
       'Content-Length': Buffer.byteLength(props.text)
     };
@@ -221,7 +219,7 @@ function post(props, callback) {
 function get(props, callback) {
   'use strict';
 
-  var headers = null;
+  let headers = null;
 
   // create request options
   function createRequestOptions(props, next) {
