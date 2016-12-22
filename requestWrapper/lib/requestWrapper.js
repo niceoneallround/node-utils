@@ -292,6 +292,76 @@ function generateBasicAuthTokenForHeader(username, password) {
   return 'Basic ' + new Buffer(username + ':' + password).toString('base64');
 }
 
+//
+// Add promise versions of the above
+//
+let promises = {};
+
+promises.postJWT = function ppostJWT(props) {
+  'use strict';
+  return new Promise(function (resolve, reject) {
+    postJWT(props, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
+promises.postJSON = function ppostJSON(props) {
+  'use strict';
+  return new Promise(function (resolve, reject) {
+    postJSON(props, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
+promises.post = function ppost(props) {
+  'use strict';
+  return new Promise(function (resolve, reject) {
+    post(props, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
+promises.getJWT = function pgetWT(props) {
+  'use strict';
+  return new Promise(function (resolve, reject) {
+    getJWT(props, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
+promises.get = function pget(props) {
+  'use strict';
+  return new Promise(function (resolve, reject) {
+    get(props, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
 module.exports = {
 
   generateBasicAuthTokenForHeader: generateBasicAuthTokenForHeader,
@@ -302,5 +372,7 @@ module.exports = {
   getJWT: getJWT,
   postJWT: postJWT,
 
-  postJSON: postJSON
+  postJSON: postJSON,
+
+  promises: promises,
 };
