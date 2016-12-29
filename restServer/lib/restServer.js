@@ -8,7 +8,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const loggerFactory = require('../../logger/lib/logger');
-const loggingMD = { fileName: 'restService.js' };
+const loggingMD = { fileName: 'node-utils/restServer.js' };
 const HttpStatus = require('http-status');
 const restify = require('restify');
 const util = require('util');
@@ -427,7 +427,7 @@ function createRestService(props) {
             }
 
             if ((!res.getHeader('content-type')) && (!res.getHeader('Content-type'))) {
-              logger.logJSON('error', { serviceType: serviceName, action: 'POST-Handler-Setting-Content-Type-to-Default-application-json',
+              logger.logJSON('info', { serviceType: serviceName, action: 'POST-Handler-Setting-Response-Content-Type-to-application-json-as-not-set',
                               path: versionedPath }, loggingMD);
               res.setHeader('content-type', 'application/json');
             }
