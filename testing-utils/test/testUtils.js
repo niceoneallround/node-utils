@@ -1,7 +1,7 @@
 /*jslint node: true, vars: true */
-var assert = require('assert'),
-  testUtils = require('../lib/utils'),
-  should = require('should');
+const assert = require('assert');
+const testUtils = require('../lib/utils');
+const should = require('should');
 
 describe('Test the test Utils', function () {
   'use strict';
@@ -22,9 +22,7 @@ describe('Test the test Utils', function () {
 
     it('2.1 dummy service ctx should be as expected', function () {
 
-      var config, props = {};
-
-      config = testUtils.getTestServiceConfig(props);
+      let config = testUtils.getTestServiceConfig({});
       assert(config, 'should have returned a config');
 
       config.should.have.property('crypto');
@@ -35,7 +33,7 @@ describe('Test the test Utils', function () {
 
     it('3.1 dummy response object should be as expected', function () {
 
-      var rsp = testUtils.createDummyResponseObject();
+      let rsp = testUtils.createDummyResponseObject();
       assert(rsp, 'should have returned a rsp');
       rsp.should.have.property('headers');
       rsp.setHeader('foo', 'bar');
@@ -43,6 +41,15 @@ describe('Test the test Utils', function () {
       rsp.setHeader('content-type', 'text/plain');
       rsp.headers.should.have.property('content-type', 'text/plain');
     }); //it 3.1
+
+    it('3.2 dummy request object should be as expected', function () {
+
+      let req = testUtils.createDummyRequestObject();
+      assert(req, 'should have returned a rsp');
+      req.should.have.property('headers');
+      req.setHeader('foo', 'bar');
+      req.headers.should.have.property('foo', 'bar');
+    }); //it 3.2
   }); // describe 3
 
 }); // describe

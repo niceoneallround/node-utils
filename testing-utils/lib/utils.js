@@ -3,16 +3,15 @@
 //
 // Utilities to help testing
 //
-var assert = require('assert'),
-    configFactory = require('../../serverConfig/lib/serverConfig'),
-    should = require('should'),
-    util = require('util');
+const assert = require('assert');
+const configFactory = require('../../serverConfig/lib/serverConfig');
+const should = require('should');
+const util = require('util');
 
 function getTestServiceConfig(props) {
   'use strict';
-  var overrides, config;
 
-  overrides = {};
+  let overrides = {};
   overrides.MODE = 'DEV';
   overrides.HOSTNAME = 'localhost';
 
@@ -70,7 +69,7 @@ function getTestServiceConfig(props) {
   overrides.crypto.jwt = {};
   overrides.crypto.jwt.JWT_SECRET = 'bogusSecret';
 
-  config = configFactory.create(overrides);
+  let config = configFactory.create(overrides);
   return config;
 }
 
@@ -78,12 +77,11 @@ function getTestServiceConfig(props) {
 // callback(ctx)
 function createDummyServiceCtx(props, callback) {
   'use strict';
-
-  var ctx = {};
   assert(callback, 'no callback param');
   assert(props, 'props param missing');
   assert(props.name, util.format('props.name missing:%j', props));
 
+  let ctx = {};
   ctx.name = props.name;
   ctx.logger = {
     logJSON: function (part1, part2, part3) { // write out
@@ -106,7 +104,7 @@ function createDummyServiceCtx(props, callback) {
 
 function createDummyResponseObject() {
   'use strict';
-  var rsp = {};
+  let rsp = {};
   rsp.headers = {};
   rsp.setHeader = function (key, value) {
     rsp.headers[key] = value;
@@ -115,8 +113,20 @@ function createDummyResponseObject() {
   return rsp;
 }
 
+function createDummyRequestObject() {
+  'use strict';
+  let req = {};
+  req.headers = {};
+  req.setHeader = function (key, value) {
+    req.headers[key] = value;
+  };
+
+  return req;
+}
+
 module.exports = {
+  createDummyRequestObject: createDummyRequestObject,
   createDummyResponseObject: createDummyResponseObject,
   createDummyServiceCtx: createDummyServiceCtx,
-  getTestServiceConfig: getTestServiceConfig
+  getTestServiceConfig: getTestServiceConfig,
 };
