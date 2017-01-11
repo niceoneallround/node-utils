@@ -33,9 +33,9 @@ const AWSGW_APIGW_METADATA_PATH = '/v1/metadata';
 const APIGW_PP_PATH = '/privacy_pipe';
 const AWSGW_APIGW_PP_PATH = '/v1/privacy_pipe';
 
-var callbacks = {};
-var promises = {};
-var utils = {};
+let callbacks = {};
+let promises = {};
+let utils = {};
 
 //------------------------
 // Domain requests
@@ -426,7 +426,37 @@ callbacks.getJWT = function getJWT(props, getUrl, callback) {
 };
 
 //
-// Post JWT to the apigw and pass result to the callback
+// A promise wrapper around post JWT
+// NOTE CONVERTED TO USE a serviceCtx as was as mistake not to use in the
+// beginning
+promises.postJWT  = function postJWT(serviceCtx, msgId, postURL, sendJWT) {
+  'use strict';
+  assert(serviceCtx, 'serviceCtx param is missing');
+  assert(msgId, 'msgId param is missing');
+  assert(postURL, 'postURL param is missing');
+  assert(sendJWT, 'sendJWT param is missing');
+
+  let props = {
+    logger: serviceCtx.logger,
+    logMsgServiceName: serviceCtx.serviceName,
+    loggerMsgId: msgId,
+  };
+
+  return new Promise(function (resolve, reject) {
+    callbacks.postJWT(props, postURL, sendJWT, function (err, rsp) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rsp);
+      }
+    });
+  });
+};
+
+//
+// Post the JWT to any URL that it assumes that is the API GATEWAY so adds
+// the necessary API_GATEWAY_API_KEY if it exists
+//
 //
 callbacks.postJWT = function postJWT(props, postUrl, sendJWT, callback) {
   'use strict';
