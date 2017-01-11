@@ -10,7 +10,7 @@ describe('apigwRequestWrapper postJWT Tests', function () {
   'use strict';
 
   let dummyServiceCtx = {
-    serviceName: 'a-service',
+    name: 'a-service',
     logger: { logJSON: function (mode, msg) { console.log('%s %j', mode, msg); } },
   };
 

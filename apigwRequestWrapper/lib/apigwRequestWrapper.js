@@ -438,7 +438,7 @@ promises.postJWT  = function postJWT(serviceCtx, msgId, postURL, sendJWT) {
 
   let props = {
     logger: serviceCtx.logger,
-    logMsgServiceName: serviceCtx.serviceName,
+    logMsgServiceName: serviceCtx.name,
     loggerMsgId: msgId,
   };
 
