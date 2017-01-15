@@ -77,7 +77,6 @@ function getTestServiceConfig(props) {
 // callback(ctx)
 function createDummyServiceCtx(props, callback) {
   'use strict';
-  assert(callback, 'no callback param');
   assert(props, 'props param missing');
   assert(props.name, util.format('props.name missing:%j', props));
 
@@ -99,7 +98,12 @@ function createDummyServiceCtx(props, callback) {
   // add stats block
   ctx.stats = {};
 
-  return callback(ctx);
+  // some code wants a callback others do not so support
+  if (callback) {
+    return callback(ctx);
+  } else {
+    return ctx;
+  }
 }
 
 function createDummyResponseObject() {

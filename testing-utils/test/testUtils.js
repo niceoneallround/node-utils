@@ -16,6 +16,13 @@ describe('Test the test Utils', function () {
         done();
       });
     }); //it 1.1
+
+    it('1.2 dummy service ctx NO CALLBACK', function () {
+      let ctx = testUtils.createDummyServiceCtx({ name: 'testSvc' });
+      assert(ctx, 'should have passed a ctx');
+      ctx.should.have.property('logger');
+      ctx.should.have.property('name', 'testSvc');
+    }); //it 1.2
   }); // describe 1
 
   describe('2 test create test service config', function () {
