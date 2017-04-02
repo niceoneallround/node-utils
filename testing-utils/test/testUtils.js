@@ -59,4 +59,15 @@ describe('Test the test Utils', function () {
     }); //it 3.2
   }); // describe 3
 
+  describe('4 test create dummy logger', function () {
+
+    it('4.1 dummy logger should be as expected', function () {
+
+      let logger = testUtils.createDummyLogger();
+      logger.should.have.property('logJSON');
+      logger.should.have.property('logProgress');
+      logger.should.have.property('logStrings');
+    }); //it 4.1
+  }); // describe 4
+
 }); // describe

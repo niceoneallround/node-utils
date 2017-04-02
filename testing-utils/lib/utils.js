@@ -73,16 +73,10 @@ function getTestServiceConfig(props) {
   return config;
 }
 
-//
-// callback(ctx)
-function createDummyServiceCtx(props, callback) {
+function createDummyLogger() {
   'use strict';
-  assert(props, 'props param missing');
-  assert(props.name, util.format('props.name missing:%j', props));
 
-  let ctx = {};
-  ctx.name = props.name;
-  ctx.logger = {
+  return {
     logJSON: function (part1, part2, part3) { // write out
       console.log('dummyServiceContext dummmy logging', part1, part2, part3);
       return 1;
@@ -92,8 +86,34 @@ function createDummyServiceCtx(props, callback) {
       console.log('**********');
       console.log('****** dummy progress:%s', msg);
       console.log('**********');
+    },
+
+    logStrings: function (level, info, strings, md) {
+      assert(level, 'logString level param is missing');
+      assert(info, 'logString info param is missing');
+      assert(strings, 'logString strings param is missing');
+      assert(md, 'logString md param is missing');
+
+      console.log(util.format('level:%s info:%j md:%j', level, info, md));
+
+      for (let i = 0; i < strings.length; i++) {
+        console.log(util.format('level:%s   %s', level, strings[i]));
+      }
     }
   };
+
+}
+
+//
+// callback(ctx)
+function createDummyServiceCtx(props, callback) {
+  'use strict';
+  assert(props, 'props param missing');
+  assert(props.name, util.format('props.name missing:%j', props));
+
+  let ctx = {};
+  ctx.name = props.name;
+  ctx.logger = createDummyLogger();
 
   // add stats block
   ctx.stats = {};
@@ -129,6 +149,7 @@ function createDummyRequestObject() {
 }
 
 module.exports = {
+  createDummyLogger: createDummyLogger,
   createDummyRequestObject: createDummyRequestObject,
   createDummyResponseObject: createDummyResponseObject,
   createDummyServiceCtx: createDummyServiceCtx,

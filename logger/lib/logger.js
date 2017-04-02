@@ -18,12 +18,14 @@ const util = require('util');
 function create(props) {
   'use strict';
 
-  var consoleOptions = {},
-      loggerInstance,
-      thisLogger;
+  // holds onto the winston logger that is created
+  let loggerInstance;
 
-  winston.level = 'debug';
-  consoleOptions.timestamp = true;
+  //winston.level = 'debug';
+
+  let consoleOptions = {
+    timestamp: true,
+  };
 
   console.log('Configuring log file with props:%j', props);
 
@@ -105,19 +107,23 @@ function create(props) {
   /**
     Used to log a string message
     @param level - log level
-    @param serviceName - the service name
-    @param action - the action
+    @param info - json object containing any information to display with the message
     @param msg - the string message
     @param md - json metadata
   */
-  function logString(level, serviceName, action, msg, md) {
+  function logStrings(level, info, strings, md) {
     assert(level, 'logString level param is missing');
-    assert(serviceName, 'logString serviceName param is missing');
-    assert(action, 'logString action param is missing');
-    assert(msg, 'logString msg param is missing');
+    assert(info, 'logString info param is missing');
+    assert(strings, 'logString msg param is missing');
     assert(md, 'logString md param is missing');
 
-    getLogger().log(level, serviceName, action, msg, md);
+    let format = '%j';
+
+    getLogger().log(level, format, [info], md);
+
+    for (let i = 0; i < strings.length; i++) {
+      getLogger().log(level, '  %s', [strings[i]]);
+    }
   }
 
   //
@@ -214,10 +220,10 @@ function create(props) {
     }
   }
 
-  thisLogger = {
+  let thisLogger = {
     log: log,
     logProgress: logProgress,
-    logString: logString,
+    logStrings: logStrings,
     logJSON: logJSON };
 
   return thisLogger;

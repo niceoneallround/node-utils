@@ -11,10 +11,12 @@ describe('Test Log String ', function () {
   it('should not blow up logging a string', function () {
 
     let md = { test: 'test-md' };
-    let msg = '\njwt1  syndicate\n';
-    msg = msg + 'jwt2  subject\n';
+    let info = { serviceName: 'sname', action: 'action1', };
 
-    logger.logString('info', 'serviceA', 'JWTs', msg, md);
+    let strings = [];
+    strings.push('jwt1  syndicate');
+    strings.push('jwt2  subject');
+    logger.logStrings('info', info, strings, md);
   });
 
 });
