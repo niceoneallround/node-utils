@@ -4,11 +4,11 @@
 // push to a shared device or service so can analyze
 //
 
-var assert = require('assert'),
-    winston = require('winston'),
-    logentries2 = require('winston-logentries'), //jshint ignore:line
-    logentries1 = require('node-logentries'), //jshint ignore:line
-    util = require('util');
+const assert = require('assert');
+const winston = require('winston');
+const logentries2 = require('winston-logentries'); //jshint ignore:line
+const logentries1 = require('node-logentries'); //jshint ignore:line
+const util = require('util');
 
 //
 // create an instance of a logger based on configuration options
@@ -50,7 +50,7 @@ function create(props) {
       ]
     });
 
-    log('info', 'Logger using logEntries', null, { filename: 'logger/utils.js' });
+    log('info', 'Logger using logEntries', null, { filename: 'node-utils/logger/utils.js' });
   }
 
   function getLogger() {
@@ -100,6 +100,24 @@ function create(props) {
     console.log('***************');
     console.log('********** %s', msg);
     console.log('***************');
+  }
+
+  /**
+    Used to log a string message
+    @param level - log level
+    @param serviceName - the service name
+    @param action - the action
+    @param msg - the string message
+    @param md - json metadata
+  */
+  function logString(level, serviceName, action, msg, md) {
+    assert(level, 'logString level param is missing');
+    assert(serviceName, 'logString serviceName param is missing');
+    assert(action, 'logString action param is missing');
+    assert(msg, 'logString msg param is missing');
+    assert(md, 'logString md param is missing');
+
+    getLogger().log(level, serviceName, action, msg, md);
   }
 
   //
@@ -199,6 +217,7 @@ function create(props) {
   thisLogger = {
     log: log,
     logProgress: logProgress,
+    logString: logString,
     logJSON: logJSON };
 
   return thisLogger;

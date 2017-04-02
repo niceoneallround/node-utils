@@ -1,32 +1,32 @@
-/*jslint node: true, vars: true */
+/*jslint node: true */
 
 //
 // Test the logger
 //
 
-var should = require('should'),
-    loggerFactory = require('../lib/logger');
+const should = require('should');
+const loggerFactory = require('../lib/logger');
 
 describe('Logger Tests', function () {
   'use strict';
 
-  var props = {};
+  let props = {};
   props.LOG_ENTRIES = false;
 
   function logSomeStuff(logger, p1) {
-    var md = { test: 'hello' };
+    let md = { test: 'hello' };
     logger.log('info', 'no params', null, md);
     logger.log('info', '1 param %s', [p1], md);
     logger.log('info', '2 param %s, %s', [p1, 'heya2'], md);
   }
 
   function logSomeJSON(logger, json) {
-    var md = { test: 'hello' };
+    let md = { test: 'hello' };
     logger.logJSON('info', json, md);
   }
 
   it('log progress', function () {
-    var logger = loggerFactory.create();
+    let logger = loggerFactory.create();
     logger.logProgress('heya');
   });
 
@@ -35,7 +35,7 @@ describe('Logger Tests', function () {
   });
 
   it('log some JSON no 3rd party logging', function () {
-    var json = { serviceType: 'UP', error: 'ouch' };
+    let json = { serviceType: 'UP', error: 'ouch' };
     logSomeJSON(loggerFactory.create(), json);
   });
 
@@ -45,52 +45,52 @@ describe('Logger Tests', function () {
   });
 
   it('log some JSON also using log entries', function () {
-    var json = { serviceType: 'UP', error: 'ouch' };
+    let json = { serviceType: 'UP', error: 'ouch' };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a svcMsg', function () {
-    var json = { serviceType: 'UP', action: 'messageOnly', svcMsg: { id: 'nice', type: ['a'] } };
+    let json = { serviceType: 'UP', action: 'messageOnly', svcMsg: { id: 'nice', type: ['a'] } };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a svcMsg and a policy', function () {
-    var json = { serviceType: 'UP', action: 'messageAndPolicy', svcMsg: { id: 'nice', type: ['a'] }, policy: { id: 'policy' } };
+    let json = { serviceType: 'UP', action: 'messageAndPolicy', svcMsg: { id: 'nice', type: ['a'] }, policy: { id: 'policy' } };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a svcMsg and an error', function () {
-    var json = { serviceType: 'UP', action: 'messageAndPolicy', svcMsg: { id: 'nice', type: ['a'] }, error: { id: 'error' } };
+    let json = { serviceType: 'UP', action: 'messageAndPolicy', svcMsg: { id: 'nice', type: ['a'] }, error: { id: 'error' } };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a svcRequest', function () {
-    var json = { serviceType: 'UP', action: 'messageOnly', svcRequest: { id: 'nice', type: ['a'] } };
+    let json = { serviceType: 'UP', action: 'messageOnly', svcRequest: { id: 'nice', type: ['a'] } };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a svcResponse', function () {
-    var json = { serviceType: 'UP', action: 'messageOnly', svcResponse: { id: 'nice', type: ['a'] } };
+    let json = { serviceType: 'UP', action: 'messageOnly', svcResponse: { id: 'nice', type: ['a'] } };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with a policy', function () {
-    var json = { serviceType: 'UP', action: 'policyOnly', policy: { id: 'nice', type: ['a'] } };
+    let json = { serviceType: 'UP', action: 'policyOnly', policy: { id: 'nice', type: ['a'] } };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with metadata', function () {
-    var json = { serviceType: 'UP', action: 'metadataOnly', metadata: { id: 'nice', type: ['a'], obj: [{ a: 1 }] } };
+    let json = { serviceType: 'UP', action: 'metadataOnly', metadata: { id: 'nice', type: ['a'], obj: [{ a: 1 }] } };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log some JSON with data', function () {
-    var json = { serviceType: 'UP', action: 'dataOnly', data: { id: 'nice', type: ['a'] } };
+    let json = { serviceType: 'UP', action: 'dataOnly', data: { id: 'nice', type: ['a'] } };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
   it('log error message', function () {
-    var json = { serviceType: 'UP', action: 'errorOnly', error: { id: 'nice', type: ['a'] } };
+    let json = { serviceType: 'UP', action: 'errorOnly', error: { id: 'nice', type: ['a'] } };
     logSomeJSON(loggerFactory.create(props), json);
   });
 
