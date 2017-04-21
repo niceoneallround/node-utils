@@ -8,7 +8,6 @@
 const assert = require('assert');
 const fs = require('fs');
 const loggerFactory = require('../../logger/lib/logger');
-const loggingMD = { fileName: 'node-utils/restServer.js' };
 const HttpStatus = require('http-status');
 const restify = require('restify');
 const util = require('util');
@@ -38,30 +37,59 @@ const util = require('util');
 
 function createRestService(props) {
   'use strict';
-
-  var thisService,
-      logger,
-      restifyServer = null,
-      serviceName,
-      baseURL = null,
-      URLversion,
-      port,
-      host = '0.0.0.0', // for docker bind to this can overide with props.host
-      internalApiKey = {};
-
   assert(props, 'createRestService requires props');
-  assert(props.name, util.format('createRestService props must have a name param:%j', props));
+  assert(props.name, util.format('createRestService props.name :%j', props));
+  assert(props.baseURL, util.format('createRestService props.baseURL missing:%j', props));
+  assert(props.URLversion, util.format('createRestService props.URLversion missing:%j', props));
+  assert(props.port, util.format('createRestService props.port missing:%j', props));
+
   console.log('createRestService invoked with props:%j', props);
-  serviceName = props.name;
-  loggingMD.ServiceType = props.name;
+
+  let serviceName = props.name;
+
+  let loggingMD = { fileName: 'node-utils/restServer.js', ServiceType: props.name, };
 
   // if passed in a logger then use that over the one we have
   //
+  let logger;
   if (props.logger) {
     logger = props.logger;
   } else {
     // logger can handle a null logConfig
     logger = loggerFactory.create(props.logConfig);
+  }
+
+  // set the host and the port
+  let host = '0.0.0.0'; // for docker bind to this can overide with props.host
+  if (props.host) {
+    host = props.host;
+  }
+
+  let port = props.port;
+
+  // confgure the base path, version information
+  // if just slash then do set to null as resify adds a slash
+  let URLversion = '/' + props.URLversion;
+  let baseURL = null;
+  if (props.baseURL !== '/') {
+    baseURL = props.baseURL;
+  } else {
+    baseURL = null;
+  }
+
+  // utility routine to prefix a baseURL and version to the path
+  function prefixBaseURLandVersion(path) {
+
+    let prefix = URLversion;
+    if (baseURL) {
+      prefix = baseURL + URLversion;
+    }
+
+    if (path) {
+      return prefix + path;
+    } else {
+      return prefix; // root
+    }
   }
 
   //
@@ -71,8 +99,9 @@ function createRestService(props) {
   //
 
   //
-  // Determine if using TLS
+  // Based on if TLS is needed create server differently
   //
+  let restifyServer = null;
   if ((process.env.TLS_ENABLED === '1') || (props.TLSEnabled === '1')) {
     assert(props.certificate, util.format('TLS enabled and no props.certificate passed in:%j', props));
     assert(props.key, util.format('TLS enabled and no props.key passed in:%j', props));
@@ -100,33 +129,13 @@ function createRestService(props) {
   restifyServer.use(restify.bodyParser());
   restifyServer.use(restify.queryParser());
 
-  // check properties needed for paths
-  assert(props.baseURL, util.format('RestServer.start No baseURL in props:%j', props));
-
-  // if just slash then do set to null as resify adds a slash
-  if (props.baseURL !== '/') {
-    baseURL = props.baseURL;
-  } else {
-    baseURL = null;
-  }
-
-  assert(props.URLversion, util.format('RestServer.start No URLversion in props:%j', props));
-  URLversion = '/' + props.URLversion;
-
-  assert(props.port, util.format('RestServer.start No port in config:%j', props));
-  port = props.port;
-
-  if (props.host) {
-    host = props.host;
-  }
-
   //
   // Check if any of the internal API key are enabled - these are controlled by
   // - INTERNAL_API_KEY_NAME the header field name
   // - INTERNAL_API_KEY the api key
   // - INTERNAL_API_KEY_ENABLED 1 or 0
   //
-  internalApiKey.enabled = process.env.INTERNAL_API_KEY_ENABLED;
+  let internalApiKey = { enabled: process.env.INTERNAL_API_KEY_ENABLED, };
   if ((internalApiKey.enabled) && (internalApiKey.enabled === '1')) {
     internalApiKey.key = process.env.INTERNAL_API_KEY;
     internalApiKey.name = process.env.INTERNAL_API_KEY_NAME;
@@ -147,11 +156,9 @@ function createRestService(props) {
 
   // check API key if all good continue with next otherwise return forbidden
   function checkInternalApiKey(req) {
-    var value;
     if ((internalApiKey.enabled) && (internalApiKey.enabled === '1')) {
       if (req.headers) {
-        value = req.headers[internalApiKey.name];
-        if (value === internalApiKey.key) {
+        if (req.headers[internalApiKey.name] === internalApiKey.key) {
           return HttpStatus.OK;
         } else {
           return HttpStatus.FORBIDDEN;
@@ -198,10 +205,10 @@ function createRestService(props) {
       assert(!err, util.format('Error restifyServer.listen;%j', err));
 
       //
-      // add a log request at '/'
+      // add status message at '/'
       //
       restifyServer.get('/', function (req, res, next) { // jshint ignore:line
-        var statusMsg = {};
+        let statusMsg = {};
         loggingHandler(req, res, next, 'GET-on-path', '/');
         res.statusCode = HttpStatus.OK;
         res.setHeader('content-type', 'application/json');
@@ -242,40 +249,28 @@ function createRestService(props) {
   // register the handler on the specified path
   //
   function registerGETHandler(path, handler) {
-
-    var versionedPath;
-
-    if (baseURL) {
-      versionedPath = baseURL + URLversion;
-    } else {
-      versionedPath = URLversion;
-    }
-
-    // if a path passed in the append
-    if (path) {
-      versionedPath =  versionedPath + path;
-    }
-
     assert(handler, 'No handler passed to registerGETHandler');
     assert(handler.get, util.format('No get method on handler:%j', handler));
+
+    let versionedPath = prefixBaseURLandVersion(path);
 
     logger.logJSON('info', { serviceType: serviceName, action: 'Registered-GET-Handler', path: versionedPath }, loggingMD);
 
     restifyServer.get(
       versionedPath,
-      function (req, res, next) { // jshint ignore:line
+      function (req, res, next) {
         loggingHandler(req, res, next, 'GET-on-path', versionedPath);
       },
 
       function (req, res, next) {
-        var s = checkInternalApiKey(req);
-        if (s !== HttpStatus.OK) {
+        let ok = checkInternalApiKey(req);
+        if (ok !== HttpStatus.OK) {
 
           logger.logJSON('info', { serviceType: serviceName,
                                   action: 'Get-on-path-FORBIDDEN', path: versionedPath,
                                   headers: req.headers }, loggingMD);
 
-          res.statusCode = s;
+          res.statusCode = ok;
           res.setHeader('content-type', 'text/plain');
           res.send('FORBIDDEN');
           return next();
@@ -306,22 +301,10 @@ function createRestService(props) {
   }
 
   function registerGETJWTHandler(path, handler) {
-
-    var versionedPath;
-
-    if (baseURL) {
-      versionedPath = baseURL + URLversion;
-    } else {
-      versionedPath = URLversion;
-    }
-
-    // if a path passed in the append
-    if (path) {
-      versionedPath =  versionedPath + path;
-    }
-
     assert(handler, 'No handler passed to registerGETJWTHandler');
     assert(handler.get, util.format('No get method on handler:%j', handler));
+
+    let versionedPath = prefixBaseURLandVersion(path);
 
     logger.logJSON('info', { serviceType: serviceName, action: 'Registered-GETJWT-Handler', path: versionedPath }, loggingMD);
 
@@ -332,14 +315,14 @@ function createRestService(props) {
       },
 
       function (req, res, next) {
-        var s = checkInternalApiKey(req);
-        if (s !== HttpStatus.OK) {
+        let ok = checkInternalApiKey(req);
+        if (ok !== HttpStatus.OK) {
 
           logger.logJSON('info', { serviceType: serviceName,
                                   action: 'GetJWT-on-path-FORBIDDEN', path: versionedPath,
                                   headers: req.headers }, loggingMD);
 
-          res.statusCode = s;
+          res.statusCode = ok;
           res.setHeader('content-type', 'text/plain');
           res.send('FORBIDDEN');
           return next();
@@ -373,17 +356,10 @@ function createRestService(props) {
   // register the handler on the specified path
   //
   function registerPOSTHandler(path, handler) {
-
-    var versionedPath;
-
     assert(handler, 'No handler passed to registerPOSTHandler');
     assert(handler.post, util.format('No post method on handler:%j', handler));
 
-    if (baseURL) {
-      versionedPath = baseURL + URLversion + path;
-    } else {
-      versionedPath = URLversion + path;
-    }
+    let versionedPath = prefixBaseURLandVersion(path);
 
     logger.logJSON('info', { serviceType: serviceName, action: 'Registered-POST-Handler', path: versionedPath }, loggingMD);
 
@@ -394,14 +370,14 @@ function createRestService(props) {
       },
 
       function (req, res, next) {
-        let s = checkInternalApiKey(req);
-        if (s !== HttpStatus.OK) {
+        let ok = checkInternalApiKey(req);
+        if (ok !== HttpStatus.OK) {
 
           logger.logJSON('info', { serviceType: serviceName,
                                   action: 'POST-on-path-FORBIDDEN', path: versionedPath,
                                   headers: req.headers }, loggingMD);
 
-          res.statusCode = s;
+          res.statusCode = ok;
           res.setHeader('content-type', 'text/plain');
           res.send('FORBIDDEN');
           return next();
@@ -446,17 +422,10 @@ function createRestService(props) {
   }
 
   function registerPOSTJWTHandler(path, handler) {
-
-    var versionedPath;
-
     assert(handler, 'No handler passed to registerPOSTJWTHandler');
     assert(handler.post, util.format('No post method on handler:%j', handler));
 
-    if (baseURL) {
-      versionedPath = baseURL + URLversion + path;
-    } else {
-      versionedPath = URLversion + path;
-    }
+    let versionedPath = prefixBaseURLandVersion(path);
 
     logger.logJSON('info', { serviceType: serviceName, action: 'Registered-POST-JWT-Handler', path: versionedPath }, loggingMD);
 
@@ -467,14 +436,14 @@ function createRestService(props) {
       },
 
       function (req, res, next) {
-        var s = checkInternalApiKey(req);
-        if (s !== HttpStatus.OK) {
+        let ok = checkInternalApiKey(req);
+        if (ok !== HttpStatus.OK) {
 
           logger.logJSON('info', { serviceType: serviceName,
                                   action: 'POSTJWT-on-path-FORBIDDEN', path: versionedPath,
                                   headers: req.headers }, loggingMD);
 
-          res.statusCode = s;
+          res.statusCode = ok;
           res.setHeader('content-type', 'text/plain');
           res.send('FORBIDDEN');
           return next();
@@ -513,7 +482,7 @@ function createRestService(props) {
     );
   }
 
-  thisService = {
+  let thisService = {
     logger: getLogger,
     registerGETHandler: registerGETHandler,
     registerGETJWTHandler: registerGETJWTHandler,
@@ -523,7 +492,7 @@ function createRestService(props) {
     stop: stop };
 
   return thisService;
-}
+} // create restService
 
 module.exports = {
   create: createRestService
