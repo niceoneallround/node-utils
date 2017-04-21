@@ -12,11 +12,13 @@
 
 # use slim version has having issues with space on AWS
 # https://hub.docker.com/_/node/
-FROM node:7.4-slim
+FROM node:7.9-alpine
 
-# make sure that apt is up to date
-RUN apt-get update
-RUN apt-get install -y apt-utils
+# make sure that apt is up to date SLIM COMMANDS
+#RUN apt-get update
+#RUN apt-get install -y apt-utils
+
+#RUN apk update
 
 # install git and its dependencies - REMOVE FOR NOW AS TRY TO SHRINK SPACE 24-Sept-15 rich
 #RUN apt-get install -y git git-core
@@ -26,7 +28,7 @@ RUN apt-get install -y apt-utils
 #RUN apt-get install -y build-essential
 
 #install nodemon - used in development
-RUN npm install -g nodemon
+#RUN npm install -g nodemon - REMOVE AS TRY TO SHRINK SIZE AND NOT REALLY USING
 
 #install forever used to run services in production as restarts on failure
 RUN npm install -g forever
