@@ -39,37 +39,54 @@ function createCanonConfigFile() {
   };
 }
 
+// test low level routine
 describe('1 config file tests', function () {
   'use strict';
 
   it('1.1 should verify and return config if all props are valid', function () {
 
     let cf = createCanonConfigFile().a_service_name;
-    let c = configFactory.create(cf);
+    let c = configFactory.createFromJSON(cf);
     assert(c, 'No config returned from create');
     commonVerifyValid(c, cf);
   });
 }); // describe 1
 
+// test low level routine
 describe('2 read YAML config file', function () {
   'use strict';
 
   it('2.1 should verify and return config if all props are valid', function () {
 
-    let yamlConfig = fs.readFileSync(__dirname + '/' + './test-data/config_test1.yaml').toString(); //console.log(yamlConfig);
-
-    let cf = yaml.safeLoad(yamlConfig); // create own copy so can checks that fields were set correctly
-    //console.log('safeload yaml', cf);
-
+    let yamlConfig = fs.readFileSync(__dirname + '/' + './test-data/config_test1.yaml').toString();
     let c = configFactory.createFromYAML(yamlConfig, 'service_1');
     assert(c, 'No config returned from create');
-    console.log(c);
 
-    commonVerifyValid(c, cf.service_1);
+    let inputConfig = yaml.safeLoad(yamlConfig); // need input config in json to validate
+    commonVerifyValid(c, inputConfig.service_1);
   });
 }); // describe 2
 
-describe('3 test verifier',  function () {
+// test main routine
+describe('3 read from passed in file', function () {
+  'use strict';
+
+  it('2.1 should read file and pass to lower level routines, returning a valid config file', function () {
+
+    let file = __dirname + '/test-data/config_test1.yaml';
+
+    let c = configFactory.createFromFile(file, 'service_1');
+    assert(c, 'No config returned from create');
+
+    //console.log('OUTPUT CONFIG FROM FILE', c);
+
+    // to validate need input config in JSON format
+    let inputConfig = readInputConfigFileReturnJSON(file);
+    commonVerifyValid(c, inputConfig.service_1);
+  });
+}); // describe 3
+
+describe('4 test verifier',  function () {
   'use strict';
 
   it('1.1 should be able to pass in verifier function, if all ok then returns config', function () {
@@ -79,16 +96,48 @@ describe('3 test verifier',  function () {
     };
 
     let cf = createCanonConfigFile().a_service_name;
-    let c = configFactory.create(cf, verifier);
+    let c = configFactory.createFromJSON(cf, verifier);
     assert(c, 'No config returned from create');
     commonVerifyValid(c, cf);
   });
-}); // describe 3
+}); // describe 4
+
+describe('5 test processor',  function () {
+  'use strict';
+
+  it('1.1 should be able to pass a processor function that gets config and can modify', function () {
+
+    let verifier = function (config) {
+      assert(config, 'no config file passed in');
+    };
+
+    let processor = function (inputConfig, outputConfig) {
+      outputConfig.ADDED_IN_PROCESSOR = 'hello';
+    };
+
+    let cf = createCanonConfigFile().a_service_name;
+    let c = configFactory.createFromJSON(cf, verifier, processor);
+    assert(c, 'No config returned from create');
+    commonVerifyValid(c, cf);
+
+    c.should.have.property('ADDED_IN_PROCESSOR', 'hello');
+  });
+}); // describe 5
 
 //
 // HELPER UTILS
 //
 
+function readInputConfigFileReturnJSON(file) {
+  'use strict';
+  let yamlConfig = fs.readFileSync(file).toString();
+  return yaml.safeLoad(yamlConfig);
+}
+
+/**
+ * @param c - the output config
+ * @param cf input config file in JSON format
+ */
 function commonVerifyValid(c, cf) {
   'use strict';
 

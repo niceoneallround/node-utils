@@ -12,10 +12,35 @@ const fs = require('fs');
 const util = require('util');
 const yaml = require('js-yaml');
 
+/**
+ * Read the passed in file, look for the configurtation named service, optionally verify it
+ * then create JSON config
+ * @_file path to file
+ * @serviceName service name in file
+ * @verifier - optional verifier function to use to check file, should assert if an issue
+ *             function(configJSON)
+ * @processor - optional processor that can process the input config and add values to output config if needed
+ *              function(inputConfig, outputConfig)
+ */
+function createFromFile(_file, serviceName, verifier, processor) {
+  'use strict';
+
+  let file = _file;
+  if (process.env.CONFIG_FILE) {
+    file = process.env.CONFIG_FILE;
+  }
+
+  console.log('****Configuration File is:%s this can be changed using the CONFIG_FILE env', file);
+
+  let configFile = fs.readFileSync(file).toString();
+
+  return createFromYAML(configFile, serviceName, verifier, processor);
+}
+
 //
 // Create from a YAML file.  See example.config.yaml for what can be passed
 //
-function createFromYAML(yamlConfig, serviceName) {
+function createFromYAML(yamlConfig, serviceName, verifier, processor) {
   'use strict';
   assert(yamlConfig, 'no yamlConfig parameter passed in');
   assert(serviceName, 'no serviceName parameter passed in');
@@ -25,7 +50,7 @@ function createFromYAML(yamlConfig, serviceName) {
   let serviceConfig = config[serviceName];
   assert(serviceConfig, util.format('No service config for service:%s: in config:%j', serviceName, config));
 
-  return create(serviceConfig);
+  return createFromJSON(serviceConfig, verifier, processor);
 }
 
 //
@@ -35,7 +60,7 @@ function createFromYAML(yamlConfig, serviceName) {
 //        if contents are as expected, if not passed then default one is
 //        used. verifier throws an assert if an issue.
 //
-function create(config, verifier) {
+function createFromJSON(config, verifier, processor) {
   'use strict';
 
   if (verifier) {
@@ -265,6 +290,14 @@ function create(config, verifier) {
   //
   c.PASSED_IN_CONFIG_FILE = config;
 
+  //
+  // If a passed in additional processor then call so can process input
+  // config and add to output config
+  //
+  if (processor) {
+    processor(config, c);
+  }
+
   return c;
 }
 
@@ -275,6 +308,9 @@ function readfile(path) {
 }
 
 module.exports = {
-  create: create,
+  createFromFile: createFromFile,
+
+  // expose for testing only
+  createFromJSON: createFromJSON,
   createFromYAML: createFromYAML,
 };
