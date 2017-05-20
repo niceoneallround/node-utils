@@ -40,7 +40,7 @@ function createCanonConfigFile() {
 }
 
 // test low level routine
-describe('1 config file tests', function () {
+describe('1 use in-memory JSON', function () {
   'use strict';
 
   it('1.1 should verify and return config if all props are valid', function () {
@@ -49,26 +49,12 @@ describe('1 config file tests', function () {
     let c = configFactory.createFromJSON(cf);
     assert(c, 'No config returned from create');
     commonVerifyValid(c, cf);
+    commonVerifyJWTValid(c, cf);
   });
 }); // describe 1
 
-// test low level routine
-describe('2 read YAML config file', function () {
-  'use strict';
-
-  it('2.1 should verify and return config if all props are valid', function () {
-
-    let yamlConfig = fs.readFileSync(__dirname + '/' + './test-data/config_test1.yaml').toString();
-    let c = configFactory.createFromYAML(yamlConfig, 'service_1');
-    assert(c, 'No config returned from create');
-
-    let inputConfig = yaml.safeLoad(yamlConfig); // need input config in json to validate
-    commonVerifyValid(c, inputConfig.service_1);
-  });
-}); // describe 2
-
 // test main routine
-describe('3 read from passed in file', function () {
+describe('2 read from file', function () {
   'use strict';
 
   it('2.1 should read file and pass to lower level routines, returning a valid config file', function () {
@@ -83,13 +69,28 @@ describe('3 read from passed in file', function () {
     // to validate need input config in JSON format
     let inputConfig = readInputConfigFileReturnJSON(file);
     commonVerifyValid(c, inputConfig.service_1);
+    commonVerifyJWTValid(c, inputConfig.service_1);
   });
-}); // describe 3
 
-describe('4 test verifier',  function () {
+  it('2.2 should be ok if no JWT section', function () {
+
+    let file = __dirname + '/test-data/config_no_jwt.yaml';
+
+    let c = configFactory.createFromFile(file, 'service_1');
+    assert(c, 'No config returned from create');
+
+    //console.log('OUTPUT CONFIG FROM FILE', c);
+
+    // to validate need input config in JSON format
+    let inputConfig = readInputConfigFileReturnJSON(file);
+    commonVerifyValid(c, inputConfig.service_1);
+  });
+}); // describe 2
+
+describe('3 test verifier',  function () {
   'use strict';
 
-  it('1.1 should be able to pass in verifier function, if all ok then returns config', function () {
+  it('3.1 should be able to pass in verifier function, if all ok then returns config', function () {
 
     let options = {
       verifier: function (config, options) {
@@ -105,10 +106,10 @@ describe('4 test verifier',  function () {
   });
 }); // describe 4
 
-describe('5 test processor',  function () {
+describe('4 test processor',  function () {
   'use strict';
 
-  it('1.1 should be able to pass a processor function that gets config and can modify', function () {
+  it('4.1 should be able to pass a processor function that gets config and can modify', function () {
 
     let options = {
       verifier: function (config) {
@@ -163,6 +164,15 @@ function commonVerifyValid(c, cf) {
   c.terminate_tls.should.have.property('certificate_file', cf.terminate_tls.certificate_file);
   c.terminate_tls.should.have.property('private_key_file', cf.terminate_tls.private_key_file);
   c.should.have.property('PROTOCOL', 'https');
+}
+
+/**
+ * @param c - the output config
+ * @param cf input config file in JSON format
+ */
+function commonVerifyJWTValid(c, cf) {
+  'use strict';
+  assert(c, 'No config returned from create');
 
   c.should.have.property('crypto');
   c.crypto.should.have.property('jwt');

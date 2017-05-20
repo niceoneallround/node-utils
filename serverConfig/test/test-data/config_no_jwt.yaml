@@ -1,0 +1,12 @@
+#
+# test config file no JWT
+#
+version: '1'
+service_1:
+  DOMAIN_NAME: test2.com
+  LISTEN_PORT: 8080
+  LISTEN_PORT_INSIDE_DOCKER: 8080
+  terminate_tls:
+    enabled: true
+    certificate_file:  '../test/test-data/fake_file1'
+    private_key_file:  '../test/test-data/fake_file1'

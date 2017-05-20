@@ -190,86 +190,88 @@ function createFromJSON(config, options) {
     c.api_gateway.webshield_api_key = c.WEBSHIELD_API_KEY;
   }
 
-  //
-  // JWT CONFIG
-  //
-  let signer = config.jwt.signer;
-  switch (signer.alg) {
-
-    case 'HS256': {
-      c.crypto = {};
-      c.crypto.jwt = {};
-      c.crypto.jwt.issuer = c.DOMAIN_NAME;
-      c.crypto.jwt.type = 'HS256';
-
-      let secret = signer.HS256.secret;
-      if (process.env.JWT_SECRET) {
-        secret = process.env.JWT_SECRET;
-      }
-
-      assert(secret, util.format('No config.jwt.signer.HS256.secret or JWT_SECRET property cannot configure signing JWTs:%j', config));
-      c.crypto.jwt.secret = secret;
-      break;
-    }
-
-    case 'RS256': {
-      c.crypto = {};
-      c.crypto.jwt = {};
-      c.crypto.jwt.issuer = c.DOMAIN_NAME;
-      c.crypto.jwt.type = 'RS256';
-
-      // the certficate file
-      let x509CertPEM = readfile(signer.RS256.certificate_file);
-      assert(x509CertPEM, util.format('No certificate_file configure signing JWTs:%j', config));
-      c.crypto.jwt.x509CertPEM = x509CertPEM;
-
-      // the public key file
-      let publicKeyPEM = readfile(signer.RS256.public_key_file);
-      assert(publicKeyPEM, util.format('No public_key_file configure signing JWTs:%j', config));
-      c.crypto.jwt.publicKeyPEM = publicKeyPEM;
-
-      // the rsa private key
-      let rsaPrivateKey = readfile(signer.RS256.private_key_file);
-      assert(rsaPrivateKey, util.format('No private_key_file configure signing JWTs:%j', config));
-      c.crypto.jwt.privateKey = rsaPrivateKey;
-      break;
-    }
-
-    default: {
-      assert(false, util.format('unknown jwt siging type'));
-    }
-  }
-
-  if (config.jwt.verifier) {
-    if (config.jwt.verifier.enabled) {
-      c.VERIFY_JWT = true;
-    } else {
-      c.VERIFY_JWT = false;
-    }
-
-    // The old code expects to be able to verify HS256 signatures with a
-    // secret that is shared by all parties. This is of course stupid but a
-    // throwback to prototype and not had a chance to remove as move to rs256
-    // keys. So services need to be able to verify. For now support by adding
-    // the secret key in the verifier
-    //
-    // if the secret is there then no need to do anything as using HS256 to sign
-    // and all just works  FIXME CODE NEEDS SECRET
-    if (!c.crypto.jwt.secret) {
-      if (process.env.JWT_SECRET) {
-        c.crypto.jwt.secret = process.env.JWT_SECRET;
-      } else if ((config.jwt.verifier.HS256) && (config.jwt.verifier.HS256.secret)) {
-        c.crypto.jwt.secret = config.jwt.verifier.HS256.secret;
-      }
-    }
-  }
-
   // allow verify to be overrriden by env
   if (process.env.VERIFY_JWT) {
     if (process.env.VERIFY_JWT.toLowerCase() === 'false') {
       c.VERIFY_JWT = false;
     } else {
       c.VERIFY_JWT = true;
+    }
+  }
+
+  //
+  // JWT configuration is optional
+  //
+  if (config.jwt) {
+    let signer = config.jwt.signer;
+    switch (signer.alg) {
+
+      case 'HS256': {
+        c.crypto = {};
+        c.crypto.jwt = {};
+        c.crypto.jwt.issuer = c.DOMAIN_NAME;
+        c.crypto.jwt.type = 'HS256';
+
+        let secret = signer.HS256.secret;
+        if (process.env.JWT_SECRET) {
+          secret = process.env.JWT_SECRET;
+        }
+
+        assert(secret, util.format('No config.jwt.signer.HS256.secret or JWT_SECRET property cannot configure signing JWTs:%j', config));
+        c.crypto.jwt.secret = secret;
+        break;
+      }
+
+      case 'RS256': {
+        c.crypto = {};
+        c.crypto.jwt = {};
+        c.crypto.jwt.issuer = c.DOMAIN_NAME;
+        c.crypto.jwt.type = 'RS256';
+
+        // the certficate file
+        let x509CertPEM = readfile(signer.RS256.certificate_file);
+        assert(x509CertPEM, util.format('No certificate_file configure signing JWTs:%j', config));
+        c.crypto.jwt.x509CertPEM = x509CertPEM;
+
+        // the public key file
+        let publicKeyPEM = readfile(signer.RS256.public_key_file);
+        assert(publicKeyPEM, util.format('No public_key_file configure signing JWTs:%j', config));
+        c.crypto.jwt.publicKeyPEM = publicKeyPEM;
+
+        // the rsa private key
+        let rsaPrivateKey = readfile(signer.RS256.private_key_file);
+        assert(rsaPrivateKey, util.format('No private_key_file configure signing JWTs:%j', config));
+        c.crypto.jwt.privateKey = rsaPrivateKey;
+        break;
+      }
+
+      default: {
+        assert(false, util.format('unknown jwt siging type'));
+      }
+    }
+
+    if (config.jwt.verifier) {
+      if (config.jwt.verifier.enabled) {
+        c.VERIFY_JWT = true;
+      } else {
+        c.VERIFY_JWT = false;
+      }
+
+      // The old code expects to be able to verify HS256 signatures with a
+      // secret that is shared by all parties. This is of course stupid but a
+      // throwback to prototype and not had a chance to remove as move to rs256
+      // keys. So services need to be able to verify. For now support by adding
+      // the secret key in the verifier
+      //
+      // if the secret is there then no need to do anything as using HS256 to sign
+      // and all just works  FIXME CODE NEEDS SECRET
+      if (!c.crypto.jwt.secret) {
+        if (process.env.JWT_SECRET) {
+          c.crypto.jwt.secret = process.env.JWT_SECRET;
+        } else if ((config.jwt.verifier.HS256) && (config.jwt.verifier.HS256.secret)) {
+          c.crypto.jwt.secret = config.jwt.verifier.HS256.secret;
+        }
+      }
     }
   }
 

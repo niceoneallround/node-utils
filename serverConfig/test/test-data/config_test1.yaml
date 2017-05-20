@@ -1,5 +1,5 @@
 #
-# Standard config file for a connector.
+# test config file
 #
 version: '1'
 service_1:
