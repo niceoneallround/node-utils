@@ -100,6 +100,8 @@ function createRestService(props) {
 
   //
   // Based on if TLS is needed create server differently
+  // look at https://nodejs.org/dist/latest-v7.x/docs/api/https.html#https_https_createserver_options_requestlistener
+  // for all the options that should support.
   //
   let restifyServer = null;
   if ((process.env.TLS_ENABLED === '1') || (props.TLSEnabled === '1')) {
@@ -110,9 +112,14 @@ function createRestService(props) {
           { serviceType: serviceName, action: 'RestServer-TLS-ENABLED',
             certificate: props.certificate, key: props.key }, loggingMD);
 
+    // use option to pass config parameters straignt through to node HTTPS so can use all parameters
+    let httpsServerOptions = {
+      cert: fs.readFileSync(props.certificate),
+      key: fs.readFileSync(props.key),
+    };
+
     restifyServer = restify.createServer({
-      certificate: fs.readFileSync(props.certificate),
-      key: fs.readFileSync(props.key)
+      httpsServerOptions: httpsServerOptions,
     });
 
   } else {

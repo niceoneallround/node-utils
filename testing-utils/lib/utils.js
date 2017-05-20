@@ -22,6 +22,11 @@ function getTestServiceConfig(props) {
   if ((props) && (props.port)) {
     overrides.PORT = props.port;
     overrides.PORT_INSIDE_DOCKER = props.port;
+  } else if ((props) && (props.LISTEN_PORT)) {
+    // new agents started calling it LISTEN_PORT as more descriptive
+    // so add to how set port, still support old 'port' option
+    overrides.LISTEN_PORT = props.LISTEN_PORT;
+    overrides.PORT_INSIDE_DOCKER = props.LISTEN_PORT;
   } else {
     overrides.PORT = 'not_passed_into_config_create';
     overrides.PORT_INSIDE_DOCKER = overrides.PORT;
