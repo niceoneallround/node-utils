@@ -1,9 +1,13 @@
 /*jslint node: true, vars: true */
 
-/*  NEW FORMAT CAN READ FROM FILE - HAVE NOT CONVERTED AS OF YET */
+/*
+
+   NEW FORMAT CAN READ FROM FILE - HAVE NOT CONVERTED AS OF YET
+
+*/
 
 const assert = require('assert');
-const configVerifier = require('./verifier').verify;
+const configFileVerifier = require('./configFileVerifier').verify;
 const fs = require('fs');
 const util = require('util');
 const yaml = require('js-yaml');
@@ -26,10 +30,19 @@ function createFromYAML(yamlConfig, serviceName) {
 
 //
 // Create from a JSON version of the YAML config file
-function create(config) {
+// @param config the config file contents, json
+// @param verifier an optional verifier function(config) that will be called to check
+//        if contents are as expected, if not passed then default one is
+//        used. verifier throws an assert if an issue.
+//
+function create(config, verifier) {
   'use strict';
 
-  configVerifier(config);
+  if (verifier) {
+    verifier(config);
+  } else {
+    configFileVerifier(config);
+  }
 
   let c = {};
 

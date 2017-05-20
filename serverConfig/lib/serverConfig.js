@@ -1,5 +1,13 @@
 /*jslint node: true, vars: true */
 
+/*
+
+  OLD SHOULD BE CONVERTING.....20-may-2017
+  use configFactory
+
+
+*/
+
 //
 //
 // A config that wraps

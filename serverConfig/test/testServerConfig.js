@@ -1,9 +1,9 @@
 /*jslint node: true, vars: true */
 
-var assert = require('assert'),
-    configUtils = require('../lib/serverConfig'),
-    should = require('should'),
-    util = require('util');
+const assert = require('assert');
+const configUtils = require('../lib/serverConfig');
+const should = require('should');
+const util = require('util');
 
 describe('Server Config Utils Tests', function () {
   'use strict';
