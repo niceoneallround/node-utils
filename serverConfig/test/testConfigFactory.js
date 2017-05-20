@@ -91,12 +91,15 @@ describe('4 test verifier',  function () {
 
   it('1.1 should be able to pass in verifier function, if all ok then returns config', function () {
 
-    let verifier = function (config) {
-      assert(config, 'no config file passed in');
+    let options = {
+      verifier: function (config, options) {
+        assert(config, 'no config file passed in');
+        assert(options, 'no options file passed in');
+      },
     };
 
     let cf = createCanonConfigFile().a_service_name;
-    let c = configFactory.createFromJSON(cf, verifier);
+    let c = configFactory.createFromJSON(cf, options);
     assert(c, 'No config returned from create');
     commonVerifyValid(c, cf);
   });
@@ -107,20 +110,28 @@ describe('5 test processor',  function () {
 
   it('1.1 should be able to pass a processor function that gets config and can modify', function () {
 
-    let verifier = function (config) {
-      assert(config, 'no config file passed in');
-    };
+    let options = {
+      verifier: function (config) {
+        assert(config, 'no config file passed in');
+      },
 
-    let processor = function (inputConfig, outputConfig) {
-      outputConfig.ADDED_IN_PROCESSOR = 'hello';
+      processor: function (inputConfig, outputConfig, options) {
+        outputConfig.ADDED_IN_PROCESSOR = 'hello';
+        outputConfig.over1 = options.overrides.over1;
+      },
+
+      overrides: {
+        over1: '1',
+      },
     };
 
     let cf = createCanonConfigFile().a_service_name;
-    let c = configFactory.createFromJSON(cf, verifier, processor);
+    let c = configFactory.createFromJSON(cf, options);
     assert(c, 'No config returned from create');
     commonVerifyValid(c, cf);
 
     c.should.have.property('ADDED_IN_PROCESSOR', 'hello');
+    c.should.have.property('over1', '1');
   });
 }); // describe 5
 

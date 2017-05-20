@@ -15,14 +15,16 @@ const yaml = require('js-yaml');
 /**
  * Read the passed in file, look for the configurtation named service, optionally verify it
  * then create JSON config
- * @_file path to file
- * @serviceName service name in file
- * @verifier - optional verifier function to use to check file, should assert if an issue
- *             function(configJSON)
- * @processor - optional processor that can process the input config and add values to output config if needed
- *              function(inputConfig, outputConfig)
+ * @param _file path to file
+ * @param serviceName service name in file
+ * @param options
+ *   overrides - optiomnal overrides that may want to pass into verifier of processor
+ *   verifier - optional verifier function to use to check file, should assert if an issue
+ *             function(configJSON, options)
+ *   processor - optional processor that can process the input config and add values to output config if needed
+ *              function(inputConfig, outputConfig, options)
  */
-function createFromFile(_file, serviceName, verifier, processor) {
+function createFromFile(_file, serviceName, options) {
   'use strict';
 
   let file = _file;
@@ -34,13 +36,13 @@ function createFromFile(_file, serviceName, verifier, processor) {
 
   let configFile = fs.readFileSync(file).toString();
 
-  return createFromYAML(configFile, serviceName, verifier, processor);
+  return createFromYAML(configFile, serviceName, options);
 }
 
 //
 // Create from a YAML file.  See example.config.yaml for what can be passed
 //
-function createFromYAML(yamlConfig, serviceName, verifier, processor) {
+function createFromYAML(yamlConfig, serviceName, options) {
   'use strict';
   assert(yamlConfig, 'no yamlConfig parameter passed in');
   assert(serviceName, 'no serviceName parameter passed in');
@@ -50,21 +52,19 @@ function createFromYAML(yamlConfig, serviceName, verifier, processor) {
   let serviceConfig = config[serviceName];
   assert(serviceConfig, util.format('No service config for service:%s: in config:%j', serviceName, config));
 
-  return createFromJSON(serviceConfig, verifier, processor);
+  return createFromJSON(serviceConfig, options);
 }
 
 //
 // Create from a JSON version of the YAML config file
 // @param config the config file contents, json
-// @param verifier an optional verifier function(config) that will be called to check
-//        if contents are as expected, if not passed then default one is
-//        used. verifier throws an assert if an issue.
+// @param options - see file
 //
-function createFromJSON(config, verifier, processor) {
+function createFromJSON(config, options) {
   'use strict';
 
-  if (verifier) {
-    verifier(config);
+  if ((options) && (options.verifier)) {
+    options.verifier(config, options);
   } else {
     configFileVerifier(config);
   }
@@ -294,8 +294,8 @@ function createFromJSON(config, verifier, processor) {
   // If a passed in additional processor then call so can process input
   // config and add to output config
   //
-  if (processor) {
-    processor(config, c);
+  if ((options) && (options.processor)) {
+    options.processor(config, c, options);
   }
 
   return c;
