@@ -43,14 +43,18 @@ gulp.task('pp', ['jshint', 'jscs', 'buddyjs']);
 
 gulp.task('pre-test', function () {
   return gulp.src(SOURCE_CODE)
-    .pipe(istanbul())
+    .pipe(istanbul({
+      includeUntested: true,
+    }))
     .pipe(istanbul.hookRequire());
 });
 
 gulp.task('test', ['pre-test', 'pp'], function () {
   return gulp.src(TESTS)
     .pipe(mocha({ grep: yargs.argv.grep }))
-    .pipe(istanbul.writeReports())
+    .pipe(istanbul.writeReports({
+      dir: './coverage',
+    }))
     .pipe(istanbul.enforceThresholds({ thresholds: { statements: 80, lines: 80, functions: 80, branches: 40 } }));
 });
 
