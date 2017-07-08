@@ -19,6 +19,10 @@ function createCanonConfigFile() {
         certificate_file: '../test/test-data/fake_file',
         private_key_file: '../test/test-data/fake_file1',
       },
+      internal_api_key: {
+        enabled: true,
+        key: '666'
+      },
       jwt: {
         signer: {
           alg: 'RS256',
@@ -50,6 +54,7 @@ describe('1 use in-memory JSON', function () {
     assert(c, 'No config returned from create');
     commonVerifyValid(c, cf);
     commonVerifyJWTValid(c, cf);
+    verifyInternalAPIKey(c, cf);
   });
 }); // describe 1
 
@@ -183,4 +188,18 @@ function commonVerifyJWTValid(c, cf) {
   c.crypto.jwt.should.have.property('privateKey', '1\n');
   c.crypto.jwt.should.have.property('secret', 'yes');
   c.should.have.property('VERIFY_JWT', true);
+}
+
+/**
+ * @param c - the output config
+ * @param cf input config file in JSON format
+ */
+function verifyInternalAPIKey(c, cf) {
+  'use strict';
+
+  assert(c, 'No config returned from create');
+
+  c.should.have.property('internal_api_key');
+  c.internal_api_key.should.have.property('enabled', true);
+  c.internal_api_key.should.have.property('key', cf.internal_api_key.key);
 }

@@ -17,6 +17,10 @@ function verify(config) {
     assert(config.terminate_tls.private_key_file, util.format('No config.terminate_tls.private_key_file property cannot configure:%j', config));
   }
 
+  if ((config.internal_api_key) && (config.internal_api_key.enabled)) {
+    assert(config.internal_api_key.key, util.format('No config.config.internal_api_key.key property cannot configure:%j', config));
+  }
+
   if (config.jwt) {
     // Ensure the jwt configuration
     assert(config.jwt, util.format('No config.jwt property cannot configure signing and verifying JWTs:%j', config));
