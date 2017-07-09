@@ -195,6 +195,11 @@ function createFromJSON(config, options) {
     c.internal_api_key.enabled = config.internal_api_key.enabled;
     c.internal_api_key.key = config.internal_api_key.key;
 
+    // can override the config KEY with environment var
+    if (process.env.INTERNAL_API_KEY) {
+      c.internal_api_key.key = process.env.INTERNAL_API_KEY;
+    }
+
     if (config.internal_api_key.name) {
       c.internal_api_key.name = config.internal_api_key.name;
     }
