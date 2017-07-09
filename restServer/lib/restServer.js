@@ -152,8 +152,19 @@ function createRestService(props) {
         if (req.headers[internalApiKeyName] === internalApiKey) {
           return HttpStatus.OK;
         } else {
+          logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Internal-API-Key-Check-Result-FORBIDDEN-NAME-OR-KEY-WRONG',
+                    internalApiKey: internalApiKey, internalApiKeyName: internalApiKeyName,
+                    headers: req.headers, }, loggingMD);
+
           return HttpStatus.FORBIDDEN;
         }
+      } else {
+
+        logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Internal-API-Key-Check-Result-FORBIDDEN-NO-HEADERS',
+                  internalApiKey: internalApiKey, internalApiKeyName: internalApiKeyName,
+                  headers: req.headers, }, loggingMD);
+
+        return HttpStatus.FORBIDDEN;
       }
     } else {
       return HttpStatus.OK;
