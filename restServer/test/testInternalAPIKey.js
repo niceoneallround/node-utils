@@ -7,6 +7,8 @@ const restServiceFactory = require('../lib/restServer');
 const should = require('should');
 const util = require('util');
 
+const RestServerConstants = require('../lib/constants');
+
 describe('RestServer Internal API KEY Tests', function () {
   'use strict';
 
@@ -89,13 +91,13 @@ describe('RestServer Internal API KEY Tests', function () {
 
     restService6.registerGETHandler('/path_12', handler12);
 
+    let headers = {};
+    headers[RestServerConstants.INTERNAL_API_KEY_DEFAULT_NAME] = API_KEY;
     request(
       { method: 'GET',
         uri: uri,
         json: true,
-        headers: {
-          'x-webshield-io-internal-api-key': API_KEY,
-        }
+        headers: headers,
       },
       function (err, res, body) {
         assert(!err, util.format('should not have been an error:%s', err));

@@ -12,7 +12,7 @@ const HttpStatus = require('http-status');
 const restify = require('restify');
 const util = require('util');
 
-const INTERNAL_API_KEY_DEFAULT_NAME = 'x-webshield-io-internal-api-key';
+const RestServerConstants = require('./constants');
 
 //
 // create a service - non blocking
@@ -131,8 +131,8 @@ function createRestService(props) {
   // setup state for internal API key
 
   let internalApiKey = null;
-  let internalApiKeyName = INTERNAL_API_KEY_DEFAULT_NAME;
-  if ((props.config.internal_api_key)  && (props.config.internal_api_key.enabled)) {
+  let internalApiKeyName = RestServerConstants.INTERNAL_API_KEY_DEFAULT_NAME;
+  if ((props.config) && (props.config.internal_api_key)  && (props.config.internal_api_key.enabled)) {
     internalApiKey = props.config.internal_api_key.key;
     if (props.config.internal_api_key.name) {
       internalApiKeyName = props.config.internal_api_key.name;
