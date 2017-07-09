@@ -12,6 +12,8 @@ const HttpStatus = require('http-status');
 const restify = require('restify');
 const util = require('util');
 
+const INTERNAL_API_KEY_DEFAULT_NAME = 'x-webshield-io-internal-api-key';
+
 //
 // create a service - non blocking
 // props.name - the service name
@@ -136,36 +138,28 @@ function createRestService(props) {
   restifyServer.use(restify.bodyParser());
   restifyServer.use(restify.queryParser());
 
-  //
-  // Check if any of the internal API key are enabled - these are controlled by
-  // - INTERNAL_API_KEY_NAME the header field name
-  // - INTERNAL_API_KEY the api key
-  // - INTERNAL_API_KEY_ENABLED 1 or 0
-  //
-  let internalApiKey = { enabled: process.env.INTERNAL_API_KEY_ENABLED, };
-  if ((internalApiKey.enabled) && (internalApiKey.enabled === '1')) {
-    internalApiKey.key = process.env.INTERNAL_API_KEY;
-    internalApiKey.name = process.env.INTERNAL_API_KEY_NAME;
-    if (!internalApiKey.name) {
-      internalApiKey.name = 'x-pn-hard-coded-api-key';
+  // setup state for internal API key
+
+  let internalApiKey = null;
+  let internalApiKeyName = INTERNAL_API_KEY_DEFAULT_NAME;
+  if ((props.internal_api_key)  && (props.internal_api_key.enabled)) {
+    internalApiKey = props.internal_api_key.key;
+    if (props.internal_api_key.name) {
+      internalApiKeyName = props.internal_api_key.name;
     }
 
-    logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Internal-API-Key-Enabled',
-          internalApiKey: internalApiKey }, loggingMD);
+    logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Internal-API-Key-ENABLED',
+          internalApiKey: internalApiKey, internalApiKeyName: internalApiKeyName, }, loggingMD);
   } else {
-    if (props.internalApiKey) {
-      internalApiKey = props.internalApiKey;
 
-      logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Internal-API-Key-Enabled-Via-Props-Override',
-            internalApiKey: internalApiKey }, loggingMD);
-    }
+    logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Internal-API-Key-DISABLED', }, loggingMD);
   }
 
   // check API key if all good continue with next otherwise return forbidden
   function checkInternalApiKey(req) {
-    if ((internalApiKey.enabled) && (internalApiKey.enabled === '1')) {
+    if (internalApiKey) {
       if (req.headers) {
-        if (req.headers[internalApiKey.name] === internalApiKey.key) {
+        if (req.headers[internalApiKeyName] === internalApiKey) {
           return HttpStatus.OK;
         } else {
           return HttpStatus.FORBIDDEN;

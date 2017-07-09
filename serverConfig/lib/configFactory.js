@@ -190,10 +190,6 @@ function createFromJSON(config, options) {
     c.api_gateway.webshield_api_key = c.WEBSHIELD_API_KEY;
   }
 
-  //
-  // An internal API key can be setup, this is used to check all incomming
-  // requests, just an extra level of protection kind of like 2-factor
-  //
   if (config.internal_api_key) {
     c.internal_api_key = {};
     c.internal_api_key.enabled = config.internal_api_key.enabled;
