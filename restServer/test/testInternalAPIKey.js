@@ -21,10 +21,15 @@ describe('RestServer Internal API KEY Tests', function () {
   props.logger = loggerFactory.create(null);
 
   before(function (done) {
+
     // setup the api key
-    props.internal_api_key = {};
-    props.internal_api_key.enabled = '1';
-    props.internal_api_key.key = API_KEY;
+    props.config = {
+      internal_api_key: {
+        enabled: true,
+        key: API_KEY,
+      }
+    };
+
     restService6 = restServiceFactory.create(props);
 
     restService6.start(function (err) {

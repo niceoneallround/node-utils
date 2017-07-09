@@ -23,18 +23,8 @@ const INTERNAL_API_KEY_DEFAULT_NAME = 'x-webshield-io-internal-api-key';
 // props.serviceVersionNumber - optional if exists added to status message
 //      on '/' - not used for url versioning
 //
-// Internal API controls - if enabled each GET or POST must contain the header key and api key
-// props.internalAPIKey.enabled - '1' or 'O'
-//  - can be overridden by process.env.INTERNAL_API_KEY_ENABLED
-// props.internalAPIKey.name - the name of header property, if not supplied default is 'x-pn-hard-coded-api-key'
-//  - can be overriden by process.env.INTERNAL_API_KEY_NAME
-// props.internalAPIKey.key - the api key value
-//  - can be override by process.env.INTERNAL_API_KEY
-//
-// TLS controls
-// Can be turned off with process.env.TLS_DISABLED: '1' - by default enabled
-// props.certficate: the file holding the certificate
-// props.key: the file holding the key
+// props.config - CAN HOLD THE CONFIG USE THIS MOVING FORWARD DO NOT ADD ANY
+// NEW PROPS THAT ARE IN CONFIG
 //
 
 function createRestService(props) {
@@ -142,10 +132,10 @@ function createRestService(props) {
 
   let internalApiKey = null;
   let internalApiKeyName = INTERNAL_API_KEY_DEFAULT_NAME;
-  if ((props.internal_api_key)  && (props.internal_api_key.enabled)) {
-    internalApiKey = props.internal_api_key.key;
-    if (props.internal_api_key.name) {
-      internalApiKeyName = props.internal_api_key.name;
+  if ((props.config.internal_api_key)  && (props.config.internal_api_key.enabled)) {
+    internalApiKey = props.config.internal_api_key.key;
+    if (props.config.internal_api_key.name) {
+      internalApiKeyName = props.config.internal_api_key.name;
     }
 
     logger.logJSON('info', { serviceType: serviceName, action: 'RestServer-Internal-API-Key-ENABLED',
