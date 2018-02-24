@@ -12,7 +12,7 @@
 
 # use slim version has having issues with space on AWS
 # https://hub.docker.com/_/node/
-FROM node:7.9-alpine
+FROM node:9-alpine
 
 # make sure that apt is up to date SLIM COMMANDS
 #RUN apt-get update
